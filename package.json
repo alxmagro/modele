@@ -1,0 +1,22 @@
+{
+  "name": "Modele",
+  "description": "Business layer with Model and API, for Javascript",
+  "private": false,
+  "author": "Alexandre Magro <alexandremagro@live.com>",
+  "version": "0.1.0",
+  "repository": "git@github.com:alexandremagro/modele.git",
+  "homepage": "https://github.com/alexandremagro/modele#readme",
+  "scripts": {
+    "start": "brunch watch --server",
+    "build": "brunch build --production"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "auto-reload-brunch": "^2",
+    "babel-brunch": "~6.0",
+    "babel-preset-latest": "^6",
+    "brunch": "^2",
+    "clean-css-brunch": "^2",
+    "uglify-js-brunch": "^2"
+  }
+}
