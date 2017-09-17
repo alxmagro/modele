@@ -7,7 +7,6 @@
   "repository": "git@github.com:alexandremagro/modele.git",
   "homepage": "https://github.com/alexandremagro/modele#readme",
   "scripts": {
-    "start": "brunch watch --server",
     "build": "brunch build --production"
   },
   "dependencies": {},
