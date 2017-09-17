@@ -8,6 +8,7 @@
   "homepage": "https://github.com/alexandremagro/modele#readme",
   "scripts": {
     "lint": "eslint src",
+    "test": "jasmine",
     "build": "brunch build --production"
   },
   "dependencies": {},
@@ -19,6 +20,7 @@
     "clean-css-brunch": "^2",
     "eslint": "^4.7.0",
     "eslint-config-equimper": "^2.2.1",
+    "jasmine": "^2.8.0",
     "uglify-js-brunch": "^2"
   }
 }
