@@ -2,7 +2,7 @@
 exports.files = {
   javascripts: {
     joinTo: {
-      'modele.js': /^src/
+      'modele.js': /^src|^node_modules/
     }
   }
 }

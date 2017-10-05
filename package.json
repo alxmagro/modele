@@ -7,20 +7,32 @@
   "repository": "git@github.com:alexandremagro/modele.git",
   "homepage": "https://github.com/alexandremagro/modele#readme",
   "scripts": {
-    "lint": "eslint src",
-    "test": "jasmine",
+    "lint": "eslint .",
+    "test": "mocha",
     "build": "brunch build --production"
   },
-  "dependencies": {},
+  "dependencies": {
+    "error-ex": "^1.3.1",
+    "fetch-ponyfill": "^4.1.0",
+    "lodash": "^4.17.4",
+    "url-pattern": "^1.0.3"
+  },
   "devDependencies": {
     "auto-reload-brunch": "^2",
     "babel-brunch": "~6.0",
+    "babel-cli": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1",
     "babel-preset-latest": "^6",
+    "body-parser": "^1.18.2",
     "brunch": "^2",
+    "chai": "^4.1.2",
     "clean-css-brunch": "^2",
-    "eslint": "^4.7.0",
-    "eslint-config-equimper": "^2.2.1",
-    "jasmine": "^2.8.0",
-    "uglify-js-brunch": "^2"
+    "eslint": "^4.8.0",
+    "eslint-plugin-html": "^3.2.2",
+    "eslint-plugin-vue-libs": "^1.2.1",
+    "express": "^4.15.4",
+    "mocha": "^3.5.3",
+    "uglify-js-brunch": "^2",
+    "uuid": "^3.1.0"
   }
 }

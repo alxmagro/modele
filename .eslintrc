@@ -1,6 +1,9 @@
 {
-  "extends": "equimper",
+  "extends": ["plugin:vue-libs/recommended"],
+  "env": {
+    "node": true,
+    "mocha": true
+  },
   "rules": {
-  	semi: [2, "never"]
   }
 }
