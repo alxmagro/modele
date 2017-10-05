@@ -4,8 +4,21 @@
   "private": false,
   "author": "Alexandre Magro <alexandremagro@live.com>",
   "version": "0.1.0",
-  "repository": "git@github.com:alexandremagro/modele.git",
+  "main": "dist/modele.js",
   "homepage": "https://github.com/alexandremagro/modele#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/alexandremagro/modele.git"
+  },
+  "bugs": {
+    "url": "https://github.com/alexandremagro/modele/issues"
+  },
+  "keywords": [
+    "resources",
+    "model",
+    "validations",
+    "api"
+  ],
   "scripts": {
     "lint": "eslint src test",
     "test": "mocha",
