@@ -3,7 +3,7 @@
   "description": "Business layer with Model and API, for Javascript",
   "private": false,
   "author": "Alexandre Magro <alexandremagro@live.com>",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "main": "dist/modele.js",
   "homepage": "https://github.com/alexandremagro/modele#readme",
   "repository": {
@@ -22,7 +22,7 @@
   "scripts": {
     "lint": "eslint src test",
     "test": "mocha",
-    "build": "brunch build --production"
+    "build": "webpack"
   },
   "dependencies": {
     "fetch-ponyfill": "^4.1.0",
@@ -30,21 +30,18 @@
     "url-pattern": "^1.0.3"
   },
   "devDependencies": {
-    "auto-reload-brunch": "^2",
-    "babel-brunch": "~6.0",
-    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
     "babel-preset-es2015": "^6.24.1",
-    "babel-preset-latest": "^6",
     "body-parser": "^1.18.2",
-    "brunch": "^2",
     "chai": "^4.1.2",
-    "clean-css-brunch": "^2",
     "eslint": "^4.8.0",
     "eslint-plugin-html": "^3.2.2",
     "eslint-plugin-vue-libs": "^1.2.1",
     "express": "^4.15.4",
     "mocha": "^3.5.3",
-    "uglify-js-brunch": "^2",
-    "uuid": "^3.1.0"
+    "uglifyjs-webpack-plugin": "^0.4.6",
+    "uuid": "^3.1.0",
+    "webpack": "^3.6.0"
   }
 }
