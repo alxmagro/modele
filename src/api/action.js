@@ -1,9 +1,9 @@
-import fetchPonyfill from 'fetch-ponyfill'
+/* global fetch, Request */
+
 import UrlPattern from 'url-pattern'
+import 'isomorphic-fetch'
 
 import Scope from './scope'
-
-const { fetch, Request } = fetchPonyfill('XMLHttpRequest')
 
 const URL_PATTERN_OPTS = {
   segmentNameCharset: 'a-zA-Z0-9_-'
