@@ -82,7 +82,7 @@ user.errors
 // => { ... }
 ```
 
-Validators will return an object with a code, and variables, and not a simple english message. You should use it to create your own errors messages, this will make easier build Internationalizations Views. You will find message examples in [/bin/i18n-examples.js](alexandremagro/modele/blob/master/bin/i18n-example.js).
+Validators will return an object with a code, and variables, and not a simple english message. You should use it to create your own errors messages, this will make easier build Internationalizations Views. You will find message examples in [/bin/i18n-examples.js](/alexandremagro/modele/blob/master/bin/i18n-example.js).
 
 ## And more...
 
@@ -92,7 +92,7 @@ This Readme and Documentarion is under construction :(
 
 ### Bug Reports & Feature Requests
 
-Please use the [issue tracker](alexandremagro/modele/issues) to report any bugs or file feature requests.
+Please use the [issue tracker](/alexandremagro/modele/issues) to report any bugs or file feature requests.
 
 ### Developing
 
