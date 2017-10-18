@@ -63,13 +63,16 @@ const UserModel = new Modele({
 })
 ```
 
-*Every Model has two Validators, onCreate and OnUpdate, onSave will perform in both of them*
+*Each Model has two validators, onCreate and OnUpdate, Use onSave to perform in both of them*
 
 Validations are not called automatically by API, instead you should use:
 
 ```js
 UserModel.creatable({ name: 'Yoda' })
+// => { ... }
+
 UserModele.updatable({ name: 'Yoda' })
+// => { ... }
 
 // You can use sugar method `valid`, If an instance has an ID, it will call `updatable`, otherwise, `creatable`, returning boolean and storing errors in `errors`
 
@@ -82,11 +85,11 @@ user.errors
 // => { ... }
 ```
 
-Validators will return an object with a code, and variables, and not a simple english message. You should use it to create your own errors messages, this will make easier build Internationalizations Views. You will find message examples in [/bin/i18n-examples.js](https://github.com/alexandremagro/modele/blob/master/bin/i18n-example.js).
+Validators will return an Error object, not a simple english message. You should use it to create your own errors messages, this will make easier build Internationalizations Views. You will find message examples in [i18n-examples.js](https://github.com/alexandremagro/modele/blob/master/bin/i18n-example.js).
 
 ## And more...
 
-This Readme and Documentarion is under construction :(
+Visit the [Wiki](https://github.com/alexandremagro/modele/wiki) to learn more.
 
 ## Contribution
 
