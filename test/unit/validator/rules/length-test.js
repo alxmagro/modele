@@ -1,100 +1,124 @@
 import { expect } from 'chai'
 import Length from '../../../../src/validator/rules/length'
+import Errors from '../../../../src/validator/errors'
 
 describe('Length', function () {
+  var errors
+
+  beforeEach(function () {
+    errors = new Errors()
+  })
+
   describe('.perform', function () {
     context('when "is" option is supplied', function () {
       var validator = new Length({ is: 4 })
 
-      it('return nothing if value length === expected', function () {
+      it('add nothing if value length === expected', function () {
         const record = { name: 'Luke' }
-        const report = validator.validate(record, 'name')
 
-        expect(report).to.deep.equal([])
+        validator.perform(record, 'name', errors)
+
+        expect(errors.any()).to.be.false
       })
 
-      it('return error if value length !== expected', function () {
+      it('add error if value length !== expected', function () {
         const record = { name: 'Anakin' }
-        const report = validator.validate(record, 'name')
 
-        expect(report).to.deep.equal([
-          {
-            message: 'wrong_length',
-            vars: {
-              prop: 'name',
-              expected: 4,
-              value: 'Anakin'
+        validator.perform(record, 'name', errors)
+
+        expect(errors.all()).to.deep.equal({
+          name: [
+            {
+              error: 'wrong_length',
+              ctx: {
+                record: record,
+                prop: 'name',
+                expected: 4,
+                value: 'Anakin'
+              }
             }
-          }
-        ])
+          ]
+        })
       })
     })
 
     context('when "min" option is supplied', function () {
       var validator = new Length({ min: 4 })
 
-      it('return nothing if value length > expected', function () {
+      it('add nothing if value length > expected', function () {
         const record = { name: 'Anakin' }
-        const report = validator.validate(record, 'name')
 
-        expect(report).to.deep.equal([])
+        validator.perform(record, 'name', errors)
+
+        expect(errors.any()).to.be.false
       })
 
-      it('return nothing if value length == expected', function () {
+      it('add nothing if value length == expected', function () {
         const record = { name: 'Luke' }
-        const report = validator.validate(record, 'name')
 
-        expect(report).to.deep.equal([])
+        validator.perform(record, 'name', errors)
+
+        expect(errors.any()).to.be.false
       })
 
-      it('return error if value length < than expected', function () {
+      it('add error if value length < than expected', function () {
         const record = { name: 'Rey' }
-        const report = validator.validate(record, 'name')
 
-        expect(report).to.deep.equal([
-          {
-            message: 'too_short',
-            vars: {
-              prop: 'name',
-              expected: 4,
-              value: 'Rey'
+        validator.perform(record, 'name', errors)
+
+        expect(errors.all()).to.deep.equal({
+          name: [
+            {
+              error: 'too_short',
+              ctx: {
+                record: record,
+                prop: 'name',
+                value: 'Rey',
+                expected: 4
+              }
             }
-          }
-        ])
+          ]
+        })
       })
     })
 
     context('when "max" option is supplied', function () {
       var validator = new Length({ max: 5 })
 
-      it('return nothing if value length < expected', function () {
+      it('add nothing if value length < expected', function () {
         const record = { name: 'Finn' }
-        const report = validator.validate(record, 'name')
 
-        expect(report).to.deep.equal([])
+        validator.validate(record, 'name', errors)
+
+        expect(errors.any()).to.be.false
       })
 
-      it('return nothing if value length == expected', function () {
+      it('add nothing if value length == expected', function () {
         const record = { name: 'Snoke' }
-        const report = validator.validate(record, 'name')
 
-        expect(report).to.deep.equal([])
+        validator.perform(record, 'name', errors)
+
+        expect(errors.any()).to.be.false
       })
 
-      it('return error if value length > expected', function () {
+      it('add error if value length > expected', function () {
         const record = { name: 'Chewbacca' }
-        const report = validator.validate(record, 'name')
 
-        expect(report).to.deep.equal([
-          {
-            message: 'too_long',
-            vars: {
-              prop: 'name',
-              expected: 5,
-              value: 'Chewbacca'
+        validator.perform(record, 'name', errors)
+
+        expect(errors.all()).to.deep.equal({
+          name: [
+            {
+              error: 'too_long',
+              ctx: {
+                record: record,
+                prop: 'name',
+                value: 'Chewbacca',
+                expected: 5
+              }
             }
-          }
-        ])
+          ]
+        })
       })
     })
   })

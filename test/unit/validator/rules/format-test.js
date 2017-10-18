@@ -1,7 +1,14 @@
 import { expect } from 'chai'
 import Format from '../../../../src/validator/rules/format'
+import Errors from '../../../../src/validator/errors'
 
 describe('Format', function () {
+  var errors
+
+  beforeEach(function () {
+    errors = new Errors()
+  })
+
   describe('#constructor', function () {
     it('throw TypeError when both "with" and "without" is supplied', function () {
       const wrong = () => new Format({ with: /^\d+$/, without: /^\d+$/ })
@@ -21,23 +28,30 @@ describe('Format', function () {
       // only numbers
       const validator = new Format({ with: /^\d+$/ })
 
-      it('return nothing if value matches', function () {
+      it('add nothing if value matches', function () {
         const record = { year: '1991' }
-        const report = validator.validate(record, 'year')
 
-        expect(report).to.be.undefined
+        validator.perform(record, 'year', errors)
+
+        expect(errors.any()).to.be.false
       })
 
-      it('return errors if value doesnt matches', function () {
+      it('add errors if value doesnt matches', function () {
         const record = { year: '1991a' }
-        const report = validator.validate(record, 'year')
 
-        expect(report).to.deep.equal({
-          message: 'format',
-          vars: {
-            prop: 'year',
-            value: '1991a'
-          }
+        validator.perform(record, 'year', errors)
+
+        expect(errors.all()).to.deep.equal({
+          year: [
+            {
+              error: 'format',
+              ctx: {
+                record: record,
+                prop: 'year',
+                value: '1991a'
+              }
+            }
+          ]
         })
       })
     })
@@ -48,21 +62,28 @@ describe('Format', function () {
 
       it('return nothing if value doesnt matches', function () {
         const record = { username: 'luke' }
-        const report = validator.validate(record, 'username')
 
-        expect(report).to.be.undefined
+        validator.perform(record, 'username', errors)
+
+        expect(errors.any()).to.be.false
       })
 
       it('return errors if value matches', function () {
         const record = { username: '1991' }
-        const report = validator.validate(record, 'username')
 
-        expect(report).to.deep.equal({
-          message: 'format',
-          vars: {
-            prop: 'username',
-            value: '1991'
-          }
+        validator.perform(record, 'username', errors)
+
+        expect(errors.all()).to.deep.equal({
+          username: [
+            {
+              error: 'format',
+              ctx: {
+                record: record,
+                prop: 'username',
+                value: '1991'
+              }
+            }
+          ]
         })
       })
     })

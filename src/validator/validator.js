@@ -1,5 +1,3 @@
-import _ from 'lodash'
-
 import absence from './rules/absence'
 import acceptance from './rules/acceptance'
 import confirmation from './rules/confirmation'
@@ -8,6 +6,8 @@ import format from './rules/format'
 import inclusion from './rules/inclusion'
 import length from './rules/length'
 import presence from './rules/presence'
+
+import Errors from './errors'
 
 const DEFAULTS = {
   absence,
@@ -46,18 +46,22 @@ export default class Validator {
   }
 
   validate (record, prop) {
-    const errors = _.map(this.rules[prop], rule => {
-      return rule.validate(record, prop)
+    const errors = new Errors()
+
+    this.rules[prop].forEach(rule => {
+      errors.merge(rule.validate(record, prop))
     })
 
-    return _.flatten(_.compact(errors))
+    return errors
   }
 
   validateAll (record) {
-    const errors = Object.keys(this.rules).map(prop => {
-      return this.validate(record, prop)
+    const errors = new Errors()
+
+    Object.keys(this.rules).forEach(prop => {
+      errors.merge(this.validate(record, prop))
     })
 
-    return _.chain(errors).flatten().groupBy('vars.prop').value()
+    return errors
   }
 }

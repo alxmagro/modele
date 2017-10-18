@@ -1,7 +1,14 @@
 import { expect } from 'chai'
 import Inclusion from '../../../../src/validator/rules/inclusion'
+import Errors from '../../../../src/validator/errors'
 
 describe('Inclusion', function () {
+  var errors
+
+  beforeEach(function () {
+    errors = new Errors()
+  })
+
   describe('#constructor', function () {
     it('throw TypeError when "in" options isnt supplied', function () {
       const wrong = () => new Inclusion()
@@ -16,24 +23,31 @@ describe('Inclusion', function () {
         in: ['www', 'us', 'ca', 'jp']
       })
 
-      it('return nothing when "in" list includes value', function () {
+      it('add nothing when record property is included', function () {
         const record = { subdomain: 'us' }
-        const report = validator.validate(record, 'subdomain')
 
-        expect(report).to.be.undefined
+        validator.perform(record, 'subdomain', errors)
+
+        expect(errors.any()).to.be.false
       })
 
-      it('return error when "in" list not includes value', function () {
+      it('add error when record property is not included', function () {
         const record = { subdomain: 'br' }
-        const report = validator.validate(record, 'subdomain')
 
-        expect(report).to.deep.equal({
-          message: 'inclusion',
-          vars: {
-            prop: 'subdomain',
-            value: 'br',
-            list: ['www', 'us', 'ca', 'jp']
-          }
+        validator.perform(record, 'subdomain', errors)
+
+        expect(errors.all()).to.deep.equal({
+          subdomain: [
+            {
+              error: 'inclusion',
+              ctx: {
+                record: record,
+                prop: 'subdomain',
+                value: 'br',
+                list: ['www', 'us', 'ca', 'jp']
+              }
+            }
+          ]
         })
       })
     })
@@ -43,24 +57,31 @@ describe('Inclusion', function () {
         in: () => ['www', 'us', 'ca', 'jp']
       })
 
-      it('return nothing when "in" list includes value', function () {
+      it('add nothing when "in" list includes value', function () {
         const record = { subdomain: 'www' }
-        const report = validator.validate(record, 'subdomain')
 
-        expect(report).to.be.undefined
+        validator.perform(record, 'subdomain', errors)
+
+        expect(errors.any()).to.be.false
       })
 
-      it('return error when "in" list not includes value', function () {
+      it('add error when "in" list not includes value', function () {
         const record = { subdomain: 'br' }
-        const report = validator.validate(record, 'subdomain')
 
-        expect(report).to.deep.equal({
-          message: 'inclusion',
-          vars: {
-            prop: 'subdomain',
-            value: 'br',
-            list: ['www', 'us', 'ca', 'jp']
-          }
+        validator.perform(record, 'subdomain', errors)
+
+        expect(errors.all()).to.deep.equal({
+          subdomain: [
+            {
+              error: 'inclusion',
+              ctx: {
+                record: record,
+                prop: 'subdomain',
+                value: 'br',
+                list: ['www', 'us', 'ca', 'jp']
+              }
+            }
+          ]
         })
       })
     })

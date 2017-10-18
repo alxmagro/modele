@@ -12,13 +12,14 @@ export default class Exclusion extends Base {
     this.list = opts.in
   }
 
-  perform (record, prop) {
+  perform (record, prop, errors) {
     const value = record[prop]
     const list = this.solvedList(record)
 
     if (list.includes(value)) {
-      return this.errorMessage('exclusion', record, prop, {
-        list: list
+      errors.add(prop, {
+        error: 'exclusion',
+        ctx: { record, prop, value, list }
       })
     }
   }

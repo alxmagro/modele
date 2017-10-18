@@ -5,11 +5,14 @@ export default class Presence extends Base {
     super(opts)
   }
 
-  perform (record, prop) {
+  perform (record, prop, errors) {
     const value = record[prop]
 
     if (this.constructor.isBlank(value)) {
-      return this.errorMessage('blank', record, prop)
+      errors.add(prop, {
+        error: 'blank',
+        ctx: { record, prop, value }
+      })
     }
   }
 }

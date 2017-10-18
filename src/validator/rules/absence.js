@@ -5,11 +5,14 @@ export default class Absence extends Base {
     super(opts)
   }
 
-  perform (record, prop) {
+  perform (record, prop, errors) {
     const value = record[prop]
 
     if (this.constructor.isPresent(value)) {
-      return this.errorMessage('present', record, prop)
+      errors.add(prop, {
+        error: 'present',
+        ctx: { record, prop, value }
+      })
     }
   }
 }

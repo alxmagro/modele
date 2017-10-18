@@ -17,13 +17,14 @@ export default class Acceptance extends Base {
     this.accept = opts.accept
   }
 
-  perform (record, prop) {
+  perform (record, prop, errors) {
     const value = record[prop]
     const acceptable = _.castArray(this.accept).includes(value)
 
     if (!acceptable) {
-      return this.errorMessage('accepted', record, prop, {
-        accept: this.accept
+      errors.add(prop, {
+        error: 'accepted',
+        ctx: { record, prop, value, accept: this.accept }
       })
     }
   }

@@ -34,9 +34,8 @@ export default class Length extends Base {
     this.max = opts.max
   }
 
-  perform (record, prop) {
+  perform (record, prop, errors) {
     const value = record[prop]
-    const errors = []
 
     for (const name in PREDICATES) {
       const expected = this[name]
@@ -45,14 +44,11 @@ export default class Length extends Base {
       if (!expected) continue
 
       if (PREDICATES[name](input.length, expected) === false) {
-        const error = this.errorMessage(MESSAGES[name], record, prop, {
-          expected: expected
+        errors.add(prop, {
+          error: MESSAGES[name],
+          ctx: { record, prop, value, expected }
         })
-
-        errors.push(error)
       }
     }
-
-    return errors
   }
 }

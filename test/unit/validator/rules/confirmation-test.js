@@ -1,9 +1,15 @@
 import { expect } from 'chai'
 import Confirmation from '../../../../src/validator/rules/confirmation'
+import Errors from '../../../../src/validator/errors'
 
 describe('Confirmation', function () {
   describe('.perform', function () {
     var validator = new Confirmation({ with: 'confirmation' })
+    var errors
+
+    beforeEach(function () {
+      errors = new Errors()
+    })
 
     it('throw type error if "with" isnt supplied', function () {
       const wrong = () => new Confirmation()
@@ -11,44 +17,56 @@ describe('Confirmation', function () {
       expect(wrong).to.throw(TypeError)
     })
 
-    it('return error if prop and confirmation doesnt match', function () {
+    it('add error if prop and confirmation doesnt match', function () {
       const record = { password: 'mypass', confirmation: 'mypss' }
-      const report = validator.perform(record, 'password')
 
-      expect(report).to.deep.equal({
-        message: 'confirmation',
-        vars: {
-          prop: 'confirmation',
-          referred: 'password',
-          value: 'mypss'
-        }
+      validator.perform(record, 'password', errors)
+
+      expect(errors.all()).to.deep.equal({
+        confirmation: [
+          {
+            error: 'confirmation',
+            ctx: {
+              record: record,
+              prop: 'confirmation',
+              value: 'mypss',
+              referred: 'password'
+            }
+          }
+        ]
       })
     })
 
     context('when case sensitive', function () {
-      it('return error if prop and confirmation case doesnt match', function () {
+      it('add error if prop and confirmation case doesnt match', function () {
         const record = { password: 'mypass', confirmation: 'MYPASS' }
-        const report = validator.perform(record, 'password')
 
-        expect(report).to.deep.equal({
-          message: 'confirmation',
-          vars: {
-            prop: 'confirmation',
-            referred: 'password',
-            value: 'MYPASS'
-          }
+        validator.perform(record, 'password', errors)
+
+        expect(errors.all()).to.deep.equal({
+          confirmation: [
+            {
+              error: 'confirmation',
+              ctx: {
+                record: record,
+                prop: 'confirmation',
+                value: 'MYPASS',
+                referred: 'password'
+              }
+            }
+          ]
         })
       })
     })
 
     context('when case insensitive', function () {
-      it('return nothing if prop and confirmation match but no case', function () {
-        validator.caseSensitive = false
-
+      it('add nothing if prop and confirmation match but no case', function () {
         const record = { password: 'mypass', confirmation: 'MYPASS' }
-        const report = validator.perform(record, 'password')
 
-        expect(report).to.be.undefined
+        validator.caseSensitive = false
+        validator.perform(record, 'password', errors)
+
+        expect(errors.any()).to.be.false
       })
     })
   })

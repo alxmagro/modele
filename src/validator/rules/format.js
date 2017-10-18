@@ -16,9 +16,12 @@ export default class Exclusion extends Base {
     this.without = opts.without
   }
 
-  perform (record, prop) {
+  perform (record, prop, errors) {
     if (!this.match(record, prop)) {
-      return this.errorMessage('format', record, prop)
+      errors.add(prop, {
+        error: 'format',
+        ctx: { record, prop, value: record[prop] }
+      })
     }
   }
 

@@ -21,14 +21,20 @@ export default class Confirmation extends Base {
     this.confirmation = opts.with
   }
 
-  perform (record, prop) {
+  perform (record, prop, errors) {
     const value = record[prop]
     const confirmation = this.confirmation
     const confirmed = this.isEqual(value, record[confirmation])
 
     if (!confirmed) {
-      return this.errorMessage('confirmation', record, confirmation, {
-        referred: prop
+      errors.add(confirmation, {
+        error: 'confirmation',
+        ctx: {
+          record,
+          prop: confirmation,
+          value: record[confirmation],
+          referred: prop
+        }
       })
     }
   }

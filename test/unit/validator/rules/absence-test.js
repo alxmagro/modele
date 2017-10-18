@@ -1,25 +1,41 @@
 import { expect } from 'chai'
 import Absence from '../../../../src/validator/rules/absence'
+import Errors from '../../../../src/validator/errors'
 
 describe('Absence', function () {
   var validator = new Absence()
+  var errors
+
+  beforeEach(function () {
+    errors = new Errors()
+  })
 
   describe('.perform', function () {
-    it('return error if prop is present', function () {
+    it('add error if prop is present', function () {
       const record = { name: 'luke' }
-      const report = validator.perform(record, 'name')
 
-      expect(report).to.deep.equal({
-        message: 'present',
-        vars: { prop: 'name', value: 'luke' }
+      validator.perform(record, 'name', errors)
+
+      expect(errors.all()).to.deep.equal({
+        name: [
+          {
+            error: 'present',
+            ctx: {
+              record: record,
+              prop: 'name',
+              value: 'luke'
+            }
+          }
+        ]
       })
     })
 
-    it('return nothing if prop isnt defined', function () {
+    it('add nothing if prop isnt defined', function () {
       const record = { name: 'luke' }
-      const report = validator.perform(record, 'surname')
 
-      expect(report).to.equal(undefined)
+      validator.perform(record, 'surname', errors)
+
+      expect(errors.any()).to.be.false
     })
   })
 })

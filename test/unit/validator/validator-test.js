@@ -4,6 +4,8 @@ import Validator from '../../../src/validator/validator'
 import Length from '../../../src/validator/rules/length'
 import Presence from '../../../src/validator/rules/presence'
 
+import Errors from '../../../src/validator/errors'
+
 describe('Validator', function () {
   describe('#constructor', function () {
     it('set a default ruleBook', function () {
@@ -77,32 +79,45 @@ describe('Validator', function () {
       record = { name: 'Luke', surname: 'Skywalker' }
     })
 
-    it('return a error list if record is not correct', function () {
+    it('return an instance of Errors', function () {
       validator.addRule('presence', 'username')
       validator.addRule('length', 'username', { min: 5 })
 
       const report = validator.validate(record, 'username')
 
-      expect(report).to.deep.equal([
-        {
-          message: 'blank',
-          vars: {
-            prop: 'username',
-            value: undefined
-          }
-        },
-        {
-          message: 'too_short',
-          vars: {
-            prop: 'username',
-            expected: 5,
-            value: undefined
-          }
-        }
-      ])
+      expect(report).to.be.an.instanceOf(Errors)
     })
 
-    it('return a empty list if record is correct', function () {
+    it('return errors if record is not correct', function () {
+      validator.addRule('presence', 'username')
+      validator.addRule('length', 'username', { min: 5 })
+
+      const report = validator.validate(record, 'username')
+
+      expect(report.all()).to.deep.equal({
+        username: [
+          {
+            error: 'blank',
+            ctx: {
+              record: record,
+              prop: 'username',
+              value: undefined
+            }
+          },
+          {
+            error: 'too_short',
+            ctx: {
+              record: record,
+              prop: 'username',
+              value: undefined,
+              expected: 5
+            }
+          }
+        ]
+      })
+    })
+
+    it('return no error if record is correct', function () {
       record.username = 'lukeskywalker'
 
       validator.addRule('presence', 'username')
@@ -110,14 +125,14 @@ describe('Validator', function () {
 
       const report = validator.validate(record, 'username')
 
-      expect(report).to.deep.equal([])
+      expect(report.any()).to.be.false
     })
   })
 
   describe('.validateAll', function () {
     var validator = new Validator()
 
-    it('return a error list of all props if record is not correct', function () {
+    it('return all props errors if record is not correct', function () {
       const record = { email: 'foo' }
 
       validator.addRule('presence', 'name')
@@ -127,48 +142,52 @@ describe('Validator', function () {
 
       const report = validator.validateAll(record)
 
-      expect(report).to.deep.equal({
+      expect(report.all()).to.deep.equal({
         name: [
           {
-            message: 'blank',
-            vars: {
+            error: 'blank',
+            ctx: {
+              record: record,
               prop: 'name',
               value: undefined
             }
           },
           {
-            message: 'too_short',
-            vars: {
+            error: 'too_short',
+            ctx: {
+              record: record,
               prop: 'name',
-              expected: 3,
-              value: undefined
+              value: undefined,
+              expected: 3
             }
           }
         ],
         confirmation: [
           {
-            message: 'confirmation',
-            vars: {
+            error: 'confirmation',
+            ctx: {
+              record: record,
               prop: 'confirmation',
-              referred: 'email',
-              value: undefined
+              value: undefined,
+              referred: 'email'
             }
           }
         ],
         email: [
           {
-            message: 'too_short',
-            vars: {
+            error: 'too_short',
+            ctx: {
+              record: record,
               prop: 'email',
-              expected: 5,
-              value: 'foo'
+              value: 'foo',
+              expected: 5
             }
           }
         ]
       })
     })
 
-    it('return a empty list if record is correct', function () {
+    it('return no error if record is correct', function () {
       const record = {
         name: 'luke',
         email: 'lukeskywalker@jedi.com',
@@ -182,7 +201,7 @@ describe('Validator', function () {
 
       const report = validator.validateAll(record)
 
-      expect(report).to.deep.equal({})
+      expect(report.any()).to.be.false
     })
   })
 })

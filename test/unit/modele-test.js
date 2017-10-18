@@ -2,6 +2,7 @@ import { expect } from 'chai'
 import FakeServer from '../fake-server'
 import Modele from '../../src/modele'
 import API from '../../src/api/api'
+import Errors from '../../src/validator/errors'
 
 describe('Modele', function () {
   var UserModel, config
@@ -178,30 +179,41 @@ describe('Modele', function () {
   })
 
   describe('.creatable', function () {
-    it('return prop error if prop is suplied', function () {
+    it('return instance of Errors', function () {
+      const record = { name: 'Yoda' }
+      const report = UserModel.creatable(record)
+
+      expect(report).to.be.an.instanceOf(Errors)
+    })
+
+    it('return prop errors if prop is suplied', function () {
       const record = { name: 'Yoda' }
       const report = UserModel.creatable(record, 'password')
 
-      expect(report).to.deep.equal([
-        {
-          message: 'blank',
-          vars: {
-            prop: 'password',
-            value: undefined
+      expect(report.all()).to.deep.equal({
+        password: [
+          {
+            error: 'blank',
+            ctx: {
+              record: record,
+              prop: 'password',
+              value: undefined
+            }
           }
-        }
-      ])
+        ]
+      })
     })
 
     it('return all props if prop isnt suplied', function () {
       const record = { name: 'Yoda' }
       const report = UserModel.creatable(record)
 
-      expect(report).to.deep.equal({
+      expect(report.all()).to.deep.equal({
         password: [
           {
-            message: 'blank',
-            vars: {
+            error: 'blank',
+            ctx: {
+              record: record,
               prop: 'password',
               value: undefined
             }
@@ -209,8 +221,9 @@ describe('Modele', function () {
         ],
         surname: [
           {
-            message: 'blank',
-            vars: {
+            error: 'blank',
+            ctx: {
+              record: record,
               prop: 'surname',
               value: undefined
             }
@@ -221,31 +234,42 @@ describe('Modele', function () {
   })
 
   describe('.updatable', function () {
+    it('return instance of Errors', function () {
+      const record = { name: 'Yoda', password: '123123' }
+      const report = UserModel.updatable(record)
+
+      expect(report).to.be.an.instanceOf(Errors)
+    })
+
     it('return prop error if prop is suplied', function () {
       const record = { name: 'Yoda', password: '123123' }
       const report = UserModel.updatable(record, 'password')
 
-      expect(report).to.deep.equal([
-        {
-          message: 'confirmation',
-          vars: {
-            prop: 'confirmation',
-            referred: 'password',
-            value: undefined
+      expect(report.all()).to.deep.equal({
+        confirmation: [
+          {
+            error: 'confirmation',
+            ctx: {
+              record: record,
+              prop: 'confirmation',
+              referred: 'password',
+              value: undefined
+            }
           }
-        }
-      ])
+        ]
+      })
     })
 
     it('return all props if prop isnt suplied', function () {
       const record = { name: 'Yoda', password: '123123' }
       const report = UserModel.updatable(record)
 
-      expect(report).to.deep.equal({
+      expect(report.all()).to.deep.equal({
         confirmation: [
           {
-            message: 'confirmation',
-            vars: {
+            error: 'confirmation',
+            ctx: {
+              record: record,
               prop: 'confirmation',
               referred: 'password',
               value: undefined
@@ -254,8 +278,9 @@ describe('Modele', function () {
         ],
         surname: [
           {
-            message: 'blank',
-            vars: {
+            error: 'blank',
+            ctx: {
+              record: record,
               prop: 'surname',
               value: undefined
             }

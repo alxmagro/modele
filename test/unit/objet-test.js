@@ -274,6 +274,19 @@ describe('Objet', function () {
   })
 
   describe('.valid', function () {
+    it('return false if has errors', function () {
+      user.name = 'Yoda'
+      user.password = '123123'
+
+      expect(user.valid('surname')).to.be.false
+    })
+
+    it('return true if has no errors', function () {
+      user.surname = 'Skywalker'
+
+      expect(user.valid('surname')).to.be.false
+    })
+
     context('when Objet is persisted', function () {
       it('record updatable errors', function () {
         user.name = 'Yoda'
@@ -281,11 +294,12 @@ describe('Objet', function () {
         user.password = '123123'
         user.valid()
 
-        expect(user.errors.errors).to.deep.equal({
+        expect(user.errors.all()).to.deep.equal({
           surname: [
             {
-              message: 'blank',
-              vars: {
+              error: 'blank',
+              ctx: {
+                record: user,
                 prop: 'surname',
                 value: ''
               }
@@ -293,11 +307,12 @@ describe('Objet', function () {
           ],
           confirmation: [
             {
-              message: 'confirmation',
-              vars: {
+              error: 'confirmation',
+              ctx: {
+                record: user,
                 prop: 'confirmation',
-                referred: 'password',
-                value: undefined
+                value: undefined,
+                referred: 'password'
               }
             }
           ]
@@ -310,14 +325,15 @@ describe('Objet', function () {
         user.password = '123123'
         user.valid('password')
 
-        expect(user.errors.errors).to.deep.equal({
+        expect(user.errors.all()).to.deep.equal({
           confirmation: [
             {
-              message: 'confirmation',
-              vars: {
+              error: 'confirmation',
+              ctx: {
+                record: user,
                 prop: 'confirmation',
-                referred: 'password',
-                value: undefined
+                value: undefined,
+                referred: 'password'
               }
             }
           ]
@@ -333,11 +349,12 @@ describe('Objet', function () {
 
         newUser.valid()
 
-        expect(newUser.errors.errors).to.deep.equal({
+        expect(newUser.errors.all()).to.deep.equal({
           password: [
             {
-              message: 'blank',
-              vars: {
+              error: 'blank',
+              ctx: {
+                record: newUser,
                 prop: 'password',
                 value: undefined
               }
@@ -345,8 +362,9 @@ describe('Objet', function () {
           ],
           surname: [
             {
-              message: 'blank',
-              vars: {
+              error: 'blank',
+              ctx: {
+                record: newUser,
                 prop: 'surname',
                 value: undefined
               }
@@ -362,11 +380,12 @@ describe('Objet', function () {
 
         newUser.valid('password')
 
-        expect(newUser.errors.errors).to.deep.equal({
+        expect(newUser.errors.all()).to.deep.equal({
           password: [
             {
-              message: 'blank',
-              vars: {
+              error: 'blank',
+              ctx: {
+                record: newUser,
                 prop: 'password',
                 value: undefined
               }

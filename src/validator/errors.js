@@ -3,6 +3,8 @@ export default class Errors {
     this.errors = {}
   }
 
+  // verificators
+
   has (field) {
     return this.errors.hasOwnProperty(field)
   }
@@ -11,18 +13,30 @@ export default class Errors {
     return Object.keys(this.errors).length > 0
   }
 
-  all (field) {
+  // getters
+
+  all () {
+    return this.errors
+  }
+
+  get (field) {
     return this.errors[field]
   }
 
-  pick (field) {
+  first (field) {
     if (this.errors[field]) {
       return this.errors[field][0]
     }
   }
 
+  // setters
+
   record (errors) {
     this.errors = errors || {}
+  }
+
+  set (prop, errors) {
+    this.errors[prop] = errors
   }
 
   add (prop, error) {
@@ -30,6 +44,16 @@ export default class Errors {
 
     this.errors[prop].push(error)
   }
+
+  merge (errors) {
+    for (const prop in errors.all()) {
+      const list = errors.get(prop) || []
+
+      list.forEach(error => this.add(prop, error))
+    }
+  }
+
+  // destroyers
 
   clear (field) {
     delete this.errors[field]

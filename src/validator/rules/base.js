@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import Errors from '../errors'
 import Helpers from '../../support/helpers'
 
 export default class Base {
@@ -54,28 +55,21 @@ export default class Base {
   }
 
   validate (record, prop) {
+    const errors = new Errors()
     const value = record[prop]
 
     if ((this.allowBlank && Base.isBlank(value)) ||
         (this.allowNil && _.isNil(value)) ||
         !this.elegible(record)) {
-      return null
+      return errors
     }
-    return this.perform(record, prop)
+
+    this.perform(record, prop, errors)
+
+    return errors
   }
 
   perform (record, prop) {
     throw new TypeError('perform should be overriden')
-  }
-
-  errorMessage (message, record, prop, vars = {}) {
-    const value = record[prop]
-
-    vars = Object.assign({}, vars, {
-      prop: prop,
-      value: value
-    })
-
-    return { message, vars }
   }
 }

@@ -1,7 +1,7 @@
 import _ from 'lodash'
 
 import Builder from './builder'
-import Errors from './errors'
+import Errors from './validator/errors'
 import API from './api/api'
 import Scope from './api/scope'
 
@@ -82,10 +82,12 @@ export default class Objet {
     const errors = this.__modele[scope](this, prop)
 
     if (prop) {
-      errors.forEach(error => this.errors.add(error.vars.prop, error))
+      for (const name in errors.all()) this.errors.set(name, errors.get(name))
     } else {
-      this.errors.record(errors)
+      this.errors.record(errors.all())
     }
+
+    return this.errors.any()
   }
 
   save () {
