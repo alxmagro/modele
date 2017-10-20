@@ -32,7 +32,7 @@ describe('Modele', function () {
       },
 
       validates: {
-        onSave: {
+        defaults: {
           name: {
             presence: true
           },
@@ -40,17 +40,9 @@ describe('Modele', function () {
             presence: true
           }
         },
-        onCreate: {
+        create: {
           password: {
             presence: true
-          }
-        },
-        onUpdate: {
-          password: {
-            confirmation: {
-              with: 'confirmation',
-              if: (record) => record.password
-            }
           }
         }
       },
@@ -178,43 +170,25 @@ describe('Modele', function () {
     })
   })
 
-  describe('.creatable', function () {
+  describe('.validate', function () {
     it('return instance of Errors', function () {
       const record = { name: 'Yoda' }
-      const report = UserModel.creatable(record)
+      const report = UserModel.validate(record)
 
       expect(report).to.be.an.instanceOf(Errors)
     })
 
-    it('return prop errors if prop is suplied', function () {
-      const record = { name: 'Yoda' }
-      const report = UserModel.creatable(record, 'password')
+    it('return errors', function () {
+      const record = {}
+      const report = UserModel.validate(record)
 
       expect(report.all()).to.deep.equal({
-        password: [
+        name: [
           {
             error: 'blank',
             ctx: {
               record: record,
-              prop: 'password',
-              value: undefined
-            }
-          }
-        ]
-      })
-    })
-
-    it('return all props if prop isnt suplied', function () {
-      const record = { name: 'Yoda' }
-      const report = UserModel.creatable(record)
-
-      expect(report.all()).to.deep.equal({
-        password: [
-          {
-            error: 'blank',
-            ctx: {
-              record: record,
-              prop: 'password',
+              prop: 'name',
               value: undefined
             }
           }
@@ -231,61 +205,77 @@ describe('Modele', function () {
         ]
       })
     })
-  })
 
-  describe('.updatable', function () {
-    it('return instance of Errors', function () {
-      const record = { name: 'Yoda', password: '123123' }
-      const report = UserModel.updatable(record)
+    context('when opts.prop is suplied', function () {
+      it('return errors of suplied prop and ignore others', function () {
+        const record = {}
+        const report = UserModel.validate(record, { prop: 'name' })
 
-      expect(report).to.be.an.instanceOf(Errors)
-    })
-
-    it('return prop error if prop is suplied', function () {
-      const record = { name: 'Yoda', password: '123123' }
-      const report = UserModel.updatable(record, 'password')
-
-      expect(report.all()).to.deep.equal({
-        confirmation: [
-          {
-            error: 'confirmation',
-            ctx: {
-              record: record,
-              prop: 'confirmation',
-              referred: 'password',
-              value: undefined
+        expect(report.all()).to.deep.equal({
+          name: [
+            {
+              error: 'blank',
+              ctx: {
+                record: record,
+                prop: 'name',
+                value: undefined
+              }
             }
-          }
-        ]
+          ]
+        })
       })
     })
 
-    it('return all props if prop isnt suplied', function () {
-      const record = { name: 'Yoda', password: '123123' }
-      const report = UserModel.updatable(record)
+    context('when opts.on is suplied', function () {
+      it('return errors of defaults and suplied validators', function () {
+        const record = { name: 'Yoda' }
+        const report = UserModel.validate(record, { on: 'create' })
 
-      expect(report.all()).to.deep.equal({
-        confirmation: [
-          {
-            error: 'confirmation',
-            ctx: {
-              record: record,
-              prop: 'confirmation',
-              referred: 'password',
-              value: undefined
+        expect(report.all()).to.deep.equal({
+          surname: [
+            {
+              error: 'blank',
+              ctx: {
+                record: record,
+                prop: 'surname',
+                value: undefined
+              }
             }
-          }
-        ],
-        surname: [
-          {
-            error: 'blank',
-            ctx: {
-              record: record,
-              prop: 'surname',
-              value: undefined
+          ],
+          password: [
+            {
+              error: 'blank',
+              ctx: {
+                record: record,
+                prop: 'password',
+                value: undefined
+              }
             }
-          }
-        ]
+          ]
+        })
+      })
+    })
+
+    context('when both opts.prop and opts.on is suplied', function () {
+      it('return prop errors of defaults and suplied validators', function () {
+        const record = { name: 'Yoda' }
+        const report = UserModel.validate(record, {
+          on: 'create',
+          prop: 'password'
+        })
+
+        expect(report.all()).to.deep.equal({
+          password: [
+            {
+              error: 'blank',
+              ctx: {
+                record: record,
+                prop: 'password',
+                value: undefined
+              }
+            }
+          ]
+        })
       })
     })
   })

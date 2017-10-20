@@ -77,17 +77,16 @@ export default class Objet {
     return this.id != null
   }
 
-  valid (prop = null) {
-    const scope = this.persisted() ? 'updatable' : 'creatable'
-    const errors = this.__modele[scope](this, prop)
+  valid (opts = {}) {
+    const errors = this.__modele.validate(this, opts)
 
-    if (prop) {
+    if (opts.prop) {
       for (const name in errors.all()) this.errors.set(name, errors.get(name))
     } else {
       this.errors.record(errors.all())
     }
 
-    return this.errors.any()
+    return !this.errors.any()
   }
 
   save () {

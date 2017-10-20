@@ -79,129 +79,129 @@ describe('Validator', function () {
       record = { name: 'Luke', surname: 'Skywalker' }
     })
 
-    it('return an instance of Errors', function () {
-      validator.addRule('presence', 'username')
-      validator.addRule('length', 'username', { min: 5 })
+    context('when props are supplied', function () {
+      it('return an instance of Errors', function () {
+        validator.addRule('presence', 'username')
+        validator.addRule('length', 'username', { min: 5 })
 
-      const report = validator.validate(record, 'username')
+        const report = validator.validate(record, 'username')
 
-      expect(report).to.be.an.instanceOf(Errors)
-    })
+        expect(report).to.be.an.instanceOf(Errors)
+      })
 
-    it('return errors if record is not correct', function () {
-      validator.addRule('presence', 'username')
-      validator.addRule('length', 'username', { min: 5 })
+      it('return errors if record is not correct', function () {
+        validator.addRule('presence', 'username')
+        validator.addRule('length', 'username', { min: 5 })
 
-      const report = validator.validate(record, 'username')
+        const report = validator.validate(record, 'username')
 
-      expect(report.all()).to.deep.equal({
-        username: [
-          {
-            error: 'blank',
-            ctx: {
-              record: record,
-              prop: 'username',
-              value: undefined
+        expect(report.all()).to.deep.equal({
+          username: [
+            {
+              error: 'blank',
+              ctx: {
+                record: record,
+                prop: 'username',
+                value: undefined
+              }
+            },
+            {
+              error: 'too_short',
+              ctx: {
+                record: record,
+                prop: 'username',
+                value: undefined,
+                expected: 5
+              }
             }
-          },
-          {
-            error: 'too_short',
-            ctx: {
-              record: record,
-              prop: 'username',
-              value: undefined,
-              expected: 5
-            }
-          }
-        ]
+          ]
+        })
+      })
+
+      it('return no error if record is correct', function () {
+        record.username = 'lukeskywalker'
+
+        validator.addRule('presence', 'username')
+        validator.addRule('length', 'username', { min: 5 })
+
+        const report = validator.validate(record, 'username')
+
+        expect(report.any()).to.be.false
       })
     })
 
-    it('return no error if record is correct', function () {
-      record.username = 'lukeskywalker'
+    context('when props are ommited', function () {
+      it('return errors of all properties if record is not correct', function () {
+        const record = { email: 'foo' }
 
-      validator.addRule('presence', 'username')
-      validator.addRule('length', 'username', { min: 5 })
+        validator.addRule('presence', 'name')
+        validator.addRule('length', 'name', { min: 3 })
+        validator.addRule('length', 'email', { min: 5 })
+        validator.addRule('confirmation', 'email', { with: 'confirmation' })
 
-      const report = validator.validate(record, 'username')
+        const report = validator.validate(record)
 
-      expect(report.any()).to.be.false
-    })
-  })
-
-  describe('.validateAll', function () {
-    var validator = new Validator()
-
-    it('return all props errors if record is not correct', function () {
-      const record = { email: 'foo' }
-
-      validator.addRule('presence', 'name')
-      validator.addRule('length', 'name', { min: 3 })
-      validator.addRule('length', 'email', { min: 5 })
-      validator.addRule('confirmation', 'email', { with: 'confirmation' })
-
-      const report = validator.validateAll(record)
-
-      expect(report.all()).to.deep.equal({
-        name: [
-          {
-            error: 'blank',
-            ctx: {
-              record: record,
-              prop: 'name',
-              value: undefined
+        expect(report.all()).to.deep.equal({
+          name: [
+            {
+              error: 'blank',
+              ctx: {
+                record: record,
+                prop: 'name',
+                value: undefined
+              }
+            },
+            {
+              error: 'too_short',
+              ctx: {
+                record: record,
+                prop: 'name',
+                value: undefined,
+                expected: 3
+              }
             }
-          },
-          {
-            error: 'too_short',
-            ctx: {
-              record: record,
-              prop: 'name',
-              value: undefined,
-              expected: 3
+          ],
+          confirmation: [
+            {
+              error: 'confirmation',
+              ctx: {
+                record: record,
+                prop: 'confirmation',
+                value: undefined,
+                referred: 'email'
+              }
             }
-          }
-        ],
-        confirmation: [
-          {
-            error: 'confirmation',
-            ctx: {
-              record: record,
-              prop: 'confirmation',
-              value: undefined,
-              referred: 'email'
+          ],
+          email: [
+            {
+              error: 'too_short',
+              ctx: {
+                record: record,
+                prop: 'email',
+                value: 'foo',
+                expected: 5
+              }
             }
-          }
-        ],
-        email: [
-          {
-            error: 'too_short',
-            ctx: {
-              record: record,
-              prop: 'email',
-              value: 'foo',
-              expected: 5
-            }
-          }
-        ]
+          ]
+        })
       })
-    })
 
-    it('return no error if record is correct', function () {
-      const record = {
-        name: 'luke',
-        email: 'lukeskywalker@jedi.com',
-        confirmation: 'lukeskywalker@jedi.com'
-      }
+      it('return no error if record is correct', function () {
+        const record = {
+          name: 'luke',
+          email: 'lukeskywalker@jedi.com',
+          confirmation: 'lukeskywalker@jedi.com'
+        }
 
-      validator.addRule('presence', 'name')
-      validator.addRule('length', 'name', { min: 3 })
-      validator.addRule('length', 'email', { min: 5 })
-      validator.addRule('confirmation', 'email', { with: 'confirmation' })
+        validator.addRule('presence', 'name')
+        validator.addRule('length', 'name', { min: 3 })
+        validator.addRule('length', 'email', { min: 5 })
+        validator.addRule('confirmation', 'email', { with: 'confirmation' })
 
-      const report = validator.validateAll(record)
+        const report = validator.validate(record)
 
-      expect(report.any()).to.be.false
+        expect(report.any()).to.be.false
+      })
     })
   })
 })

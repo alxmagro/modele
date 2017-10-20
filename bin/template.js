@@ -56,23 +56,21 @@ const User = new Modele({
   // Check link bellow for more informations about default validates
   // And how create your owns validations
   validates: {
-    onCreate: {
-      email: {
-        confirmation: true
-      },
-      password: {
-        presence: true
-      }
-    },
-
-    // onUpdate: {}
-
-    onSave: {
+    defaults: {
       email: {
         format: { with: /\S+@\S+\.\S+/ }
       },
       password: {
         length: { min: 8 }
+      }
+    },
+
+    create: {
+      email: {
+        confirmation: true
+      },
+      password: {
+        presence: true
       }
     }
   },

@@ -1,37 +1,31 @@
-# Introduction
-
 *Project in alpha, it isn't stable in any version before 1.0.0*
 
 Modele is a client-side representation of a Model and Resource.
-Use it as Models with API Restfull, client-side validators, default and computed properties, and methods. Example:
+Use it as Models with API RESTful, client-side validators, default and computed properties, and methods.
+
+## Features
+
+- RESTful API
+- Validations
+- Default and Computed properties, and methods to Model and their instances.
+
+## Examples
+
+### API
 
 ```js
 import Modele from 'modele'
 
 const UserModel = new Modele({
-  name: 'User'
-})
-
-var user = UserModel.new({ name: 'Luke' })
-```
-
-This is a basic config to Model. You can add CRUD API simple adding:
-
-```js
-import Modele from 'modele'
-
-const UserModel = new Modele({
-  // ...
+  name: 'User',
   api: {
     baseURL: 'https\\://jsonplaceholder.typicode.com/users'
   }
 })
 
-var user = UserModel.new({ name: 'Luke' })
 ```
-*\* Note the escape (`\\`) before protocol colon. This is required, because colons are also considered variables in the baseURL.*
 
-Now, Modele will create actions CRUD for the Model and its instances, use:
+Modele will create CRUD actions for the Model and their instances:
 
 ```js
 //...
@@ -42,15 +36,13 @@ UserModel.update(1, { name: 'Anakin Skywalker' })
 UserModel.delete(1)
 ```
 
-You can add validations in the following way:
+### Validations:
 
 ```js
 const UserModel = new Modele({
-  // ...
+  name: 'User',
   validates: {
-    // onCreate: {}
-    // onUpdate: {}
-    onSave: {
+    defaults: {
       name: {
         presence: true
       },
@@ -63,18 +55,11 @@ const UserModel = new Modele({
 })
 ```
 
-*Each Model has two validators, onCreate and OnUpdate, Use onSave to perform in both of them*
-
 Validations are not called automatically by API, instead you should use:
 
 ```js
-UserModel.creatable({ name: 'Yoda' })
-// => { ... }
-
-UserModele.updatable({ name: 'Yoda' })
-// => { ... }
-
-// You can use sugar method `valid`, If an instance has an ID, it will call `updatable`, otherwise, `creatable`, returning boolean and storing errors in `errors`
+UserModel.validate({ name: 'Yoda' })
+// => Errors { ... }
 
 var user = UserModel({ name: 'Yoda' })
 
@@ -82,10 +67,10 @@ user.valid()
 // => false
 
 user.errors
-// => { ... }
+// => Errors { ... }
 ```
 
-Validators will return an Error object, not a simple english message. You should use it to create your own errors messages, this will make easier build Internationalizations Views. You will find message examples in [i18n-examples.js](https://github.com/alexandremagro/modele/blob/master/bin/i18n-example.js).
+Validators will return an Errors Object, not a simple english message. You should use it to create your own errors messages, this will make easier to customize and build Internationalizations Views. You will find message examples in [i18n-examples.js](https://github.com/alexandremagro/modele/blob/master/bin/i18n-example.js).
 
 ## And more...
 

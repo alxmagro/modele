@@ -4,6 +4,7 @@ import API from './api/api'
 import Objet from './objet'
 import Scope from './api/scope'
 import Validator from './validator/validator'
+import Errors from './validator/errors'
 
 /*
   A Factory that represents a Resource or a Model from your server-side app,
@@ -47,21 +48,19 @@ export default class Modele {
     // validations
     if (opts.validates) {
       const config = _.get(opts, 'config.validator')
+      const scopes = _.get(opts, 'validates', {})
+      const validators = {}
 
-      const onCreateValidator = new Validator(config)
-      const onUpdateValidator = new Validator(config)
+      Object.keys(scopes).forEach(scope => {
+        const scopeRules = _.get(opts, ['validates', scope], {})
+        const validator = new Validator(config)
 
-      Builder.addRulesToValidator(onCreateValidator, opts.validates.onCreate)
-      Builder.addRulesToValidator(onCreateValidator, opts.validates.onSave)
-      Builder.addRulesToValidator(onUpdateValidator, opts.validates.onUpdate)
-      Builder.addRulesToValidator(onUpdateValidator, opts.validates.onSave)
+        Builder.addRulesToValidator(validator, scopeRules)
 
-      Object.defineProperty(this, '__validators', {
-        value: {
-          onCreate: onCreateValidator,
-          onUpdate: onUpdateValidator
-        }
+        validators[scope] = validator
       })
+
+      Object.defineProperty(this, '__validators', { value: validators })
     }
   }
 
@@ -83,23 +82,31 @@ export default class Modele {
     return new this.constructor(this.__opts, newKeys)
   }
 
-  creatable (record, prop = null) {
-    return this.__validate(this.__validators.onCreate, record, prop)
-  }
+  validate (record, opts = {}) {
+    const errors = new Errors()
 
-  updatable (record, prop = null) {
-    return this.__validate(this.__validators.onUpdate, record, prop)
+    // validate scope supplied by 'opts.on'
+    if (opts.on) {
+      const validator = this.__validators[opts.on]
+
+      if (!validator) {
+        throw new TypeError(`Modele Error: Validator ${opts.on} not supplied.`)
+      }
+
+      errors.merge(validator.validate(record, opts.prop))
+    }
+
+    // validate defaults
+    if (this.__validators.defaults) {
+      const validator = this.__validators.defaults
+
+      errors.merge(validator.validate(record, opts.prop))
+    }
+
+    return errors
   }
 
   // protected
-
-  __validate (validator, record, prop) {
-    if (prop) {
-      return validator.validate(record, prop)
-    } else {
-      return validator.validateAll(record)
-    }
-  }
 
   __caller (action) {
     const config = Object.assign({}, this.__api.config, action.config)

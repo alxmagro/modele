@@ -1,3 +1,5 @@
+import _ from 'lodash'
+
 import absence from './rules/absence'
 import acceptance from './rules/acceptance'
 import confirmation from './rules/confirmation'
@@ -45,21 +47,16 @@ export default class Validator {
     this.rules[prop].push(rule)
   }
 
-  validate (record, prop) {
+  validate (record, props = null) {
     const errors = new Errors()
+    props = props || Object.keys(this.rules)
 
-    this.rules[prop].forEach(rule => {
-      errors.merge(rule.validate(record, prop))
-    })
+    _.castArray(props).forEach(prop => {
+      if (!this.rules[prop]) return
 
-    return errors
-  }
-
-  validateAll (record) {
-    const errors = new Errors()
-
-    Object.keys(this.rules).forEach(prop => {
-      errors.merge(this.validate(record, prop))
+      this.rules[prop].forEach(rule => {
+        errors.merge(rule.validate(record, prop))
+      })
     })
 
     return errors

@@ -4,7 +4,7 @@ import FakeServer from '../fake-server.js'
 import Modele from '../../src/modele'
 
 describe('Objet', function () {
-  var server, UserModel, BookModel, user
+  var server, UserModel, BookModel
 
   beforeEach(function () {
     server = new FakeServer()
@@ -52,7 +52,7 @@ describe('Objet', function () {
       },
 
       validates: {
-        onSave: {
+        defaults: {
           name: {
             presence: true
           },
@@ -60,17 +60,9 @@ describe('Objet', function () {
             presence: true
           }
         },
-        onCreate: {
+        create: {
           password: {
             presence: true
-          }
-        },
-        onUpdate: {
-          password: {
-            confirmation: {
-              with: 'confirmation',
-              if: (record) => record.password
-            }
           }
         }
       },
@@ -94,8 +86,6 @@ describe('Objet', function () {
       }
     })
 
-    user = UserModel.new(server.db.users[0])
-
     server.start()
   })
 
@@ -104,12 +94,18 @@ describe('Objet', function () {
   })
 
   describe('#constructor', function () {
+    var record
+
+    beforeEach(function () {
+      record = UserModel.new(server.db.users[0])
+    })
+
     it('set __modele', function () {
-      expect(user).to.have.property('__modele', UserModel)
+      expect(record).to.have.property('__modele', UserModel)
     })
 
     it('set __keys', function () {
-      expect(user).to.have.deep.property('__keys', {})
+      expect(record).to.have.deep.property('__keys', {})
     })
 
     it('set __original', function () {
@@ -119,11 +115,11 @@ describe('Objet', function () {
         server.db.users[0]
       )
 
-      expect(user).to.have.deep.property('__original', data)
+      expect(record).to.have.deep.property('__original', data)
     })
 
     it('set callable custom actions', function (done) {
-      user
+      record
         .findOne()
         .then(res => res.json())
         .then(res => {
@@ -134,7 +130,7 @@ describe('Objet', function () {
     })
 
     it('set callable default actions', function (done) {
-      user
+      record
         .update({ name: 'Yoda' })
         .then(res => res.json())
         .then(res => {
@@ -145,23 +141,23 @@ describe('Objet', function () {
     })
 
     it('set data', function () {
-      expect(user).to.have.deep.property('createdAt', new Date(2010, 10, 10))
+      expect(record).to.have.deep.property('createdAt', new Date(2010, 10, 10))
     })
 
     it('set computeds', function () {
-      const expected = `${user.name} ${user.surname}`
+      const expected = `${record.name} ${record.surname}`
 
-      expect(user).to.have.property('fullName', expected)
+      expect(record).to.have.property('fullName', expected)
     })
 
     it('set methods', function () {
-      const expected = `Hi Yoda! My name is ${user.name}`
+      const expected = `Hi Yoda! My name is ${record.name}`
 
-      expect(user.salute('Yoda')).to.equal(expected)
+      expect(record.salute('Yoda')).to.equal(expected)
     })
 
     it('set associations', function () {
-      user = UserModel.new({
+      record = UserModel.new({
         name: 'Yoda',
         books: [
           {
@@ -178,19 +174,20 @@ describe('Objet', function () {
         'by Alan Dean Foster & George Lucas'
       ].join(' ')
 
-      expect(user.books[0].presentation()).to.equal(expected)
+      expect(record.books[0].presentation()).to.equal(expected)
     })
   })
 
   describe('.where', function () {
-    var copy
+    var copy, record
 
     beforeEach(function () {
-      copy = user.where({ api: 2 })
+      record = UserModel.new({ name: 'Luke', surname: 'Skywalker' })
+      copy = record.where({ api: 2 })
     })
 
     it('create a copy of object', function () {
-      expect(user).to.deep.equal(copy)
+      expect(record).to.deep.equal(copy)
     })
 
     it('assigns keys to copy', function () {
@@ -204,52 +201,72 @@ describe('Objet', function () {
     })
 
     it('keep original object keys unaltered', function () {
-      expect(user.__keys).to.deep.equal({})
+      expect(record.__keys).to.deep.equal({})
     })
   })
 
   describe('.changed', function () {
-    it('return true when props are changed', function () {
-      user.name = 'Yoda'
+    var record
 
-      expect(user.changed()).to.be.true
+    beforeEach(function () {
+      record = UserModel.new({ name: 'Luke', surname: 'Skywalker' })
+    })
+
+    it('return true when props are changed', function () {
+      record.name = 'Yoda'
+
+      expect(record.changed()).to.be.true
     })
 
     it('return false when props keep unchanged', function () {
-      expect(user.changed()).to.be.false
+      expect(record.changed()).to.be.false
     })
   })
 
   describe('.unchanged', function () {
-    it('return false when props are changed', function () {
-      user.name = 'Yoda'
+    var record
 
-      expect(user.unchanged()).to.be.false
+    beforeEach(function () {
+      record = UserModel.new({ name: 'Luke', surname: 'Skywalker' })
+    })
+
+    it('return false when props are changed', function () {
+      record.name = 'Yoda'
+
+      expect(record.unchanged()).to.be.false
     })
 
     it('return true when props keep unchanged', function () {
-      expect(user.unchanged()).to.be.true
+      expect(record.unchanged()).to.be.true
     })
   })
 
   describe('.persisted', function () {
     it('return true when has ID', function () {
-      expect(user.persisted()).to.be.true
+      const record = UserModel.new({ id: 42, name: 'Yoda' })
+
+      expect(record.persisted()).to.be.true
     })
 
     it('return false when has not ID', function () {
-      const newUser = UserModel.new()
+      const record = UserModel.new({ name: 'Yoda' })
 
-      expect(newUser.persisted()).to.be.false
+      expect(record.persisted()).to.be.false
     })
   })
 
   describe('.save', function () {
+    var record
+
+    beforeEach(function () {
+      record = UserModel.new(server.db.users[0])
+    })
+
     context('when it is persisted', function () {
       it('updates the object', function (done) {
-        user.name = 'Yoda'
+        record.name = 'Yoda'
 
-        user
+        record
           .save()
           .then(res => {
             expect(server.db.users[0]).to.have.property('name', 'Yoda')
@@ -262,9 +279,9 @@ describe('Objet', function () {
     context('when it is new record', function () {
       it('creates an object', function () {
         const size = server.db.users.length
-        const newUser = UserModel.new({ name: 'Yoda' })
+        const record = UserModel.new({ name: 'Yoda' })
 
-        newUser
+        record
           .save()
           .then(res => {
             expect(server.db.users).to.have.lengthOf(size + 1)
@@ -275,117 +292,81 @@ describe('Objet', function () {
 
   describe('.valid', function () {
     it('return false if has errors', function () {
-      user.name = 'Yoda'
-      user.password = '123123'
+      const record = UserModel.new({ name: 'Luke' })
 
-      expect(user.valid('surname')).to.be.false
+      expect(record.valid()).to.be.false
     })
 
-    it('return true if has no errors', function () {
-      user.surname = 'Skywalker'
+    it('return true if has no error', function () {
+      const record = UserModel.new({ name: 'Luke', surname: 'Skywalker' })
 
-      expect(user.valid('surname')).to.be.false
+      expect(record.valid()).to.be.true
     })
 
-    context('when Objet is persisted', function () {
-      it('record updatable errors', function () {
-        user.name = 'Yoda'
-        user.surname = ''
-        user.password = '123123'
-        user.valid()
+    context('when opts.prop is suplied', function () {
+      it('return errors of suplied prop and ignore others', function () {
+        const record = UserModel.new()
 
-        expect(user.errors.all()).to.deep.equal({
+        record.valid({ prop: 'name' })
+
+        expect(record.errors.all()).to.deep.equal({
+          name: [
+            {
+              error: 'blank',
+              ctx: {
+                record: record,
+                prop: 'name',
+                value: undefined
+              }
+            }
+          ]
+        })
+      })
+    })
+
+    context('when opts.on is supplied', function () {
+      it('record errors of defaults and supplied scope', function () {
+        const record = UserModel.new({ name: 'Yoda' })
+
+        record.valid({ on: 'create' })
+
+        expect(record.errors.all()).to.deep.equal({
           surname: [
             {
               error: 'blank',
               ctx: {
-                record: user,
+                record: record,
                 prop: 'surname',
-                value: ''
+                value: undefined
               }
             }
           ],
-          confirmation: [
-            {
-              error: 'confirmation',
-              ctx: {
-                record: user,
-                prop: 'confirmation',
-                value: undefined,
-                referred: 'password'
-              }
-            }
-          ]
-        })
-      })
-
-      it('record updatable prop errors if prop is supplied', function () {
-        user.name = 'Yoda'
-        user.surname = ''
-        user.password = '123123'
-        user.valid('password')
-
-        expect(user.errors.all()).to.deep.equal({
-          confirmation: [
-            {
-              error: 'confirmation',
-              ctx: {
-                record: user,
-                prop: 'confirmation',
-                value: undefined,
-                referred: 'password'
-              }
-            }
-          ]
-        })
-      })
-    })
-
-    context('when Objet is new record', function () {
-      it('record creatable errors', function () {
-        const newUser = UserModel.new({
-          name: 'Yoda'
-        })
-
-        newUser.valid()
-
-        expect(newUser.errors.all()).to.deep.equal({
           password: [
             {
               error: 'blank',
               ctx: {
-                record: newUser,
+                record: record,
                 prop: 'password',
                 value: undefined
               }
             }
-          ],
-          surname: [
-            {
-              error: 'blank',
-              ctx: {
-                record: newUser,
-                prop: 'surname',
-                value: undefined
-              }
-            }
           ]
         })
       })
+    })
 
-      it('record creatable prop errors if prop is supplied', function () {
-        const newUser = UserModel.new({
-          name: 'Yoda'
-        })
+    context('when both opts.prop and opts.on is suplied', function () {
+      it('return prop errors of defaults and suplied validators', function () {
+        const record = UserModel.new({ name: 'Yoda' })
 
-        newUser.valid('password')
+        record.valid({ on: 'create', prop: 'password' })
 
-        expect(newUser.errors.all()).to.deep.equal({
+        expect(record.errors.all()).to.deep.equal({
           password: [
             {
               error: 'blank',
               ctx: {
-                record: newUser,
+                record: record,
                 prop: 'password',
                 value: undefined
               }
