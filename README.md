@@ -63,7 +63,7 @@ Validations are not called automatically by API, instead you should use:
 UserModel.validate({ name: 'Yoda' })
 // => Errors { ... }
 
-var user = UserModel({ name: 'Yoda' })
+var user = UserModel.new({ name: 'Yoda' })
 
 user.valid()
 // => false
