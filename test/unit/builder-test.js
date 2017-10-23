@@ -105,7 +105,7 @@ describe('Builder', function () {
     })
 
     context('when called by Modele', function () {
-      it('define a member action (id, body, opts)', function (done) {
+      it('define a member action (id, body)', function (done) {
         UserModel
           .findOne(user.id)
           .then(res => res.json())
@@ -116,7 +116,7 @@ describe('Builder', function () {
           .catch(err => done(err))
       })
 
-      it('define a collection action (body, opts)', function (done) {
+      it('define a collection action (body)', function (done) {
         const size = server.db.users.length
 
         UserModel
@@ -131,7 +131,7 @@ describe('Builder', function () {
     })
 
     context('when called by Objet', function () {
-      it('define a member action (body, opts)', function (done) {
+      it('define a member action (body)', function (done) {
         user
           .findOne()
           .then(res => res.json())
