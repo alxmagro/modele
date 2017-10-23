@@ -38,9 +38,18 @@ describe('Action', function () {
         'Content-Type': 'multipart/form-data'
       })
     })
+  })
 
-    it('set body', function () {
-      expect(action).to.have.property('body', true)
+  describe('#toQuery', function () {
+    it('convert params to URL query', function () {
+      const output = Action.toQuery({
+        a: 100,
+        b: 'has spaces',
+        c: [1, 2, 3],
+        d: { x: 9, y: 8 }
+      })
+
+      expect(output).to.equal('a=100&b=has%20spaces&c[]=1&c[]=2&c[]=3&d[x]=9&d[y]=8')
     })
   })
 
@@ -55,6 +64,38 @@ describe('Action', function () {
 
     afterEach(function () {
       server.stop()
+    })
+
+    it('send Object if opts.config.json is true', function (done) {
+      const create = new Action('http\\://localhost\\:3000/users', {
+        method: 'POST'
+      })
+
+      create
+        .call({
+          data: { name: 'Yoda' },
+          config: { json: true }
+        })
+        .then(res => res.json())
+        .then(res => {
+          expect(res.name).to.equal('Yoda')
+          done()
+        })
+        .catch(err => done(err))
+    })
+
+    it('send data as query params if method is GET', function (done) {
+      const list = new Action('http\\://localhost\\:3000/users')
+
+      list
+        .call({
+          data: { sort: 'createdAt' }
+        })
+        .then(res => {
+          expect(res.url).to.equal('http://localhost:3000/users?sort=createdAt')
+          done()
+        })
+        .catch(err => done(err))
     })
 
     it('can list', function (done) {
@@ -75,14 +116,13 @@ describe('Action', function () {
       const create = new Action('http\\://localhost\\:3000/users', {
         method: 'POST',
         headers: {
-          'Accept': 'application/json',
           'Content-Type': 'application/json'
         }
       })
 
       create
         .call({
-          body: JSON.stringify({ name: 'Yoda' })
+          data: JSON.stringify({ name: 'Yoda' })
         })
         .then(res => res.json())
         .then(res => {
@@ -114,7 +154,6 @@ describe('Action', function () {
         scope: 'member',
         method: 'PUT',
         headers: {
-          'Accept': 'application/json',
           'Content-Type': 'application/json'
         }
       })
@@ -122,7 +161,7 @@ describe('Action', function () {
       action
         .call({
           id: user.id,
-          body: JSON.stringify({ name: 'Yoda' })
+          data: JSON.stringify({ name: 'Yoda' })
         })
         .then(res => {
           expect(user.name).to.equal('Yoda')

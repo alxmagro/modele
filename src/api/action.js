@@ -24,10 +24,29 @@ export default class Action {
     this.baseURL = baseURL || '/'
     this.scope = opts.scope || 'collection'
     this.path = opts.path
-    this.method = opts.method
+    this.method = opts.method || 'GET'
     this.headers = opts.headers || {}
-    this.body = opts.body != null ? opts.body : true
     this.credentials = opts.credentials
+  }
+
+  static toQuery (params, prefix) {
+    const query = Object.keys(params).map((key) => {
+      const value = params[key]
+
+      if (params.constructor === Array) {
+        key = `${prefix}[]`
+      } else if (params.constructor === Object) {
+        key = (prefix ? `${prefix}[${key}]` : key)
+      }
+
+      if (typeof value === 'object') {
+        return Action.toQuery(value, key)
+      } else {
+        return `${key}=${encodeURIComponent(value)}`
+      }
+    })
+
+    return [].concat.apply([], query).join('&')
   }
 
   /*
@@ -40,16 +59,30 @@ export default class Action {
       throw new TypeError('ID is required')
     }
 
-    const id = opts.id
-    const keys = opts.keys
-    const body = opts.body
+    const config = opts.config || {}
     const headers = Object.assign({}, this.headers, opts.headers)
 
-    const request = new Request(this.__url(id, keys), {
+    let url = this.__url(opts.id, opts.keys)
+    let body
+
+    if (this.method === 'GET') {
+      if (opts.data) {
+        url = url + '?' + Action.toQuery(opts.data)
+      }
+    } else {
+      body = opts.data
+    }
+
+    if (config.json) {
+      headers['Content-Type'] = 'application/json'
+      body = JSON.stringify(body)
+    }
+
+    const request = new Request(url, {
       method: this.method,
       headers: headers,
       credentials: this.credentials,
-      body: this.body ? body : null
+      body: body
     })
 
     return fetch(request)

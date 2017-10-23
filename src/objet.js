@@ -2,7 +2,6 @@ import _ from 'lodash'
 
 import Builder from './builder'
 import Errors from './validator/errors'
-import API from './api/api'
 import Scope from './api/scope'
 
 export default class Objet {
@@ -100,24 +99,12 @@ export default class Objet {
   // protected
 
   __caller (action) {
-    const config = Object.assign({}, this.__modele.__api.config, action.config)
-
     return (data) => {
-      let body = data
-      let headers = {}
-
-      if (config.json) {
-        const prepared = API.toJSON(body, headers)
-
-        body = prepared.body
-        headers = prepared.headers
-      }
-
       return action.call({
-        headers: headers,
         id: this.id,
-        body: body,
-        keys: this.__keys
+        data: data,
+        keys: this.__keys,
+        config: this.__modele.__api.config
       })
     }
   }

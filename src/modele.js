@@ -109,45 +109,21 @@ export default class Modele {
   // protected
 
   __caller (action) {
-    const config = Object.assign({}, this.__api.config, action.config)
+    return (...args) => {
+      let id, data
 
-    if (Scope.onCollection(action.scope)) {
-      return (data) => {
-        let body = data
-        let headers = {}
-
-        if (config.json) {
-          const prepared = API.toJSON(body, headers)
-
-          body = prepared.body
-          headers = prepared.headers
-        }
-
-        return action.call({
-          headers: headers,
-          data: body,
-          keys: this.__keys
-        })
+      if (Scope.onCollection(action.scope)) {
+        [data] = args
+      } else {
+        [id, data] = args
       }
-    } else {
-      return (id, data) => {
-        let body = data
-        let headers = {}
 
-        if (config.json) {
-          const prepared = API.toJSON(body, headers)
-
-          body = prepared.body
-          headers = prepared.headers
-        }
-
-        return action.call({
-          headers: headers,
-          id: id,
-          body: body,
-          keys: this.__keys
-        })
-      }
+      return action.call({
+        id: id,
+        data: data,
+        keys: this.__keys,
+        config: this.__api.config
+      })
     }
   }
 }

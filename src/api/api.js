@@ -63,14 +63,4 @@ export default class API {
       this.actions[name] = new Action(baseURL, opts)
     })
   }
-
-  static toJSON (body, headers) {
-    body = JSON.stringify(body)
-    headers = Object.assign({}, headers, {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json'
-    })
-
-    return { body, headers }
-  }
 }
