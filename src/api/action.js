@@ -15,15 +15,15 @@ export default class Action {
 
     // Request
     this.request = {}
-    this.request.method = 'GET'
     this.request.headers = {}
-    this.request.body = null
-    this.request.mode = null
-    this.request.credentials = null
-    this.request.cache = null
-    this.request.redirect = null
-    this.request.referrer = null
-    this.request.integrity = null
+    // this.request.method = 'GET'
+    // this.request.body = null
+    // this.request.mode = null
+    // this.request.credentials = null
+    // this.request.cache = null
+    // this.request.redirect = null
+    // this.request.referrer = null
+    // this.request.integrity = null
 
     _.merge(this, opts)
   }
