@@ -88,12 +88,12 @@ export default class Objet {
     return !this.errors.any()
   }
 
-  save () {
+  save (request = {}) {
     if (this.persisted()) {
-      return this.__modele.update(this.id, this)
+      return this.__modele.update(this.id, this, request)
     }
 
-    return this.__modele.create(this)
+    return this.__modele.create(this, request)
   }
 
   // protected
