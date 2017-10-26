@@ -53,12 +53,14 @@ describe('Builder', function () {
 
     beforeEach(function () {
       server = new FakeServer()
-      baseURL = 'http\\://localhost\\:3000/users'
+      baseURL = 'http://localhost:3000/users'
 
       UserModel = new Modele({
         name: 'User',
         api: {
-          baseURL: 'http\\://localhost\\:3000/users',
+          defaults: {
+            baseURL: baseURL
+          },
           actions: {
             defaults: {
               all: false,
@@ -72,28 +74,31 @@ describe('Builder', function () {
       })
 
       Builder.defineActions(UserModel, {
-        findAll: new Action(baseURL, {
-          method: 'GET',
+        findAll: new Action({
           scope: 'collection',
-          path: false,
-          data: false
+          baseURL: baseURL,
+          request: {
+            method: 'GET'
+          }
         }),
-        findOne: new Action(baseURL, {
-          method: 'GET',
+        findOne: new Action({
           scope: 'member',
-          path: false,
-          data: false
+          baseURL: baseURL,
+          request: {
+            method: 'GET'
+          }
         })
       })
 
       user = UserModel.new(server.db.users[0])
 
       Builder.defineActions(user, {
-        findOne: new Action(baseURL, {
-          method: 'GET',
+        findOne: new Action({
           scope: 'member',
-          path: false,
-          data: false
+          baseURL: baseURL,
+          request: {
+            method: 'GET'
+          }
         })
       })
 

@@ -1,66 +1,71 @@
 import _ from 'lodash'
 import Action from './action'
 
+import asJsonTransform from './transform/as-json'
+import asQueryTrasform from './transform/as-query'
+
 const DEFAULT_CONFIG = {
-  json: true
+  transform: {
+    asJson: asJsonTransform,
+    asQuery: asQueryTrasform
+  }
 }
 
 const DEFAULT_ACTIONS = {
   all: {
-    method: 'GET',
     scope: 'collection',
-    path: false,
-    data: false
+    request: {
+      method: 'GET'
+    }
   },
   create: {
-    method: 'POST',
     scope: 'collection',
-    path: false,
-    data: true
+    request: {
+      method: 'POST'
+    }
   },
   read: {
-    method: 'GET',
     scope: 'member',
-    path: false,
-    data: false
+    request: {
+      method: 'GET'
+    }
   },
   update: {
-    method: 'PUT',
     scope: 'member',
-    path: false,
-    data: true
+    request: {
+      method: 'PUT'
+    }
   },
   delete: {
-    method: 'DELETE',
     scope: 'member',
-    path: false,
-    data: false
+    request: {
+      method: 'DELETE'
+    }
   }
 }
 
 export default class API {
-  /*
-    Build a API that represent a set of actions
-    @param {string} opts.baseURL - Common baseURL of all actions
-    @param {Object} opts.actions.custom - {method, scope, path, data, body, credentials}
-    @param {Object} opts.actions.defaults - {all, create, read, update, delete} that value is boolean that enable/disable default actions
-  */
   constructor (opts = {}) {
-    const baseURL = opts.baseURL || '/'
-    const defaultsSetup = _.get(opts, 'actions.defaults', {})
-    const customActions = _.get(opts, 'actions.custom', {})
+    const defaults = _.get(opts, 'actions.defaults', {})
+    const custom = _.get(opts, 'actions.custom', {})
 
-    this.config = _.get(opts, 'config', DEFAULT_CONFIG)
+    this.defaults = _.merge({}, DEFAULT_CONFIG, opts.defaults)
     this.actions = {}
 
     _.forOwn(DEFAULT_ACTIONS, (opts, name) => {
-      if (defaultsSetup[name] !== false) {
-        this.actions[name] = new Action(baseURL, opts)
+      if (defaults[name] !== false) {
+        this.addAction(name, opts)
       }
     })
 
-    _.forOwn(customActions, (opts, name) => {
-      this.actions[name] = new Action(baseURL, opts)
+    _.forOwn(custom, (opts, name) => {
+      this.addAction(name, opts)
     })
+  }
+
+  addAction (name, opts) {
+    opts = _.merge({}, this.defaults, opts)
+
+    this.actions[name] = new Action(opts)
   }
 }

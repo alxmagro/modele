@@ -11,7 +11,9 @@ describe('Modele', function () {
     config = {
       name: 'User',
       api: {
-        baseURL: 'http\\://localhost\\:3000/users',
+        defaults: {
+          baseURL: 'http://localhost:3000/users'
+        },
         actions: {
           defaults: {
             all: false,
@@ -23,9 +25,10 @@ describe('Modele', function () {
           custom: {
             upvote: {
               scope: 'member',
-              method: 'PUT',
-              path: 'upvote',
-              body: false
+              url: 'upvote',
+              request: {
+                method: 'PUT'
+              }
             }
           }
         }

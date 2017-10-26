@@ -15,10 +15,11 @@ describe('API', function () {
         },
         custom: {
           upvote: {
-            method: 'GET',
             scope: 'member',
-            path: 'upvote',
-            data: false
+            url: 'upvote',
+            request: {
+              method: 'GET'
+            }
           }
         }
       }

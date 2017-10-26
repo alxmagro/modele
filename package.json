@@ -25,9 +25,10 @@
     "build": "webpack"
   },
   "dependencies": {
+    "interpolate-url": "^0.0.2",
     "isomorphic-fetch": "^2.2.1",
-    "lodash": "^4.17.4",
-    "url-pattern": "^1.0.3"
+    "join-path": "^1.1.1",
+    "lodash": "^4.17.4"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",

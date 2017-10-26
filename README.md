@@ -21,7 +21,9 @@ import Modele from 'modele'
 const UserModel = new Modele({
   name: 'User',
   api: {
-    baseURL: 'https\\://jsonplaceholder.typicode.com/users'
+    defaults: {
+      baseURL: 'https://jsonplaceholder.typicode.com/users'
+    }
   }
 })
 

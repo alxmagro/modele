@@ -7,49 +7,38 @@ describe('Action', function () {
   var action
 
   beforeEach(function () {
-    action = new Action('http\\://localhost\\:3000/users', {
+    action = new Action({
       scope: 'member',
-      path: 'update',
-      method: 'PUT',
-      body: true,
-      headers: { 'Content-Type': 'multipart/form-data' }
+      baseURL: 'http://localhost:3000/users',
+      url: 'update',
+      request: {
+        method: 'PUT',
+        headers: { 'Content-Type': 'multipart/form-data' }
+      }
     })
   })
 
   describe('#constructor', function () {
     it('set baseURL', function () {
-      expect(action).to.have.property('baseURL', 'http\\://localhost\\:3000/users')
+      expect(action).to.have.property('baseURL', 'http://localhost:3000/users')
     })
 
     it('set scope', function () {
       expect(action).to.have.property('scope', 'member')
     })
 
-    it('set path', function () {
-      expect(action).to.have.property('path', 'update')
+    it('set url', function () {
+      expect(action).to.have.property('url', 'update')
     })
 
-    it('set method', function () {
-      expect(action).to.have.property('method', 'PUT')
+    it('set request.method', function () {
+      expect(action.request).to.have.property('method', 'PUT')
     })
 
-    it('set headers', function () {
-      expect(action).to.deep.have.property('headers', {
+    it('set request.headers', function () {
+      expect(action.request).to.deep.have.property('headers', {
         'Content-Type': 'multipart/form-data'
       })
-    })
-  })
-
-  describe('#toQuery', function () {
-    it('convert params to URL query', function () {
-      const output = Action.toQuery({
-        a: 100,
-        b: 'has spaces',
-        c: [1, 2, 3],
-        d: { x: 9, y: 8 }
-      })
-
-      expect(output).to.equal('a=100&b=has%20spaces&c[]=1&c[]=2&c[]=3&d[x]=9&d[y]=8')
     })
   })
 
@@ -66,41 +55,11 @@ describe('Action', function () {
       server.stop()
     })
 
-    it('send Object if opts.config.json is true', function (done) {
-      const create = new Action('http\\://localhost\\:3000/users', {
-        method: 'POST'
-      })
-
-      create
-        .call({
-          data: { name: 'Yoda' },
-          config: { json: true }
-        })
-        .then(res => res.json())
-        .then(res => {
-          expect(res.name).to.equal('Yoda')
-          done()
-        })
-        .catch(err => done(err))
-    })
-
-    it('send data as query params if method is GET', function (done) {
-      const list = new Action('http\\://localhost\\:3000/users')
-
-      list
-        .call({
-          data: { sort: 'createdAt' }
-        })
-        .then(res => {
-          expect(res.url).to.equal('http://localhost:3000/users?sort=createdAt')
-          done()
-        })
-        .catch(err => done(err))
-    })
-
     it('can list', function (done) {
-      const list = new Action('http\\://localhost\\:3000/users')
       const size = server.db.users.length
+      const list = new Action({
+        baseURL: 'http://localhost:3000/users'
+      })
 
       list
         .call()
@@ -113,17 +72,19 @@ describe('Action', function () {
     })
 
     it('can create', function (done) {
-      const create = new Action('http\\://localhost\\:3000/users', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
+      const create = new Action({
+        baseURL: 'http://localhost:3000/users',
+        request: {
+          method: 'POST',
+          body: JSON.stringify({ name: 'Yoda' }),
+          headers: {
+            'Content-Type': 'application/json'
+          }
         }
       })
 
       create
-        .call({
-          data: JSON.stringify({ name: 'Yoda' })
-        })
+        .call()
         .then(res => res.json())
         .then(res => {
           expect(res.name).to.equal('Yoda')
@@ -134,8 +95,9 @@ describe('Action', function () {
 
     it('can read', function (done) {
       const user = server.db.users[0]
-      const action = new Action('http\\://localhost\\:3000/users', {
-        scope: 'member'
+      const action = new Action({
+        scope: 'member',
+        baseURL: 'http://localhost:3000/users'
       })
 
       action
@@ -150,19 +112,20 @@ describe('Action', function () {
 
     it('can update', function (done) {
       const user = server.db.users[0]
-      const action = new Action('http\\://localhost\\:3000/users', {
+      const action = new Action({
         scope: 'member',
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
+        baseURL: 'http://localhost:3000/users',
+        request: {
+          method: 'PUT',
+          body: JSON.stringify({ name: 'Yoda' }),
+          headers: {
+            'Content-Type': 'application/json'
+          }
         }
       })
 
       action
-        .call({
-          id: user.id,
-          data: JSON.stringify({ name: 'Yoda' })
-        })
+        .call({ id: user.id })
         .then(res => {
           expect(user.name).to.equal('Yoda')
           done()
@@ -172,9 +135,12 @@ describe('Action', function () {
 
     it('can destroy', function (done) {
       const size = server.db.users.length
-      const action = new Action('http\\://localhost\\:3000/users', {
-        method: 'DELETE',
-        scope: 'member'
+      const action = new Action({
+        scope: 'member',
+        baseURL: 'http://localhost:3000/users',
+        request: {
+          method: 'DELETE'
+        }
       })
 
       action
@@ -187,37 +153,66 @@ describe('Action', function () {
     })
   })
 
-  describe('.__url', function () {
-    it('append ID to baseURL', function () {
-      const action = new Action('example.com/users')
+  describe('.solvedURL', function () {
+    context('when action scope is "member"', function () {
+      var action
 
-      expect(action.__url(42)).to.equal('example.com/users/42')
+      beforeEach(function () {
+        action = new Action({
+          scope: 'member',
+          baseURL: 'example.com/users'
+        })
+      })
+
+      it('throw TypeError if ID is undefined', function () {
+        const wrong = () => action.solvedURL()
+
+        expect(wrong).to.throw(TypeError)
+      })
+
+      it('append ID to baseURL', function () {
+        expect(action.solvedURL(42)).to.equal('example.com/users/42')
+      })
+
+      it('append ID and path to baseURL', function () {
+        action = new Action({
+          baseURL: 'example.com/users',
+          url: 'edit'
+        })
+
+        expect(action.solvedURL(42)).to.equal('example.com/users/42/edit')
+      })
     })
 
-    it('append path to baseURL', function () {
-      const action = new Action('example.com/users', { path: 'search' })
+    context('when action scope is "collection"', function () {
+      it('append path to baseURL', function () {
+        const action = new Action({
+          baseURL: 'example.com/users',
+          url: 'search'
+        })
 
-      expect(action.__url()).to.equal('example.com/users/search')
-    })
+        expect(action.solvedURL()).to.equal('example.com/users/search')
+      })
 
-    it('append ID and path to baseURL', function () {
-      action = new Action('example.com/users', { path: 'edit' })
+      it('solve snake_cased keys', function () {
+        action = new Action({
+          baseURL: '/api/:api/group/:group_id/users'
+        })
 
-      expect(action.__url(42)).to.equal('example.com/users/42/edit')
-    })
+        const url = action.solvedURL(null, { api: 1, group_id: 42 })
 
-    it('solve snake_cased keys', function () {
-      action = new Action('/api/:api/group/:group_id/users')
-      const url = action.__url(null, { api: 1, group_id: 42 })
+        expect(url).to.equal('/api/1/group/42/users')
+      })
 
-      expect(url).to.equal('/api/1/group/42/users')
-    })
+      it('solve camelCased keys', function () {
+        action = new Action({
+          baseURL: '/api/:api/group/:groupId/users'
+        })
 
-    it('solve camelCased keys', function () {
-      action = new Action('/api/:api/group/:groupId/users')
-      const url = action.__url(null, { api: 1, groupId: 42 })
+        const url = action.solvedURL(null, { api: 1, groupId: 42 })
 
-      expect(url).to.equal('/api/1/group/42/users')
+        expect(url).to.equal('/api/1/group/42/users')
+      })
     })
   })
 })

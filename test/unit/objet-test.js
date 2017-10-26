@@ -21,7 +21,9 @@ describe('Objet', function () {
     UserModel = new Modele({
       name: 'User',
       api: {
-        baseURL: 'http\\://localhost\\:3000/users',
+        defaults: {
+          baseURL: 'http://localhost:3000/users'
+        },
         actions: {
           defaults: {
             all: false,
@@ -32,16 +34,16 @@ describe('Objet', function () {
           },
           custom: {
             findAll: {
-              method: 'GET',
               scope: 'collection',
-              path: false,
-              data: false
+              request: {
+                method: 'GET'
+              }
             },
             findOne: {
-              method: 'GET',
               scope: 'member',
-              path: false,
-              data: false
+              request: {
+                method: 'GET'
+              }
             }
           }
         }

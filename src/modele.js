@@ -110,19 +110,18 @@ export default class Modele {
 
   __caller (action) {
     return (...args) => {
-      let id, data
+      let id, body, request
 
       if (Scope.onCollection(action.scope)) {
-        [data] = args
+        [body, request = {}] = args
       } else {
-        [id, data] = args
+        [id, body, request = {}] = args
       }
 
       return action.call({
         id: id,
-        data: data,
         keys: this.__keys,
-        config: this.__api.config
+        request: _.merge({ body }, request)
       })
     }
   }

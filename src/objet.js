@@ -99,12 +99,11 @@ export default class Objet {
   // protected
 
   __caller (action) {
-    return (data) => {
+    return (body, request = {}) => {
       return action.call({
         id: this.id,
-        data: data,
         keys: this.__keys,
-        config: this.__modele.__api.config
+        request: _.merge({ body }, request)
       })
     }
   }

@@ -3,11 +3,10 @@ import Modele from 'modele'
 const User = new Modele({
   name: 'User',
   api: {
-    // JSON stryngify body and add content-type and accept headers
-    // config: {
-    //   json: false
-    // },
-    baseURL: 'www.mydomain.com/api/:api_id/users',
+    defaults: {
+      baseURL: 'http\\://www.mydomain.com/api/:api_id/users'
+    },
+
     actions: {
       // CRUD actions are default included:
       // 1. all (GET /)
@@ -27,20 +26,16 @@ const User = new Modele({
         // Ex.: (PUT www.mydomain.com/api/2/users/42/avatar)
         uploadAvatar: {
           // Use scope to specify if action is on collection or on member
-          // Obs: actions on member include ID beetwen baseURL and path
-          method: 'PUT',
+          // Obs: actions on member include ID beetwen baseURL and url
           scope: 'member',
-          path: 'avatar',
-          body: true
+          url: 'avatar',
+          request: {
+            method: 'PUT'
+          }
           // You can include requests headers with:
           // headers: {
           //   'Content-Type': 'multipart/form-data'
           // }
-          // and disable JSON.stringify only in action
-          // config: {
-          //   json: false
-          // }
-          //
         }
       }
     }
