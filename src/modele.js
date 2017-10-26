@@ -19,9 +19,7 @@ export default class Modele {
     Object.defineProperty(this, '__keys', { value: keys })
 
     // api
-    if (opts.api === true) {
-      Object.defineProperty(this, '__api', { value: new API() })
-    } else if (opts.api !== false) {
+    if (opts.api) {
       Object.defineProperty(this, '__api', { value: new API(opts.api) })
     }
 
