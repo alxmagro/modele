@@ -25,8 +25,8 @@
     "build": "webpack"
   },
   "dependencies": {
+    "axios": "^0.17.0",
     "interpolate-url": "^0.0.2",
-    "isomorphic-fetch": "^2.2.1",
     "join-path": "^1.1.1",
     "lodash": "^4.17.4"
   },
@@ -41,6 +41,7 @@
     "eslint-plugin-vue-libs": "^1.2.1",
     "express": "^4.15.4",
     "mocha": "^3.5.3",
+    "sinon": "^4.1.1",
     "uglifyjs-webpack-plugin": "^0.4.6",
     "uuid": "^3.1.0",
     "webpack": "^3.6.0"

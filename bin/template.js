@@ -1,104 +1,55 @@
-import Modele from 'modele'
+import Modele, { validates } from 'modele'
 
-const User = new Modele({
-  name: 'User',
-  api: {
-    defaults: {
-      baseURL: 'http\\://www.mydomain.com/api/:api_id/users'
-    },
+class User extends Modele {
+  // config
 
-    actions: {
-      // CRUD actions are default included:
-      // 1. all (GET /)
-      // 2. create (POST /)
-      // 3. read (GET /:id)
-      // 4. update (PUT /:id)
-      // 5. destroy (DELETE /:id)
-      // defaults: {
-      //   all: false,
-      //   create: false,
-      //   read: false,
-      //   update: false,
-      //   delete: false
-      // }
-      custom: {
+  api () {
+    return {
+      baseURL: 'http://www.mydomain.com/api/:api_id/users'
+    }
+  }
 
-        // Ex.: (PUT www.mydomain.com/api/2/users/42/avatar)
-        uploadAvatar: {
-          // Use scope to specify if action is on collection or on member
-          // Obs: actions on member include ID beetwen baseURL and url
-          scope: 'member',
-          url: 'avatar',
-          request: {
-            method: 'PUT'
-          }
-          // You can include requests headers with:
-          // headers: {
-          //   'Content-Type': 'multipart/form-data'
-          // }
-        }
+  actions () {
+    return {
+      uploadAvatar: {
+        config: { method: 'put', url: 'avatar' }
       }
     }
-  },
+  }
 
-  // User `assoctiations` to convert sub-objetc in anothers Modeles.
-  // It can be an array or a single plain object
-  // associations: {
-  //   projects: ProjectModel
-  // }
-
-  // Define client-server validations
-  // Check link bellow for more informations about default validates
-  // And how create your owns validations
-  validates: {
-    defaults: {
-      email: {
-        format: { with: /\S+@\S+\.\S+/ }
-      },
-      password: {
-        length: { min: 8 }
-      }
-    },
-
-    create: {
-      email: {
-        confirmation: true
-      },
-      password: {
-        presence: true
-      }
-    }
-  },
-
-  // static: {
-  //   data: function () { ... },
-  //   computed: {},
-  //   methods: {},
-  // },
-
-  // Define default attributes:
-  data: function () {
+  defaults () {
     return {
       createdAt: new Date()
     }
-  },
+  }
 
-  // Define computed attributes
-  computed: {
-    fullName: function (record) {
-      if (this.name && this.surname) {
-        return `#{this.name} #{this.surname}`
+  validations () {
+    return {
+      defaults: {
+        email: validates.format(/\S+@\S+\.\S+/),
+        password: validates.length({ min: 8 })
+      },
+
+      create: {
+        email: validates.confirmation('emailConfirmation'),
+        password: validates.presence()
       }
-
-      return '...'
-    }
-  },
-
-  methods: {
-    hallo: function (another) {
-      console.log(`Hi ${another.name}! My name is ${this.name}.`)
     }
   }
-})
+
+  // custom
+
+  get fullName(record) {
+    if (this.name && this.surname) {
+      return `#{this.name} #{this.surname}`
+    }
+
+    return '...'
+  }
+
+  hallo (another) {
+    console.log(`Hi ${another.name}! My name is ${this.name}.`)
+  }
+}
 
 export default User
