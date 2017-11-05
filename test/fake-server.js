@@ -46,6 +46,11 @@ export default class FakeServer {
     app.use(bodyParser.json())
     app.use(bodyParser.urlencoded({ extended: true }))
 
+    // interceptor
+    // app.use(function(req, res, next) {
+    //   next()
+    // })
+
     // index
     app.get('/users', (req, res) => {
       res.json(this.db.users)
