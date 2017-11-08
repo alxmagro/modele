@@ -2,7 +2,7 @@ import { expect } from 'chai'
 import URL from '../../../src/http/url'
 
 describe('URL', function () {
-  describe ('#new', function () {
+  describe('#new', function () {
     it('join paths', function () {
       expect(URL.new('foo', 'bar').url).to.equal('foo/bar')
     })
@@ -21,5 +21,4 @@ describe('URL', function () {
       expect(URL.new('foo', ':bar').solve({ bar: 2 })).to.equal('foo/2')
     })
   })
-
 })

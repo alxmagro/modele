@@ -132,5 +132,36 @@ describe('Modele', function () {
         })
         .catch(done)
     })
+
+    // validations
+
+    it('should be able validates all attributes', function () {
+      const result = user.valid()
+
+      expect(result).to.be.false
+    })
+
+    it('should be able validates one attribute', function () {
+      const result = user.valid('defaults', 'password')
+
+      expect(result).to.be.false
+    })
+
+    it('should be able record validation errors', function () {
+      user.valid()
+
+      expect(user.errors.all()).to.deep.equal({
+        password: [
+          {
+            name: 'presence',
+            context: {
+              attribute: 'password',
+              record: user.toJSON(),
+              value: undefined
+            }
+          }
+        ]
+      })
+    })
   })
 })

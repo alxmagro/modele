@@ -23,12 +23,6 @@ export default class Errors {
     return this.errors[field]
   }
 
-  first (field) {
-    if (this.errors[field]) {
-      return this.errors[field][0]
-    }
-  }
-
   // setters
 
   record (errors) {
@@ -45,13 +39,13 @@ export default class Errors {
     this.errors[prop].push(error)
   }
 
-  merge (errors) {
-    for (const prop in errors.all()) {
-      const list = errors.get(prop) || []
+  // merge (errors) {
+  //   for (const prop in errors.all()) {
+  //     const list = errors.get(prop) || []
 
-      list.forEach(error => this.add(prop, error))
-    }
-  }
+  //     list.forEach(error => this.add(prop, error))
+  //   }
+  // }
 
   // destroyers
 

@@ -1,14 +1,19 @@
 import _ from 'lodash'
 import axios from 'axios'
 import URL from './http/url'
-import Errors from './validator/errors'
+import { Validator, Errors } from './validation'
 
 const RESERVED = [
   // TODO
 ]
 
+const DEFAULT_VALIDATORS = {
+  defaults: {}
+}
+
 const DEFAULT_OPTIONS = {
-  identifier: 'id'
+  identifier: 'id',
+  ruleset: null
 }
 
 const DEFAULT_ACTIONS = {
@@ -16,6 +21,21 @@ const DEFAULT_ACTIONS = {
     config: {},
     success (response) {
       this.assign(response.data)
+    }
+  },
+
+  create: {
+    config () {
+      return {
+        method: 'post',
+        data: this.toJSON()
+      }
+    },
+
+    success (response) {
+      if (response) {
+        this.assign(response.data)
+      }
     }
   },
 
@@ -28,7 +48,6 @@ const DEFAULT_ACTIONS = {
     },
 
     success (response) {
-      // clear errors
       if (response) {
         this.assign(response.data)
       }
@@ -37,6 +56,7 @@ const DEFAULT_ACTIONS = {
 
   destroy: {
     config: { method: 'delete' },
+
     success () {
       this.clear()
     }
@@ -53,9 +73,11 @@ export default class Modele {
     this._options = {}
     this._changes = new Set()
     this._pending = false
+    this._validators = {}
     this.errors = new Errors()
 
     this.setOptions()
+    this.setValidators()
     this.registerActions()
 
     this.assign(attributes)
@@ -102,6 +124,10 @@ export default class Modele {
     return {}
   }
 
+  validation () {
+
+  }
+
   actions () {
     return {}
   }
@@ -115,7 +141,7 @@ export default class Modele {
 
   // ALIASES
 
-  get $() {
+  get $ () {
     return this._reference
   }
 
@@ -131,8 +157,8 @@ export default class Modele {
 
   // STATE MUTATIONS
 
-  setChange (attribute, value) {
-    if (value) {
+  setChange (attribute) {
+    if (this.get(attribute) !== this.saved(attribute)) {
       this._changes.add(attribute)
     } else {
       this._changes.delete(attribute)
@@ -150,6 +176,12 @@ export default class Modele {
 
   reset () {
     this._attributes = _.cloneDeep(this._reference)
+  }
+
+  clear () {
+    this.clearAttributes()
+    this.clearErrors()
+    this.clearState()
   }
 
   // REQUESTS
@@ -189,7 +221,7 @@ export default class Modele {
       this.setPending(true)
 
       // call before callback
-      if (onRequest) onRequest.call(this)
+      onRequest && onRequest.call(this)
 
       // merge default config (api) with config
       config = _.merge({}, this.api(), config)
@@ -233,12 +265,6 @@ export default class Modele {
     this.sync()
   }
 
-  clear () {
-    this.clearAttributes()
-    this.clearErrors()
-    this.clearState()
-  }
-
   /**
    * Returns the model's identifier value.
    */
@@ -252,6 +278,10 @@ export default class Modele {
 
   setOption (path, value) {
     return _.set(this._options, path, value)
+  }
+
+  getValidator (path) {
+    return _.get(this._validators, path)
   }
 
   toJSON () {
@@ -281,16 +311,11 @@ export default class Modele {
       this.registerAttribute(attribute)
     }
 
-    const saved = this.saved(attribute)
     const previous = this.get(attribute)
 
     if (this.getOption('mutateOnChange')) {
       value = this.mutated(attribute, value)
     }
-
-    const primal = _.isEqual(saved, value)
-
-    this.setChange(attribute, !primal)
 
     const changed = !_.isEqual(previous, value)
 
@@ -300,7 +325,53 @@ export default class Modele {
 
     _.set(this._attributes, attribute, value)
 
+    this.setChange(attribute)
+
     return value
+  }
+
+  valid (scope = 'defaults', attribute) {
+    let errors
+
+    if (attribute) {
+      errors = this.validateAttribute(attribute, scope)
+
+      this.errors.set(attribute, errors)
+    } else {
+      errors = this.validate(scope)
+
+      this.errors.record(errors)
+    }
+
+    return !this.errors.any()
+  }
+
+  validateAttribute (attribute, scope = 'defaults') {
+    const errors = []
+
+    if (scope !== 'defaults') {
+      errors.concat(this.validateAttribute(this._attributes, attribute))
+    }
+
+    const validator = this.getValidator(scope)
+
+    errors.concat(validator.validateAttribute(this._attributes, attribute))
+
+    return errors
+  }
+
+  validate (scope = 'defaults') {
+    const errors = {}
+
+    if (scope !== 'defaults') {
+      _.merge(errors, this.validate())
+    }
+
+    const validator = this.getValidator(scope)
+
+    _.merge(errors, validator.validate(this._attributes))
+
+    return errors
   }
 
   // REGISTERS
@@ -309,12 +380,26 @@ export default class Modele {
     this._options = Object.assign({}, DEFAULT_OPTIONS, this.options())
   }
 
+  setValidators () {
+    const scopes = Object.assign({}, DEFAULT_VALIDATORS, this.validation())
+
+    _.each(scopes, (attributes, scope) => {
+      this.setValidator(scope, attributes)
+    })
+  }
+
   registerActions () {
     const actions = Object.assign({}, DEFAULT_ACTIONS, this.actions())
 
     _.each(actions, (value, attribute) => {
       this.registerAction(attribute, value)
     })
+  }
+
+  setValidator (name, attributes) {
+    const ruleset = this.getOption('ruleset')
+
+    this._validators[name] = new Validator(ruleset, attributes)
   }
 
   registerAction (name, options) {

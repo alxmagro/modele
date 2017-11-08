@@ -26,13 +26,47 @@ class User extends Modele {
   validations () {
     return {
       defaults: {
-        email: validates.format(/\S+@\S+\.\S+/),
-        password: validates.length({ min: 8 })
+        email: {
+          presence: true,
+          format: { with: /\S+@\S+\.\S+/ }
+        },
+        password: {
+          length: { min: 8 }
+        }
       },
 
       create: {
-        email: validates.confirmation('emailConfirmation'),
-        password: validates.presence()
+        email: {
+          confirmation: { with: 'email_confirmation' }
+        },
+        password: {
+          presence: true
+        }
+      }
+    }
+  }
+
+  validations () {
+    return {
+      defaults: {
+        email () {
+          presence()
+          format(/\S+@\S+\.\S+/)
+        },
+
+        password () {
+          length(8)
+        }
+      },
+
+      create: {
+        email () {
+          confirmation('email_confirmation')
+        }
+
+        password () {
+          presence()
+        }
       }
     }
   }

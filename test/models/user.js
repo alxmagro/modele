@@ -1,4 +1,4 @@
-import Modele, { validates } from '../../src/modele'
+import Modele from '../../src/modele'
 
 export default class User extends Modele {
   api () {
@@ -21,11 +21,13 @@ export default class User extends Modele {
     }
   }
 
-  validations () {
+  validation () {
     return {
-      name:     validates.presence(),
-      surname:  validates.presence(),
-      password: validates.presence({ on: 'create' })
+      defaults: {
+        name: { presence: true },
+        surname: { presence: true },
+        password: { presence: true }
+      }
     }
   }
 
