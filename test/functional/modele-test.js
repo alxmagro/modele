@@ -1,15 +1,15 @@
 import { expect } from 'chai'
 import sinon from 'sinon'
 import FakeServer from '../fake-server'
-import User from '../models/user'
+import Users from '../models/users'
 
 describe('Modele', function () {
-  describe('instance', function () {
+  describe('member', function () {
     var server, user
 
     beforeEach(function () {
       server = new FakeServer()
-      user = new User(server.db.users[0])
+      user = Users.new(server.db.users[0])
 
       server.start()
     })
@@ -36,19 +36,6 @@ describe('Modele', function () {
       expect(user.ligthsaberColor).to.equal('Blue')
     })
 
-    it('should choose identifier attribute', function (done) {
-      user.set('uid', user.id)
-      user.set('id', undefined)
-      user.setOption('identifier', 'uid')
-
-      user.fetch()
-        .then(res => {
-          expect(res.data).to.deep.equal(server.db.users[0])
-          done()
-        })
-        .catch(done)
-    })
-
     // states
 
     context('when no one attribute is changed', function () {
@@ -67,13 +54,13 @@ describe('Modele', function () {
 
     context('when a request is send', function () {
       beforeEach(function () {
-        sinon.spy(user, 'setPending')
+        sinon.spy(user, '_setPending')
       })
 
       it('should set state pending as true', function (done) {
         user.fetch()
           .then(res => {
-            expect(user.setPending.getCall(0).args[0]).to.equal(true)
+            expect(user._setPending.getCall(0).args[0]).to.equal(true)
             done()
           })
           .catch(done)
@@ -82,7 +69,7 @@ describe('Modele', function () {
       it('should set state pending as false when completed', function (done) {
         user.fetch()
           .then(res => {
-            expect(user.setPending.getCall(1).args[0]).to.equal(false)
+            expect(user._setPending.getCall(1).args[0]).to.equal(false)
             done()
           })
           .catch(done)

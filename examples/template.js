@@ -1,14 +1,14 @@
-import Modele, { validates } from 'modele'
+import { Resource, Member } from 'modele'
 
-class User extends Modele {
-  // config
-
+class Users extends Resource {
   api () {
     return {
       baseURL: 'http://www.mydomain.com/api/:api_id/users'
     }
   }
+}
 
+class User extends Member {
   actions () {
     return {
       uploadAvatar: {
@@ -46,31 +46,6 @@ class User extends Modele {
     }
   }
 
-  validations () {
-    return {
-      defaults: {
-        email () {
-          presence()
-          format(/\S+@\S+\.\S+/)
-        },
-
-        password () {
-          length(8)
-        }
-      },
-
-      create: {
-        email () {
-          confirmation('email_confirmation')
-        }
-
-        password () {
-          presence()
-        }
-      }
-    }
-  }
-
   // custom
 
   get fullName(record) {
@@ -86,4 +61,4 @@ class User extends Modele {
   }
 }
 
-export default User
+export default new Users()

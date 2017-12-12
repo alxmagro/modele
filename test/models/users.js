@@ -1,12 +1,18 @@
-import Modele from '../../src/modele'
+import { Resource, Member } from '../../src/modele'
 
-export default class User extends Modele {
+class Users extends Resource {
   api () {
     return {
       baseURL: 'http://localhost:3000/users'
     }
   }
 
+  member () {
+    return User
+  }
+}
+
+class User extends Member {
   actions () {
     return {
       upvote: {
@@ -41,3 +47,5 @@ export default class User extends Modele {
     return 'Hello'
   }
 }
+
+export default new Users()
