@@ -24,8 +24,8 @@ export default class Resource extends Base {
   }
 
   stub (identifier) {
-    const Member = this.member
-    const stub = new Member()
+    const Member = this.member()
+    const stub = new Member(null, this)
     const key = this.getOption('identifier')
 
     stub.set(key, identifier)

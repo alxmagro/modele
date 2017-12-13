@@ -4,6 +4,20 @@ import FakeServer from '../fake-server'
 import Users from '../models/users'
 
 describe('Modele', function () {
+  describe('resource', function () {
+    it('can create a member instance', function () {
+      const user = Users.new({ name: 'Luke' })
+
+      expect(user.name).to.equal('Luke')
+    })
+
+    it('can create a stub', function () {
+      const user = Users.stub(1)
+
+      expect(user.id).to.equal(1)
+    })
+  })
+
   describe('member', function () {
     var server, user
 
