@@ -1,6 +1,6 @@
-import { Resource, Member } from '../../src/modele'
+import Modele from '../../src/modele'
 
-class Users extends Resource {
+class Users extends Modele.Resource {
   api () {
     return {
       baseURL: 'http://localhost:3000/users'
@@ -12,7 +12,7 @@ class Users extends Resource {
   }
 }
 
-class User extends Member {
+class User extends Modele.Member {
   actions () {
     return {
       upvote: {

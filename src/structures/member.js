@@ -6,8 +6,10 @@ import { Validator, Errors } from '../validation'
 const DEFAULT_ACTIONS = {
   fetch: {
     config: {},
-    success (response) {
-      this.assign(response.data)
+    callbacks: {
+      success (response) {
+        this.assign(response.data)
+      }
     }
   },
 
@@ -19,9 +21,11 @@ const DEFAULT_ACTIONS = {
       }
     },
 
-    success (response) {
-      if (response) {
-        this.assign(response.data)
+    callbacks: {
+      success (response) {
+        if (response) {
+          this.assign(response.data)
+        }
       }
     }
   },
@@ -34,9 +38,11 @@ const DEFAULT_ACTIONS = {
       }
     },
 
-    success (response) {
-      if (response) {
-        this.assign(response.data)
+    callbacks: {
+      success (response) {
+        if (response) {
+          this.assign(response.data)
+        }
       }
     }
   },
@@ -44,8 +50,10 @@ const DEFAULT_ACTIONS = {
   destroy: {
     config: { method: 'delete' },
 
-    success () {
-      this.clear()
+    callbacks: {
+      success () {
+        this.clear()
+      }
     }
   }
 }
@@ -77,6 +85,9 @@ const RESERVED = [
 export default class Member extends Base {
   constructor (attributes = {}, resource) {
     super()
+
+    this._pending = false
+    this._defaults = { actions: DEFAULT_ACTIONS }
     this._resource = resource
     this._keys = {}
     this._attributes = {}
@@ -85,6 +96,7 @@ export default class Member extends Base {
     this._validators = {}
     this.errors = new Errors()
 
+    this._registerActions()
     this._setValidators()
 
     this.assign(attributes)
@@ -256,10 +268,6 @@ export default class Member extends Base {
     return _.get(this._validators, path)
   }
 
-  _actionConfigs () {
-    return this._resource.api()
-  }
-
   _clearAttributes () {
     const defaults = this.defaults()
 
@@ -279,10 +287,6 @@ export default class Member extends Base {
   _prepareRequest (config) {
     config.url = URL.new(config.url).solve(this._keys)
     config.baseURL = URL.new(config.baseURL, this.identifier()).solve(this._keys)
-  }
-
-  _defaultActions () {
-    return DEFAULT_ACTIONS
   }
 
   _registerAttribute (attribute) {

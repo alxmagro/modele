@@ -1,12 +1,7 @@
 import _ from 'lodash'
-import axios from 'axios'
+import Modele from '../modele'
 
 export default class Base {
-  constructor () {
-    this._pending = false
-    this._registerActions()
-  }
-
   action (options) {
     return (...configs) => {
       // set first config
@@ -23,47 +18,43 @@ export default class Base {
         .value()
 
       // send request
-      return this.send(
-        config,
-        options.before,
-        options.success,
-        options.failure
-      )
+      return this.send(config, options.callbacks)
     }
   }
 
-  send (config, onRequest, onSuccess, onFailure) {
+  send (config, callbacks = {}) {
     return new Promise((resolve, reject) => {
       this._setPending(true)
 
       // call before callback
-      onRequest && onRequest.call(this)
+      if (callbacks.before) callbacks.before.call(this)
 
       // merge default config (api) with config
-      config = _.merge({}, this._actionConfigs(), config)
+      config = _.merge({}, this._resource.api(), config)
 
       // prepare
       this._prepareRequest(config)
 
       // send
-      return axios(config)
+      return Modele.adapters.http.send(config)
 
         // success
         .then((response) => {
           this._setPending(false)
-          if (onSuccess) onSuccess.call(this, response)
+          if (callbacks.success) callbacks.success.call(this, response)
           return resolve(response)
         })
 
         // failure
         .catch((error) => {
           this._setPending(false)
-          if (onFailure) onFailure.call(this, error)
+          if (callbacks.failure) callbacks.failure.call(this, error)
           return reject(error)
         })
 
         // failure fallback
         .catch((fatal) => {
+          this._setPending(false)
           return reject(fatal)
         })
     })
@@ -77,8 +68,6 @@ export default class Base {
 
   // abstract
 
-  _defaultActions () {}
-  _actionConfigs () {}
   _prepareRequest (config) {}
 
   // private
@@ -88,7 +77,7 @@ export default class Base {
   }
 
   _registerActions () {
-    const actions = Object.assign({}, this._defaultActions(), this.actions())
+    const actions = Object.assign({}, this._defaults.actions, this.actions())
 
     _.each(actions, (value, attribute) => {
       this._registerAction(attribute, value)

@@ -1,5 +1,5 @@
-import Base from './base'
 import _ from 'lodash'
+import Base from './base'
 import URL from '../http/url'
 
 const DEFAULT_ACTIONS = {
@@ -17,7 +17,13 @@ const DEFAULT_OPTIONS = {
 export default class Resource extends Base {
   constructor (attributes = {}) {
     super()
+
+    this._pending = false
+    this._defaults = { actions: DEFAULT_ACTIONS }
+    this._resource = this
     this._keys = {}
+
+    this._registerActions()
     this._setOptions()
 
     this.boot()
@@ -66,11 +72,11 @@ export default class Resource extends Base {
     return _.set(this._options, path, value)
   }
 
-  // private
-
-  _actionConfigs () {
-    return this.api()
+  send (config, callbacks) {
+    this.adapters.http.send(config, callbacks)
   }
+
+  // private
 
   _setOptions () {
     this._options = Object.assign({}, DEFAULT_OPTIONS, this.options())
@@ -79,9 +85,5 @@ export default class Resource extends Base {
   _prepareRequest (config) {
     config.url = URL.new(config.url).solve(this._keys)
     config.baseURL = URL.new(config.baseURL).solve(this._keys)
-  }
-
-  _defaultActions () {
-    return DEFAULT_ACTIONS
   }
 }
