@@ -33,7 +33,7 @@ export default class Validator {
     }
   }
 
-  addRule (attribute, name, options) {
+  addRule (prop, name, options) {
     if (!this.ruleset[name]) {
       throw new TypeError(`Rule "${name}" is not defined`)
     }
@@ -48,23 +48,23 @@ export default class Validator {
 
     const rule = this.ruleset[name](options)
 
-    this.rules[attribute] = this.rules[attribute] || []
-    this.rules[attribute].push(rule)
+    this.rules[prop] = this.rules[prop] || []
+    this.rules[prop].push(rule)
   }
 
   addRules (config) {
-    _.each(config, (rules, attribute) => {
+    _.each(config, (rules, prop) => {
       _.each(rules, (options, name) => {
-        this.addRule(attribute, name, options)
+        this.addRule(prop, name, options)
       })
     })
   }
 
-  validateAttribute (record, attribute) {
+  validateProp (record, prop) {
     const errors = []
 
-    _.each(this.rules[attribute], rule => {
-      const error = rule.validate(record, attribute)
+    _.each(this.rules[prop], rule => {
+      const error = rule.run(record, prop)
 
       if (error) errors.push(error)
     })
@@ -75,10 +75,10 @@ export default class Validator {
   validate (record) {
     const errors = {}
 
-    _.each(this.rules, (rules, attribute) => {
-      const attrErrors = this.validateAttribute(record, attribute)
+    _.each(this.rules, (rules, prop) => {
+      const attrErrors = this.validateProp(record, prop)
 
-      if (attrErrors.length) errors[attribute] = attrErrors
+      if (attrErrors.length) errors[prop] = attrErrors
     })
 
     return errors

@@ -79,7 +79,7 @@ const RESERVED = [
   'set',
   'valid',
   'validateAttribute',
-  'validate'
+  'validateAll'
 ]
 
 export default class Member extends Base {
@@ -210,15 +210,15 @@ export default class Member extends Base {
     return value
   }
 
-  valid (scope = 'defaults', attribute) {
+  valid (options = {}) {
     let errors
 
-    if (attribute) {
-      errors = this.validateAttribute(attribute, scope)
+    if (options.attribute) {
+      errors = this.validateAttribute(options.attribute, options.scope)
 
-      this.errors.set(attribute, errors)
+      this.errors.set(options.attribute, errors)
     } else {
-      errors = this.validate(scope)
+      errors = this.validateAll(options.scope)
 
       this.errors.record(errors)
     }
@@ -227,31 +227,29 @@ export default class Member extends Base {
   }
 
   validateAttribute (attribute, scope = 'defaults') {
-    const errors = []
-
-    if (scope !== 'defaults') {
-      errors.concat(this.validateAttribute(this._attributes, attribute))
+    // IF scope is default, validate only it.
+    if (scope === 'defaults') {
+      return this.validator(scope).validateProp(attribute)
     }
 
-    const validator = this._getValidator(scope)
-
-    errors.concat(validator.validateAttribute(this._attributes, attribute))
-
-    return errors
+    // IF scope is not default, validate defaults and it.
+    return _.concat(
+      this.validateAttribute(attribute),
+      this._validator(scope).validateProp(this.toJSON(), attribute)
+    )
   }
 
-  validate (scope = 'defaults') {
-    const errors = {}
-
-    if (scope !== 'defaults') {
-      _.merge(errors, this.validate())
+  validateAll (scope = 'defaults') {
+    // IF scope is default, validate only it.
+    if (scope === 'defaults') {
+      return this._validator(scope).validate(this.toJSON())
     }
 
-    const validator = this._getValidator(scope)
-
-    _.merge(errors, validator.validate(this._attributes))
-
-    return errors
+    // IF scope is not default, validate defaults and it.
+    return _.merge(
+      this.validateAll(),
+      this._validator(scope).validate(this.toJSON())
+    )
   }
 
   // private
@@ -264,7 +262,7 @@ export default class Member extends Base {
     }
   }
 
-  _getValidator (path) {
+  _validator (path) {
     return _.get(this._validators, path)
   }
 

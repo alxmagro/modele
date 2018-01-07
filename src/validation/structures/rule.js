@@ -7,7 +7,7 @@ export default class Rule {
     this.data = _.get(config, 'data', {})
   }
 
-  validate (record, attribute) {
+  run (record, attribute) {
     const value = record[attribute]
     const valid = this.test(value, record, attribute)
 
