@@ -229,7 +229,7 @@ export default class Member extends Base {
   validateAttribute (attribute, scope = 'defaults') {
     // IF scope is default, validate only it.
     if (scope === 'defaults') {
-      return this.validator(scope).validateProp(attribute)
+      return this._validator(scope).validateProp(attribute)
     }
 
     // IF scope is not default, validate defaults and it.
