@@ -1,5 +1,5 @@
-import Base from './base'
 import _ from 'lodash'
+import Base from './base'
 import URL from '../http/url'
 import { Validator, Errors } from '../validation'
 
@@ -105,7 +105,6 @@ export default class Member extends Base {
 
   // interface
 
-  resource () {}
   boot () {}
 
   actions () {

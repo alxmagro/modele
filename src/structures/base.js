@@ -36,7 +36,7 @@ export default class Base {
       this._prepareRequest(config)
 
       // send
-      return Modele.adapters.http.send(config)
+      return Modele.axios(config)
 
         // success
         .then((response) => {
