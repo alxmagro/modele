@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import Modele from '../../src/modele'
 
 class Users extends Modele.Resource {
@@ -13,17 +14,16 @@ class Users extends Modele.Resource {
 }
 
 class User extends Modele.Member {
-  actions () {
-    return {
-      upvote: {
-        config: { method: 'put', url: 'upvote' }
-      }
-    }
-  }
-
   defaults () {
     return {
       ligthsaberColor: 'Blue'
+    }
+  }
+
+  mutations () {
+    return {
+      name: [String, _.trim],
+      surname: [String, _.trim]
     }
   }
 
@@ -33,6 +33,14 @@ class User extends Modele.Member {
         name: { presence: true },
         surname: { presence: true },
         password: { presence: true }
+      }
+    }
+  }
+
+  actions () {
+    return {
+      upvote: {
+        config: { method: 'put', url: 'upvote' }
       }
     }
   }

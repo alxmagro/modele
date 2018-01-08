@@ -94,6 +94,7 @@ export default class Member extends Base {
     this._reference = {}
     this._changes = new Set()
     this._validators = {}
+    this._mutations = this._compiledMutations()
     this.errors = new Errors()
 
     this._registerActions()
@@ -116,6 +117,10 @@ export default class Member extends Base {
   }
 
   validation () {
+    return {}
+  }
+
+  mutations () {
     return {}
   }
 
@@ -164,11 +169,20 @@ export default class Member extends Base {
   }
 
   toJSON () {
-    return this._attributes
+    return _.mapValues(this._attributes, (value, key) => this.mutated(key))
   }
 
   has (attribute) {
     return _.has(this._attributes, attribute)
+  }
+
+  mutated (attribute) {
+    const value = this.get(attribute)
+    const mutator = _.get(this._mutations, attribute)
+
+    return mutator
+      ? mutator(value)
+      : value
   }
 
   saved (attribute, fallback) {
@@ -252,6 +266,10 @@ export default class Member extends Base {
   }
 
   // private
+
+  _compiledMutations () {
+    return _.mapValues(this.mutations(), (m) => _.flow(m))
+  }
 
   _setChange (attribute) {
     if (this.get(attribute) !== this.saved(attribute)) {

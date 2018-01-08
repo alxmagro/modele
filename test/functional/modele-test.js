@@ -90,6 +90,14 @@ describe('Modele', function () {
       })
     })
 
+    // mutations
+
+    it('should be able to mutate attributes', function () {
+      user.name = '   Yoda   '
+
+      expect(user.toJSON().name).to.be.equal('Yoda')
+    })
+
     // requests
 
     it('should be able to fetch resource', function (done) {
@@ -135,6 +143,23 @@ describe('Modele', function () {
     })
 
     // validations
+
+    it('should validate attribute after mutation', function () {
+      user.name = '       '
+
+      user.valid()
+
+      expect(user.errors.get('name')).to.deep.equal([
+        {
+          name: 'presence',
+          context: {
+            attribute: 'name',
+            record: user.toJSON(),
+            value: ''
+          }
+        }
+      ])
+    })
 
     it('should be able validates all attributes', function () {
       const result = user.valid()
