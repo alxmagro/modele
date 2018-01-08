@@ -74,6 +74,7 @@ const RESERVED = [
   'assign',
   'toJSON',
   'has',
+  'mutated',
   'saved',
   'get',
   'set',
