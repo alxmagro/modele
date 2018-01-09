@@ -11,7 +11,8 @@ const DEFAULT_ACTIONS = {
 
 const DEFAULT_OPTIONS = {
   identifier: 'id',
-  ruleset: null
+  ruleset: null,
+  mutateOnChange: false
 }
 
 export default class Resource extends Base {

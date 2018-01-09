@@ -170,15 +170,16 @@ export default class Member extends Base {
   }
 
   toJSON () {
-    return _.mapValues(this._attributes, (value, key) => this.mutated(key))
+    return _.mapValues(this._attributes, (value, key) => this.mutated(key, value))
   }
 
   has (attribute) {
     return _.has(this._attributes, attribute)
   }
 
-  mutated (attribute) {
-    const value = this.get(attribute)
+  mutated (attribute, value) {
+    value = value || this.get(attribute)
+
     const mutator = _.get(this._mutations, attribute)
 
     return mutator
