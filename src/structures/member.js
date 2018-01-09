@@ -307,10 +307,15 @@ export default class Member extends Base {
   }
 
   _registerAttribute (attribute) {
+    // verify is already exists
     if (_.has(RESERVED, attribute)) {
       throw new Error(`Attribute ${attribute} cannot be define: reserved property.`)
     }
 
+    // create empty error list
+    this.errors.set(attribute, [])
+
+    // define getter and setter
     Object.defineProperty(this, attribute, {
       get: () => this.get(attribute),
       set: (value) => this.set(attribute, value)

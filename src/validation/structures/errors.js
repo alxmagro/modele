@@ -1,55 +1,47 @@
 export default class Errors {
   constructor () {
-    this.errors = {}
-  }
-
-  // verificators
-
-  has (field) {
-    return this.errors.hasOwnProperty(field)
-  }
-
-  any () {
-    return Object.keys(this.errors).length > 0
+    this.map = {}
   }
 
   // getters
 
   all () {
-    return this.errors
+    return this.map
   }
 
-  get (field) {
-    return this.errors[field]
+  get (prop) {
+    return this.map[prop]
   }
 
   // setters
 
   record (errors) {
-    this.errors = errors || {}
+    this.map = errors || {}
   }
 
   set (prop, errors) {
-    this.errors[prop] = errors
+    this.map[prop] = errors
   }
 
   add (prop, error) {
-    if (!this.errors[prop]) this.errors[prop] = []
+    if (!this.map[prop]) this.set(prop, [])
 
-    this.errors[prop].push(error)
+    this.map[prop].push(error)
   }
 
-  // merge (errors) {
-  //   for (const prop in errors.all()) {
-  //     const list = errors.get(prop) || []
+  // verificators
 
-  //     list.forEach(error => this.add(prop, error))
-  //   }
-  // }
+  has (prop) {
+    return this.get(prop) && this.get(prop).length > 0
+  }
+
+  any () {
+    return Object.values(this.map).some(x => x.length > 0)
+  }
 
   // destroyers
 
-  clear (field) {
-    delete this.errors[field]
+  clear (prop) {
+    this.set(prop, [])
   }
 }
