@@ -29,8 +29,7 @@
     "interpolate-url": "^0.0.2",
     "is_js": "^0.9.0",
     "join-path": "^1.1.1",
-    "lodash": "^4.17.4",
-    "moment": "^2.19.1"
+    "lodash": "^4.17.4"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",

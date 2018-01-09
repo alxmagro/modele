@@ -1,5 +1,5 @@
 import { Rule, solved } from '../'
-import moment from 'moment'
+import is from 'is_js'
 
 export default (obj) => {
   const format = obj.format
@@ -9,27 +9,23 @@ export default (obj) => {
   if (before && after) {
     return new Rule({
       name: 'date_between',
-      test: (value) => moment(value).isBetween(before, after),
+      test: (value) => is.inDateRange(value, before, after),
       data: { before, after }
     })
   }
 
   if (before) {
-    const validation = (obj.orSame) ? 'isSameOrBefore' : 'isBefore'
-
     return new Rule({
       name: 'date_before',
-      test: (value) => moment(value)[validation](before),
+      test: (value) => (obj.orSame) ? value <= before : value < before,
       data: { before }
     })
   }
 
   if (after) {
-    const validation = (obj.orSame) ? 'isAfterOrBefore' : 'isAfter'
-
     return new Rule({
       name: 'date_after',
-      test: (value) => moment(value)[validation](after),
+      test: (value) => (obj.orSame) ? value >= after : value > after,
       data: { after }
     })
   }
