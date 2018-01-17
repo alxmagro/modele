@@ -10,26 +10,6 @@ export default class Base {
     }, route)
   }
 
-  action (options) {
-    return (...configs) => {
-      // set first config
-      if (options.config) configs = _.concat(options.config, configs)
-
-      // merge all other configs
-      const config = _.chain(configs)
-        .map((config) => {
-          return _.isFunction(config) ? config.call(this) : config
-        })
-        .reduce((acum, config) => {
-          return _.merge(acum, config)
-        }, {})
-        .value()
-
-      // send request
-      return this.send(config, options.callbacks)
-    }
-  }
-
   send (config, callbacks = {}) {
     return new Promise((resolve, reject) => {
       this._setPending(true)
@@ -103,12 +83,24 @@ export default class Base {
   }
 
   _registerAction (name, options) {
+    // verify is it is'nt aready defined
     if (_.has(this, name)) {
       throw new Error(`Action ${name} cannot be define: Already defined.`)
     }
 
-    Object.defineProperty(this, name, {
-      value: this.action(options)
-    })
+    // build action
+    const value = (callConfig) => {
+      const actionConfig = _.isFunction(options.config)
+        ? options.config.call(this)
+        : options.config
+
+      const config = _.merge({}, actionConfig, callConfig)
+
+      // send request
+      return this.send(config, options.callbacks)
+    }
+
+    // register
+    Object.defineProperty(this, name, { value })
   }
 }
