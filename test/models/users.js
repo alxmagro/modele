@@ -2,9 +2,18 @@ import _ from 'lodash'
 import Modele from '../../src/modele'
 
 class Users extends Modele.Resource {
-  api () {
+  options () {
     return {
-      baseURL: 'http://localhost:3000/users'
+      requestOptions: {
+        baseURL: 'http://localhost:3000'
+      }
+    }
+  }
+
+  routes () {
+    return {
+      resource: '/users{$url}',
+      member: '/users/{id}{$url}'
     }
   }
 
@@ -40,7 +49,7 @@ class User extends Modele.Member {
   actions () {
     return {
       upvote: {
-        config: { method: 'put', url: 'upvote' }
+        config: { method: 'put', url: '/upvote' }
       }
     }
   }

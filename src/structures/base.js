@@ -2,6 +2,14 @@ import _ from 'lodash'
 import Modele from '../modele'
 
 export default class Base {
+  getURL (route, parameters = {}) {
+    const replacements = this._getRouteReplacements(route, parameters)
+
+    return _.reduce(replacements, (result, value = '', parameter) => {
+      return _.replace(result, parameter, value)
+    }, route)
+  }
+
   action (options) {
     return (...configs) => {
       // set first config
@@ -30,10 +38,12 @@ export default class Base {
       if (callbacks.before) callbacks.before.call(this)
 
       // merge default config (api) with config
-      config = _.merge({}, this._resource.api(), config)
+      config = _.merge({}, this.getOption('requestOptions'), config)
 
-      // prepare
-      this._prepareRequest(config)
+      // set URL
+      config.url = this.getURL(this._route, this._getRouteParameters({
+        [this.getOption('routeParameterURL')]: config.url
+      }))
 
       // send
       return Modele.axios(config)
@@ -66,11 +76,19 @@ export default class Base {
     return this._pending
   }
 
-  // abstract
-
-  _prepareRequest (config) {}
-
   // private
+
+  _getRouteReplacements (route, parameters = {}) {
+    const pattern = new RegExp(this.getOption('routeParameterPattern'), 'g')
+    const replace = {}
+    let parameter
+
+    while ((parameter = pattern.exec(route)) !== null) {
+      replace[parameter[0]] = parameters[parameter[1]]
+    }
+
+    return replace
+  }
 
   _setPending (value) {
     this._pending = value

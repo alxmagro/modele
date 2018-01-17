@@ -1,6 +1,5 @@
 import _ from 'lodash'
 import Base from './base'
-import URL from '../http/url'
 
 const DEFAULT_ACTIONS = {
   fetch: {},
@@ -11,8 +10,11 @@ const DEFAULT_ACTIONS = {
 
 const DEFAULT_OPTIONS = {
   identifier: 'id',
-  ruleset: null,
-  mutateOnChange: false
+  mutateOnChange: false,
+  requestOptions: {},
+  routeParameterPattern: /\{([^}]+)\}/,
+  routeParameterURL: '$url',
+  ruleset: null
 }
 
 export default class Resource extends Base {
@@ -21,11 +23,11 @@ export default class Resource extends Base {
 
     this._pending = false
     this._defaults = { actions: DEFAULT_ACTIONS }
-    this._resource = this
-    this._keys = {}
+    this._routeParams = {}
+    this._route = this.routes().resource
+    this._options = _.merge({}, DEFAULT_OPTIONS, this.options())
 
     this._registerActions()
-    this._setOptions()
 
     this.boot()
   }
@@ -49,11 +51,8 @@ export default class Resource extends Base {
   // interface
 
   member () {}
-  boot () {}
 
-  api () {
-    return {}
-  }
+  boot () {}
 
   options () {
     return {}
@@ -61,6 +60,15 @@ export default class Resource extends Base {
 
   actions () {
     return {}
+  }
+
+  routes () {
+    const actionURL = this.getOption('routeParameterURL')
+
+    return {
+      resource: '{' + actionURL + '}',
+      member: '/{id}{' + actionURL + '}'
+    }
   }
 
   // methods
@@ -73,18 +81,9 @@ export default class Resource extends Base {
     return _.set(this._options, path, value)
   }
 
-  send (config, callbacks) {
-    this.adapters.http.send(config, callbacks)
-  }
-
   // private
 
-  _setOptions () {
-    this._options = Object.assign({}, DEFAULT_OPTIONS, this.options())
-  }
-
-  _prepareRequest (config) {
-    config.url = URL.new(config.url).solve(this._keys)
-    config.baseURL = URL.new(config.baseURL).solve(this._keys)
+  _getRouteParameters (defaults = {}) {
+    return _.merge({}, this._routeParams, defaults)
   }
 }

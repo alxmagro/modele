@@ -1,6 +1,5 @@
 import _ from 'lodash'
 import Base from './base'
-import URL from '../http/url'
 import { Validator, Errors } from '../validation'
 
 const DEFAULT_ACTIONS = {
@@ -90,12 +89,13 @@ export default class Member extends Base {
     this._pending = false
     this._defaults = { actions: DEFAULT_ACTIONS }
     this._resource = resource
-    this._keys = {}
+    this._routeParams = {}
     this._attributes = {}
     this._reference = {}
     this._changes = new Set()
     this._validators = {}
     this._mutations = this._compiledMutations()
+    this._route = this.routes().member
     this.errors = new Errors()
 
     this._registerActions()
@@ -146,6 +146,16 @@ export default class Member extends Base {
     return this._changes.size > 0
   }
 
+  // delegate to resource
+
+  getOption (path, fallback) {
+    return this._resource.getOption(path, fallback)
+  }
+
+  routes () {
+    return this._resource.routes()
+  }
+
   // methods
 
   get $ () {
@@ -156,7 +166,7 @@ export default class Member extends Base {
    * Returns the model's identifier value.
    */
   identifier () {
-    return this.get(this._resource.getOption('identifier'))
+    return this.get(this.getOption('identifier'))
   }
 
   /**
@@ -208,7 +218,7 @@ export default class Member extends Base {
 
     const previous = this.get(attribute)
 
-    if (this._resource.getOption('mutateOnChange')) {
+    if (this.getOption('mutateOnChange')) {
       value = this.mutated(attribute, value)
     }
 
@@ -269,6 +279,10 @@ export default class Member extends Base {
 
   // private
 
+  _getRouteParameters (defaults = {}) {
+    return _.merge({}, this._attributes, this._routeParams, defaults)
+  }
+
   _compiledMutations () {
     return _.mapValues(this.mutations(), (m) => _.flow(m))
   }
@@ -301,11 +315,6 @@ export default class Member extends Base {
     this._pending = false
   }
 
-  _prepareRequest (config) {
-    config.url = URL.new(config.url).solve(this._keys)
-    config.baseURL = URL.new(config.baseURL, this.identifier()).solve(this._keys)
-  }
-
   _registerAttribute (attribute) {
     // verify is already exists
     if (_.has(RESERVED, attribute)) {
@@ -331,7 +340,7 @@ export default class Member extends Base {
   }
 
   _setValidator (name, attributes) {
-    const ruleset = this._resource.getOption('ruleset')
+    const ruleset = this.getOption('ruleset')
 
     this._validators[name] = new Validator(ruleset, attributes)
   }
