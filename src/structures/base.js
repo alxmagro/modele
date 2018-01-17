@@ -26,7 +26,7 @@ export default class Base {
       }))
 
       // send
-      return Modele.axios(config)
+      return Modele.globals.axios(config)
 
         // success
         .then((response) => {
