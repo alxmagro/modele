@@ -1,4 +1,5 @@
 const path = require('path')
+const LodashModuleReplacementPlugin = require('lodash-webpack-plugin')
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
 
 module.exports = {
@@ -15,6 +16,7 @@ module.exports = {
     ]
   },
   plugins: [
+    new LodashModuleReplacementPlugin(),
     new UglifyJSPlugin()
   ]
 }
