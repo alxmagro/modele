@@ -1,4 +1,5 @@
-import _ from 'lodash'
+import _isFunction from 'lodash/isFunction'
+
 import Validator from './structures/validator'
 import Rule from './structures/rule'
 import Errors from './structures/errors'
@@ -10,5 +11,5 @@ exports.Errors = Errors
 // helpers
 
 export function solved (value) {
-  return (_.isFunction(value)) ? value() : value
+  return _isFunction(value) ? value() : value
 }

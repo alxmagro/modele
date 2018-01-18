@@ -1,12 +1,17 @@
-import _ from 'lodash'
+import _each from 'lodash/each'
+import _isFunction from 'lodash/isFunction'
+import _reduce from 'lodash/reduce'
+import _replace from 'lodash/replace'
+import _merge from 'lodash/merge'
+
 import Modele from '../modele'
 
 export default class Base {
   getURL (route, parameters = {}) {
     const replacements = this._getRouteReplacements(route, parameters)
 
-    return _.reduce(replacements, (result, value = '', parameter) => {
-      return _.replace(result, parameter, value)
+    return _reduce(replacements, (result, value = '', parameter) => {
+      return _replace(result, parameter, value)
     }, route)
   }
 
@@ -18,7 +23,7 @@ export default class Base {
       if (callbacks.before) callbacks.before.call(this)
 
       // merge default config (api) with config
-      config = _.merge({}, this.getOption('requestOptions'), config)
+      config = _merge({}, this.getOption('requestOptions'), config)
 
       // set URL
       config.url = this.getURL(this._route, this._getRouteParameters({
@@ -77,24 +82,24 @@ export default class Base {
   _registerActions () {
     const actions = Object.assign({}, this._defaults.actions, this.actions())
 
-    _.each(actions, (value, attribute) => {
+    _each(actions, (value, attribute) => {
       this._registerAction(attribute, value)
     })
   }
 
   _registerAction (name, options) {
     // verify is it is'nt aready defined
-    if (_.has(this, name)) {
+    if (this.hasOwnProperty(name)) {
       throw new Error(`Action ${name} cannot be define: Already defined.`)
     }
 
     // build action
     const value = (callConfig) => {
-      const actionConfig = _.isFunction(options.config)
+      const actionConfig = _isFunction(options.config)
         ? options.config.call(this)
         : options.config
 
-      const config = _.merge({}, actionConfig, callConfig)
+      const config = _merge({}, actionConfig, callConfig)
 
       // send request
       return this.send(config, options.callbacks)

@@ -1,4 +1,7 @@
-import _ from 'lodash'
+import _get from 'lodash/get'
+import _merge from 'lodash/merge'
+import _set from 'lodash/set'
+
 import Base from './base'
 import Modele from '../modele'
 
@@ -17,7 +20,7 @@ export default class Resource extends Base {
     this._defaults = { actions: DEFAULT_ACTIONS }
     this._routeParams = {}
     this._route = this.routes().resource
-    this._options = _.merge({}, Modele.globals.options, this.options())
+    this._options = _merge({}, Modele.globals.options, this.options())
 
     this._registerActions()
 
@@ -66,16 +69,16 @@ export default class Resource extends Base {
   // methods
 
   getOption (path, fallback) {
-    return _.get(this._options, path, fallback)
+    return _get(this._options, path, fallback)
   }
 
   setOption (path, value) {
-    return _.set(this._options, path, value)
+    return _set(this._options, path, value)
   }
 
   // private
 
   _getRouteParameters (defaults = {}) {
-    return _.merge({}, this._routeParams, defaults)
+    return _merge({}, this._routeParams, defaults)
   }
 }

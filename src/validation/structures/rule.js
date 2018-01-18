@@ -1,10 +1,11 @@
-import _ from 'lodash'
+import _get from 'lodash/get'
+import _merge from 'lodash/merge'
 
 export default class Rule {
   constructor (config = {}) {
-    this.name = _.get(config, 'name')
-    this.test = _.get(config, 'test', _.stubTrue)
-    this.data = _.get(config, 'data', {})
+    this.name = _get(config, 'name')
+    this.test = _get(config, 'test', () => true)
+    this.data = _get(config, 'data', {})
   }
 
   run (record, attribute) {
@@ -14,7 +15,7 @@ export default class Rule {
     if (!valid) {
       return {
         name: this.name,
-        context: _.merge({}, this.data, { record, attribute, value })
+        context: _merge({}, this.data, { record, attribute, value })
       }
     }
   }

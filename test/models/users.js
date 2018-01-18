@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import Modele from '../../src/modele'
 
 class Users extends Modele.Resource {
@@ -31,8 +30,8 @@ class User extends Modele.Member {
 
   mutations () {
     return {
-      name: [String, _.trim],
-      surname: [String, _.trim]
+      name: (value) => String(value).trim(),
+      surname: (value) => String(value).trim()
     }
   }
 

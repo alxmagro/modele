@@ -1,4 +1,5 @@
-import _ from 'lodash'
+import _each from 'lodash/each'
+
 import absence from '../rules/absence'
 import acceptance from '../rules/acceptance'
 import confirmation from '../rules/confirmation'
@@ -59,8 +60,8 @@ export default class Validator {
   }
 
   addRules (config) {
-    _.each(config, (rules, prop) => {
-      _.each(rules, (options, name) => {
+    _each(config, (rules, prop) => {
+      _each(rules, (options, name) => {
         this.addRule(prop, name, options)
       })
     })
@@ -69,7 +70,7 @@ export default class Validator {
   validateProp (record, prop) {
     const errors = []
 
-    _.each(this.rules[prop], rule => {
+    _each(this.rules[prop], rule => {
       const error = rule.run(record, prop)
 
       if (error) errors.push(error)
@@ -81,7 +82,7 @@ export default class Validator {
   validate (record) {
     const errors = {}
 
-    _.each(this.rules, (rules, prop) => {
+    _each(this.rules, (rules, prop) => {
       const attrErrors = this.validateProp(record, prop)
 
       if (attrErrors.length) errors[prop] = attrErrors

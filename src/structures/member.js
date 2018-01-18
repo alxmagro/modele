@@ -1,4 +1,15 @@
-import _ from 'lodash'
+import _cloneDeep from 'lodash/cloneDeep'
+import _concat from 'lodash/concat'
+import _defaultsDeep from 'lodash/defaultsDeep'
+import _each from 'lodash/each'
+import _flow from 'lodash/flow'
+import _get from 'lodash/get'
+import _isEqual from 'lodash/isEqual'
+import _isPlainObject from 'lodash/isPlainObject'
+import _mapValues from 'lodash/mapValues'
+import _merge from 'lodash/merge'
+import _set from 'lodash/set'
+
 import Base from './base'
 import { Validator, Errors } from '../validation'
 
@@ -128,12 +139,12 @@ export default class Member extends Base {
   // state
 
   sync () {
-    this._reference = _.cloneDeep(this._attributes)
+    this._reference = _cloneDeep(this._attributes)
     this._changes.clear()
   }
 
   reset () {
-    this._attributes = _.cloneDeep(this._reference)
+    this._attributes = _cloneDeep(this._reference)
   }
 
   clear () {
@@ -175,22 +186,22 @@ export default class Member extends Base {
    * @returns {Object} The attributes that were assigned to the model.
    */
   assign (attributes) {
-    this.set(_.defaultsDeep({}, attributes, _.cloneDeep(this.defaults())))
+    this.set(_defaultsDeep({}, attributes, _cloneDeep(this.defaults())))
     this.sync()
   }
 
   toJSON () {
-    return _.mapValues(this._attributes, (value, key) => this.mutated(key, value))
+    return _mapValues(this._attributes, (value, key) => this.mutated(key, value))
   }
 
   has (attribute) {
-    return _.has(this._attributes, attribute)
+    return this._attributes.hasOwnProperty(attribute)
   }
 
   mutated (attribute, value) {
     value = value || this.get(attribute)
 
-    const mutator = _.get(this._mutations, attribute)
+    const mutator = _get(this._mutations, attribute)
 
     return mutator
       ? mutator(value)
@@ -198,16 +209,16 @@ export default class Member extends Base {
   }
 
   saved (attribute, fallback) {
-    return _.get(this._reference, attribute, fallback)
+    return _get(this._reference, attribute, fallback)
   }
 
   get (attribute, fallback) {
-    return _.get(this._attributes, attribute, fallback)
+    return _get(this._attributes, attribute, fallback)
   }
 
   set (attribute, value) {
-    if (_.isPlainObject(attribute)) {
-      return _.each(attribute, (value, key) => this.set(key, value))
+    if (_isPlainObject(attribute)) {
+      return _each(attribute, (value, key) => this.set(key, value))
     }
 
     const defined = this.has(attribute)
@@ -222,13 +233,13 @@ export default class Member extends Base {
       value = this.mutated(attribute, value)
     }
 
-    const changed = !_.isEqual(previous, value)
+    const changed = !_isEqual(previous, value)
 
     if (previous && !changed) {
       return previous
     }
 
-    _.set(this._attributes, attribute, value)
+    _set(this._attributes, attribute, value)
 
     this._setChange(attribute)
 
@@ -258,7 +269,7 @@ export default class Member extends Base {
     }
 
     // IF scope is not default, validate defaults and it.
-    return _.concat(
+    return _concat(
       this.validateAttribute(attribute),
       this._validator(scope).validateProp(this.toJSON(), attribute)
     )
@@ -271,7 +282,7 @@ export default class Member extends Base {
     }
 
     // IF scope is not default, validate defaults and it.
-    return _.merge(
+    return _merge(
       this.validateAll(),
       this._validator(scope).validate(this.toJSON())
     )
@@ -280,11 +291,11 @@ export default class Member extends Base {
   // private
 
   _getRouteParameters (defaults = {}) {
-    return _.merge({}, this._attributes, this._routeParams, defaults)
+    return _merge({}, this._attributes, this._routeParams, defaults)
   }
 
   _compiledMutations () {
-    return _.mapValues(this.mutations(), (m) => _.flow(m))
+    return _mapValues(this.mutations(), (m) => _flow(m))
   }
 
   _setChange (attribute) {
@@ -296,7 +307,7 @@ export default class Member extends Base {
   }
 
   _validator (path) {
-    return _.get(this._validators, path)
+    return _get(this._validators, path)
   }
 
   _clearAttributes () {
@@ -317,7 +328,7 @@ export default class Member extends Base {
 
   _registerAttribute (attribute) {
     // verify is already exists
-    if (_.has(RESERVED, attribute)) {
+    if (RESERVED.includes(attribute)) {
       throw new Error(`Attribute ${attribute} cannot be define: reserved property.`)
     }
 
@@ -334,7 +345,7 @@ export default class Member extends Base {
   _setValidators () {
     const scopes = Object.assign({}, DEFAULT_VALIDATORS, this.validation())
 
-    _.each(scopes, (attributes, scope) => {
+    _each(scopes, (attributes, scope) => {
       this._setValidator(scope, attributes)
     })
   }
