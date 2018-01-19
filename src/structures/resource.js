@@ -20,7 +20,7 @@ const DEFAULT_OPTIONS = {
 }
 
 export default class Resource extends Base {
-  constructor (attributes = {}) {
+  constructor () {
     super()
 
     this._pending = false

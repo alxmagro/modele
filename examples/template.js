@@ -1,18 +1,29 @@
-import { Resource, Member } from 'modele'
+import Modele from 'modele'
 
-class Users extends Resource {
-  api () {
+class Users extends Modele.Resource {
+  axios () {
     return {
-      baseURL: 'http://www.mydomain.com/api/:api_id/users'
+      baseURL: 'http://www.mydomain.com/api'
     }
+  }
+
+  routes () {
+    return {
+      resource: '/users{$url}',
+      member: '/users/{id}{$url}'
+    }
+  }
+
+  member () {
+    return User
   }
 }
 
-class User extends Member {
+class User extends Modele.Member {
   actions () {
     return {
       uploadAvatar: {
-        config: { method: 'put', url: 'avatar' }
+        config: { method: 'put', url: '/avatar' }
       }
     }
   }
@@ -49,15 +60,7 @@ class User extends Member {
   // custom
 
   get fullName(record) {
-    if (this.name && this.surname) {
-      return `#{this.name} #{this.surname}`
-    }
-
-    return '...'
-  }
-
-  hallo (another) {
-    console.log(`Hi ${another.name}! My name is ${this.name}.`)
+    return this.name + ' ' + this.surname
   }
 }
 
