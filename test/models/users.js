@@ -1,11 +1,9 @@
 import Modele from '../../src/modele'
 
 class Users extends Modele.Resource {
-  options () {
+  axios () {
     return {
-      requestOptions: {
-        baseURL: 'http://localhost:3000'
-      }
+      baseURL: 'http://localhost:3000'
     }
   }
 

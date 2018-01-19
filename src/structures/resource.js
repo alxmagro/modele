@@ -3,13 +3,20 @@ import _merge from 'lodash/merge'
 import _set from 'lodash/set'
 
 import Base from './base'
-import Modele from '../modele'
 
 const DEFAULT_ACTIONS = {
-  fetch: {},
   create: {
     config: { method: 'post' }
-  }
+  },
+  fetch: {}
+}
+
+const DEFAULT_OPTIONS = {
+  identifier: 'id',
+  mutateOnChange: false,
+  routeParameterPattern: /\{([^}]+)\}/,
+  routeParameterURL: '$url',
+  ruleset: null
 }
 
 export default class Resource extends Base {
@@ -20,7 +27,7 @@ export default class Resource extends Base {
     this._defaults = { actions: DEFAULT_ACTIONS }
     this._routeParams = {}
     this._route = this.routes().resource
-    this._options = _merge({}, Modele.globals.options, this.options())
+    this._options = _merge({}, DEFAULT_OPTIONS, this.options())
 
     this._registerActions()
 
@@ -48,6 +55,10 @@ export default class Resource extends Base {
   member () {}
 
   boot () {}
+
+  axios () {
+    return {}
+  }
 
   options () {
     return {}

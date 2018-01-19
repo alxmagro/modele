@@ -167,6 +167,10 @@ export default class Member extends Base {
     return this._resource.routes()
   }
 
+  axios () {
+    return this._resource.axios()
+  }
+
   // methods
 
   get $ () {

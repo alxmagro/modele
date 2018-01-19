@@ -23,7 +23,7 @@ export default class Base {
       if (callbacks.before) callbacks.before.call(this)
 
       // merge default config (api) with config
-      config = _merge({}, this.getOption('requestOptions'), config)
+      config = _merge({}, this.axios(), config)
 
       // set URL
       config.url = this.getURL(this._route, this._getRouteParameters({
