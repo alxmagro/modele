@@ -12,6 +12,7 @@ const DEFAULT_ACTIONS = {
 const DEFAULT_OPTIONS = {
   customRules: null,
   identifier: 'id',
+  mutateBeforeSync: true,
   mutateOnChange: false,
   routeParameterPattern: /\{([^}]+)\}/,
   routeParameterURL: '$url'

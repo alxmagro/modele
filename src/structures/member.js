@@ -130,6 +130,10 @@ export default class Member extends Base {
   // state
 
   sync () {
+    if (this.getOption('mutateBeforeSync')) {
+      this.mutate()
+    }
+
     this._reference = _cloneDeep(this._attributes)
     this._changes.clear()
   }
@@ -258,6 +262,10 @@ export default class Member extends Base {
     this._setChange(attribute)
 
     return value
+  }
+
+  mutate () {
+    this._attributes = this.toJSON()
   }
 
   valid (options = {}) {
