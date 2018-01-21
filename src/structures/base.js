@@ -2,17 +2,6 @@ import _merge from 'lodash/merge'
 import Modele from '../modele'
 
 export default class Base {
-  getURL (route, parameters = {}) {
-    const replacements = this._getRouteReplacements(route, parameters)
-
-    // Replace all {variable} in routes to your values
-    return Object.keys(replacements).reduce((result, parameter) => {
-      const value = replacements[parameter] || ''
-
-      return result.replace(parameter, value)
-    }, route)
-  }
-
   send (config, callbacks = {}) {
     return new Promise((resolve, reject) => {
       this._setPending(true)
@@ -24,7 +13,7 @@ export default class Base {
       config = _merge({}, this.axios(), config)
 
       // set URL
-      config.url = this.getURL(this._route, this._getRouteParameters({
+      config.url = this._getURL(this._route, this._getRouteParameters({
         [this.getOption('routeParameterURL')]: config.url
       }))
 
@@ -60,6 +49,17 @@ export default class Base {
   }
 
   // private
+
+  _getURL (route, parameters = {}) {
+    const replacements = this._getRouteReplacements(route, parameters)
+
+    // Replace all {variable} in routes to your values
+    return Object.keys(replacements).reduce((result, parameter) => {
+      const value = replacements[parameter] || ''
+
+      return result.replace(parameter, value)
+    }, route)
+  }
 
   _getRouteReplacements (route, parameters = {}) {
     const pattern = new RegExp(this.getOption('routeParameterPattern'), 'g')
