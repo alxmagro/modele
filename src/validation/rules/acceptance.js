@@ -1,9 +1,11 @@
-import { Rule } from '../'
+import Rule from '../structures/rule'
 import is from 'is_js'
 
-export default () => {
-  return new Rule({
-    name: 'acceptance',
-    test: (value) => is.truthy(value)
-  })
+export default class Acceptance extends Rule {
+  definitions () {
+    return {
+      name: 'acceptance',
+      test: (value) => is.truthy(value)
+    }
+  }
 }

@@ -1,16 +1,11 @@
 import { expect } from 'chai'
-import Rule from '../../../../src/validation/structures/rule'
-import confirmation from '../../../../src/validation/rules/confirmation'
+import Confirmation from '../../../../src/validation/rules/confirmation'
 
 describe('confirmation', function () {
   var rule
 
   beforeEach(function () {
-    rule = confirmation({ with: 'second' })
-  })
-
-  it('build a Rule', function () {
-    expect(rule).to.be.an.instanceof(Rule)
+    rule = new Confirmation({ with: 'second' })
   })
 
   it('return true if value is equal to record[with]', function () {

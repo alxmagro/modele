@@ -1,22 +1,50 @@
-import _get from 'lodash/get'
-import _merge from 'lodash/merge'
-
 export default class Rule {
-  constructor (config = {}) {
-    this.name = _get(config, 'name')
-    this.test = _get(config, 'test', () => true)
-    this.data = _get(config, 'data', {})
+  constructor (options = {}) {
+    const definitions = this.definitions(options)
+
+    this.name = definitions.name
+    this.test = definitions.test
+    this.options = options
   }
 
-  run (record, attribute) {
-    const value = record[attribute]
-    const valid = this.test(value, record, attribute)
+  // interfaces
+
+  definitions (options) {
+    return {}
+  }
+
+  // methods
+
+  verify (record, prop) {
+    const value = record[prop]
+    const valid = this.test(value, record, prop)
 
     if (!valid) {
       return {
         name: this.name,
-        context: _merge({}, this.data, { record, attribute, value })
+        validator: 'modele',
+        context: Object.assign({}, this.options, { record, prop, value })
       }
     }
+  }
+
+  elegible (scope) {
+    return this.isActive() && this.onScope(scope)
+  }
+
+  isActive () {
+    return !this.options.if || this.options.if()
+  }
+
+  onScope (scope) {
+    return !this.options.on || this.options.on === scope
+  }
+
+  // helpers
+
+  solved (value) {
+    return (typeof value === 'function')
+      ? value()
+      : value
   }
 }

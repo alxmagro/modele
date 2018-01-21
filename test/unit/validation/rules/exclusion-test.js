@@ -1,12 +1,12 @@
 import { expect } from 'chai'
 import Rule from '../../../../src/validation/structures/rule'
-import exclusion from '../../../../src/validation/rules/exclusion'
+import Exclusion from '../../../../src/validation/rules/exclusion'
 
 describe('exclusion', function () {
   var rule
 
   beforeEach(function () {
-    rule = exclusion({ in: ['foo', 'bar'] })
+    rule = new Exclusion({ in: ['foo', 'bar'] })
   })
 
   it('build a Rule', function () {
@@ -22,7 +22,7 @@ describe('exclusion', function () {
   })
 
   it('accepts function as param', function () {
-    rule = exclusion({ in: () => ['foo', 'bar'] })
+    rule = new Exclusion({ in: () => ['foo', 'bar'] })
 
     expect(rule.test('baz')).to.be.true
   })

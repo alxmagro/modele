@@ -1,12 +1,14 @@
-import { Rule } from '../'
+import Rule from '../structures/rule'
 
-export default (obj) => {
-  if (obj.with) {
-    return new Rule({
-      name: 'format',
-      test: (value) => obj.with.test(value)
-    })
+export default class Format extends Rule {
+  definitions (options) {
+    if (options.with) {
+      return {
+        name: 'format',
+        test: (value) => options.with.test(value)
+      }
+    }
+
+    throw new TypeError('Enter "with" option')
   }
-
-  throw new TypeError('Enter "with" option')
 }

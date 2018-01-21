@@ -1,17 +1,15 @@
-import _each from 'lodash/each'
-import _isFunction from 'lodash/isFunction'
-import _reduce from 'lodash/reduce'
-import _replace from 'lodash/replace'
 import _merge from 'lodash/merge'
-
 import Modele from '../modele'
 
 export default class Base {
   getURL (route, parameters = {}) {
     const replacements = this._getRouteReplacements(route, parameters)
 
-    return _reduce(replacements, (result, value = '', parameter) => {
-      return _replace(result, parameter, value)
+    // Replace all {variable} in routes to your values
+    return Object.keys(replacements).reduce((result, parameter) => {
+      const value = replacements[parameter] || ''
+
+      return result.replace(parameter, value)
     }, route)
   }
 
@@ -82,9 +80,9 @@ export default class Base {
   _registerActions () {
     const actions = Object.assign({}, this._defaults.actions, this.actions())
 
-    _each(actions, (value, attribute) => {
-      this._registerAction(attribute, value)
-    })
+    for (const attribute in actions) {
+      this._registerAction(attribute, actions[attribute])
+    }
   }
 
   _registerAction (name, options) {
@@ -95,7 +93,7 @@ export default class Base {
 
     // build action
     const value = (callConfig) => {
-      const actionConfig = _isFunction(options.config)
+      const actionConfig = typeof options.config === 'function'
         ? options.config.call(this)
         : options.config
 

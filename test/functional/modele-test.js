@@ -152,8 +152,9 @@ describe('Modele', function () {
       expect(user.errors.get('name')).to.deep.equal([
         {
           name: 'presence',
+          validator: 'modele',
           context: {
-            attribute: 'name',
+            prop: 'name',
             record: user.toJSON(),
             value: ''
           }
@@ -177,16 +178,19 @@ describe('Modele', function () {
       user.valid()
 
       expect(user.errors.all()).to.deep.equal({
+        name: [],
         password: [
           {
             name: 'presence',
+            validator: 'modele',
             context: {
-              attribute: 'password',
+              prop: 'password',
               record: user.toJSON(),
               value: undefined
             }
           }
-        ]
+        ],
+        surname: []
       })
     })
   })

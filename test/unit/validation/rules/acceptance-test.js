@@ -1,16 +1,11 @@
 import { expect } from 'chai'
-import Rule from '../../../../src/validation/structures/rule'
-import acceptance from '../../../../src/validation/rules/acceptance'
+import Acceptance from '../../../../src/validation/rules/acceptance'
 
 describe('acceptance', function () {
   var rule
 
   beforeEach(function () {
-    rule = acceptance()
-  })
-
-  it('build a Rule', function () {
-    expect(rule).to.be.an.instanceof(Rule)
+    rule = new Acceptance()
   })
 
   it('return false if value not exists', function () {

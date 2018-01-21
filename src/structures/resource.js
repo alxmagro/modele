@@ -1,7 +1,5 @@
 import _get from 'lodash/get'
-import _merge from 'lodash/merge'
 import _set from 'lodash/set'
-
 import Base from './base'
 
 const DEFAULT_ACTIONS = {
@@ -12,11 +10,11 @@ const DEFAULT_ACTIONS = {
 }
 
 const DEFAULT_OPTIONS = {
+  customRules: null,
   identifier: 'id',
   mutateOnChange: false,
   routeParameterPattern: /\{([^}]+)\}/,
-  routeParameterURL: '$url',
-  ruleset: null
+  routeParameterURL: '$url'
 }
 
 export default class Resource extends Base {
@@ -27,7 +25,7 @@ export default class Resource extends Base {
     this._defaults = { actions: DEFAULT_ACTIONS }
     this._routeParams = {}
     this._route = this.routes().resource
-    this._options = _merge({}, DEFAULT_OPTIONS, this.options())
+    this._options = Object.assign({}, DEFAULT_OPTIONS, this.options())
 
     this._registerActions()
 
@@ -90,6 +88,6 @@ export default class Resource extends Base {
   // private
 
   _getRouteParameters (defaults = {}) {
-    return _merge({}, this._routeParams, defaults)
+    return Object.assign({}, this._routeParams, defaults)
   }
 }

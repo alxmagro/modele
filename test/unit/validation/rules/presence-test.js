@@ -1,16 +1,11 @@
 import { expect } from 'chai'
-import Rule from '../../../../src/validation/structures/rule'
-import presence from '../../../../src/validation/rules/presence'
+import Presence from '../../../../src/validation/rules/presence'
 
 describe('presence', function () {
   var rule
 
   beforeEach(function () {
-    rule = presence()
-  })
-
-  it('build a Rule', function () {
-    expect(rule).to.be.an.instanceof(Rule)
+    rule = new Presence()
   })
 
   it('return false if value is undefined', function () {

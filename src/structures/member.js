@@ -1,17 +1,14 @@
 import _cloneDeep from 'lodash/cloneDeep'
-import _concat from 'lodash/concat'
 import _defaultsDeep from 'lodash/defaultsDeep'
-import _each from 'lodash/each'
 import _flow from 'lodash/flow'
 import _get from 'lodash/get'
 import _isEqual from 'lodash/isEqual'
 import _isPlainObject from 'lodash/isPlainObject'
 import _mapValues from 'lodash/mapValues'
-import _merge from 'lodash/merge'
 import _set from 'lodash/set'
-
 import Base from './base'
-import { Validator, Errors } from '../validation'
+import Validator from '../validation/structures/validator'
+import Errors from '../validation/structures/errors'
 
 const DEFAULT_ACTIONS = {
   fetch: {
@@ -68,10 +65,6 @@ const DEFAULT_ACTIONS = {
   }
 }
 
-const DEFAULT_VALIDATORS = {
-  defaults: {}
-}
-
 const RESERVED = [
   'boot',
   'actions',
@@ -88,9 +81,7 @@ const RESERVED = [
   'saved',
   'get',
   'set',
-  'valid',
-  'validateAttribute',
-  'validateAll'
+  'valid'
 ]
 
 export default class Member extends Base {
@@ -104,13 +95,13 @@ export default class Member extends Base {
     this._attributes = {}
     this._reference = {}
     this._changes = new Set()
-    this._validators = {}
     this._mutations = this._compiledMutations()
     this._route = this.routes().member
-    this.errors = new Errors()
+    this._validator = new Validator(this.getOption('customRules'))
+    this._errors = new Errors()
 
     this._registerActions()
-    this._setValidators()
+    this._registerRules()
 
     this.assign(attributes)
     this.boot()
@@ -147,10 +138,15 @@ export default class Member extends Base {
     this._attributes = _cloneDeep(this._reference)
   }
 
+  // reset attributes, errors and state
   clear () {
-    this._clearAttributes()
-    this._clearErrors()
-    this._clearState()
+    const defaults = this.defaults()
+
+    this._attributes = defaults
+    this._reference = defaults
+    this._errors.clear()
+    this._changes.clear()
+    this._pending = false
   }
 
   changed () {
@@ -171,11 +167,21 @@ export default class Member extends Base {
     return this._resource.axios()
   }
 
-  // methods
+  // getters
 
   get $ () {
     return this._reference
   }
+
+  get errors () {
+    return this._errors
+  }
+
+  get validator () {
+    return this._validator
+  }
+
+  // methods
 
   /**
    * Returns the model's identifier value.
@@ -222,7 +228,11 @@ export default class Member extends Base {
 
   set (attribute, value) {
     if (_isPlainObject(attribute)) {
-      return _each(attribute, (value, key) => this.set(key, value))
+      for (const key in attribute) {
+        this.set(key, attribute[key])
+      }
+
+      return attribute
     }
 
     const defined = this.has(attribute)
@@ -251,14 +261,15 @@ export default class Member extends Base {
   }
 
   valid (options = {}) {
-    let errors
+    const attribute = options.attribute
+    const scope = options.scope
 
-    if (options.attribute) {
-      errors = this.validateAttribute(options.attribute, options.scope)
+    if (attribute) {
+      const errors = this._validator.validateProp(this.toJSON(), attribute, scope)
 
-      this.errors.set(options.attribute, errors)
+      this.errors.set(attribute, errors)
     } else {
-      errors = this.validateAll(options.scope)
+      const errors = this._validator.validate(this.toJSON(), scope)
 
       this.errors.record(errors)
     }
@@ -266,40 +277,10 @@ export default class Member extends Base {
     return !this.errors.any()
   }
 
-  validateAttribute (attribute, scope = 'defaults') {
-    // IF scope is default, validate only it.
-    if (scope === 'defaults') {
-      return this._validator(scope).validateProp(this.toJSON(), attribute)
-    }
-
-    // IF scope is not default, validate defaults and it.
-    return _concat(
-      this.validateAttribute(attribute),
-      this._validator(scope).validateProp(this.toJSON(), attribute)
-    )
-  }
-
-  validateAll (scope = 'defaults') {
-    // IF scope is default, validate only it.
-    if (scope === 'defaults') {
-      return this._validator(scope).validate(this.toJSON())
-    }
-
-    // IF scope is not default, validate defaults and it.
-    return _merge(
-      this.validateAll(),
-      this._validator(scope).validate(this.toJSON())
-    )
-  }
-
   // private
 
   _getRouteParameters (defaults = {}) {
-    return _merge({}, this._attributes, this._routeParams, defaults)
-  }
-
-  _compiledMutations () {
-    return _mapValues(this.mutations(), (m) => _flow(m))
+    return Object.assign({}, this._attributes, this._routeParams, defaults)
   }
 
   _setChange (attribute) {
@@ -310,24 +291,8 @@ export default class Member extends Base {
     }
   }
 
-  _validator (path) {
-    return _get(this._validators, path)
-  }
-
-  _clearAttributes () {
-    const defaults = this.defaults()
-
-    this._attributes = defaults
-    this._reference = defaults
-  }
-
-  _clearErrors () {
-    this.errors.clear()
-  }
-
-  _clearState () {
-    this._changes.clear()
-    this._pending = false
+  _compiledMutations () {
+    return _mapValues(this.mutations(), (m) => _flow(m))
   }
 
   _registerAttribute (attribute) {
@@ -337,7 +302,7 @@ export default class Member extends Base {
     }
 
     // create empty error list
-    this.errors.set(attribute, [])
+    this._errors.set(attribute, [])
 
     // define getter and setter
     Object.defineProperty(this, attribute, {
@@ -346,17 +311,7 @@ export default class Member extends Base {
     })
   }
 
-  _setValidators () {
-    const scopes = Object.assign({}, DEFAULT_VALIDATORS, this.validation())
-
-    _each(scopes, (attributes, scope) => {
-      this._setValidator(scope, attributes)
-    })
-  }
-
-  _setValidator (name, attributes) {
-    const ruleset = this.getOption('ruleset')
-
-    this._validators[name] = new Validator(ruleset, attributes)
+  _registerRules () {
+    this._validator.setRules(this.validation())
   }
 }

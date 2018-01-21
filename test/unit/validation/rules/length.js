@@ -1,17 +1,12 @@
 import { expect } from 'chai'
-import Rule from '../../../../src/validation/structures/rule'
-import length from '../../../../src/validation/rules/length'
+import Length from '../../../../src/validation/rules/length'
 
 describe('length', function () {
   var rule
 
   context('when "is" is suplied', function () {
     beforeEach(function () {
-      rule = length({ is: 3 })
-    })
-
-    it('build a Rule', function () {
-      expect(rule).to.be.an.instanceof(Rule)
+      rule = new Length({ is: 3 })
     })
 
     it('return true if value.length == is', function () {
@@ -25,11 +20,7 @@ describe('length', function () {
 
   context('when "min" and "max" is suplied', function () {
     beforeEach(function () {
-      rule = length({ min: 3, max: 5 })
-    })
-
-    it('build a Rule', function () {
-      expect(rule).to.be.an.instanceof(Rule)
+      rule = new Length({ min: 3, max: 5 })
     })
 
     it('return true if value.length between min and max', function () {
@@ -47,11 +38,7 @@ describe('length', function () {
 
   context('when "min" is suplied', function () {
     beforeEach(function () {
-      rule = length({ min: 3 })
-    })
-
-    it('build a Rule', function () {
-      expect(rule).to.be.an.instanceof(Rule)
+      rule = new Length({ min: 3 })
     })
 
     it('return true if value.length >= min', function () {
@@ -65,11 +52,7 @@ describe('length', function () {
 
   context('when "max" is suplied', function () {
     beforeEach(function () {
-      rule = length({ max: 5 })
-    })
-
-    it('build a Rule', function () {
-      expect(rule).to.be.an.instanceof(Rule)
+      rule = new Length({ max: 5 })
     })
 
     it('return true if value.length <= max', function () {

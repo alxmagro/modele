@@ -1,13 +1,15 @@
-import { Rule, solved } from '../'
+import Rule from '../structures/rule'
 import is from 'is_js'
 
-export default (obj) => {
-  if (obj.in) {
-    return new Rule({
-      name: 'inclusion',
-      test: (value) => is.inArray(value, solved(obj.in))
-    })
-  }
+export default class Inclusion extends Rule {
+  definitions (options) {
+    if (options.in) {
+      return {
+        name: 'inclusion',
+        test: (value) => is.inArray(value, this.solved(options.in))
+      }
+    }
 
-  throw new TypeError('Enter "in" option')
+    throw new TypeError('Enter "in" option')
+  }
 }

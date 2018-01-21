@@ -1,16 +1,11 @@
 import { expect } from 'chai'
-import Rule from '../../../../src/validation/structures/rule'
-import format from '../../../../src/validation/rules/format'
+import Format from '../../../../src/validation/rules/format'
 
 describe('format', function () {
   var rule
 
   beforeEach(function () {
-    rule = format({ with: /\d+/ })
-  })
-
-  it('build a Rule', function () {
-    expect(rule).to.be.an.instanceof(Rule)
+    rule = new Format({ with: /\d+/ })
   })
 
   it('return true if regex match value', function () {

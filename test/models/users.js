@@ -35,11 +35,9 @@ class User extends Modele.Member {
 
   validation () {
     return {
-      defaults: {
-        name: { presence: true },
-        surname: { presence: true },
-        password: { presence: true }
-      }
+      name: { presence: true },
+      surname: { presence: true },
+      password: { presence: true }
     }
   }
 

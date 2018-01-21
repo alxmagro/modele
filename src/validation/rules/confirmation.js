@@ -1,14 +1,15 @@
-import { Rule } from '../'
+import Rule from '../structures/rule'
 import is from 'is_js'
 
-export default (obj) => {
-  if (obj.with) {
-    return new Rule({
-      name: 'confirmation',
-      test: (value, record) => is.equal(value, record[obj.with]),
-      data: obj
-    })
-  }
+export default class Confirmation extends Rule {
+  definitions (options) {
+    if (options.with) {
+      return {
+        name: 'confirmation',
+        test: (value, record) => is.equal(value, record[options.with])
+      }
+    }
 
-  throw new TypeError('Enter "with" option')
+    throw new TypeError('Enter "with" option')
+  }
 }

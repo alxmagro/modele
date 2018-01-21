@@ -36,23 +36,14 @@ class User extends Modele.Member {
 
   validations () {
     return {
-      defaults: {
-        email: {
-          presence: true,
-          format: { with: /\S+@\S+\.\S+/ }
-        },
-        password: {
-          length: { min: 8 }
-        }
+      email: {
+        presence: true,
+        format: { with: /\S+@\S+\.\S+/ }
+        confirmation: { with: 'email_confirmation', on: 'create' }
       },
-
-      create: {
-        email: {
-          confirmation: { with: 'email_confirmation' }
-        },
-        password: {
-          presence: true
-        }
+      password: {
+        length: { min: 8 }
+        presence: { on: 'create' }
       }
     }
   }

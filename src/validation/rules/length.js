@@ -1,37 +1,35 @@
-import { Rule } from '../'
+import Rule from '../structures/rule'
 
-export default (obj) => {
-  if (obj.is) {
-    return new Rule({
-      name: 'length',
-      test: (value) => value.length === obj.is,
-      data: obj
-    })
-  }
-
-  if (obj.min) {
-    if (obj.max) {
-      return new Rule({
-        name: 'length_between',
-        test: (value) => value.length <= obj.max && value.length >= obj.min,
-        data: obj
-      })
-    } else {
-      return new Rule({
-        name: 'length_min',
-        test: (value) => value.length >= obj.min,
-        data: obj
-      })
+export default class Length extends Rule {
+  definitions (options) {
+    if (options.is) {
+      return {
+        name: 'length',
+        test: (value) => value.length === options.is
+      }
     }
-  }
 
-  if (obj.max) {
-    return new Rule({
-      name: 'length_max',
-      test: (value) => value.length <= obj.max,
-      data: obj
-    })
-  }
+    if (options.min) {
+      if (options.max) {
+        return {
+          name: 'length_between',
+          test: (value) => value.length <= options.max && value.length >= options.min
+        }
+      } else {
+        return {
+          name: 'length_min',
+          test: (value) => value.length >= options.min
+        }
+      }
+    }
 
-  return new TypeError('Supply options "is", "min" and/or "max"')
+    if (options.max) {
+      return {
+        name: 'length_max',
+        test: (value) => value.length <= options.max
+      }
+    }
+
+    return new TypeError('Supply options "is", "min" and/or "max"')
+  }
 }

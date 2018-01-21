@@ -1,47 +1,29 @@
-import _each from 'lodash/each'
-
-import absence from '../rules/absence'
-import acceptance from '../rules/acceptance'
-import confirmation from '../rules/confirmation'
-import date from '../rules/date'
-import exclusion from '../rules/exclusion'
-import format from '../rules/format'
-import future from '../rules/future'
-import inclusion from '../rules/inclusion'
-import length from '../rules/length'
-import past from '../rules/past'
-import presence from '../rules/presence'
-
-const DEFAULT_RULESET = {
-  absence,
-  acceptance,
-  confirmation,
-  date,
-  exclusion,
-  format,
-  future,
-  inclusion,
-  length,
-  past,
-  presence
-}
+import ruleset from './ruleset'
 
 export default class Validator {
-  /**
-   *
-   * param {Object} ruleset JSON with Rule name and constructor
-   */
-  constructor (ruleset, schema) {
-    this.ruleset = ruleset || DEFAULT_RULESET
+  constructor (additions = {}) {
+    this.ruleset = Object.assign({}, ruleset, additions)
     this.rules = {}
+  }
 
-    if (schema) {
-      this.addRules(schema)
+  setRules (schema = {}) {
+    for (const prop in schema) {
+      // init ruleset
+      this.rules[prop] = []
+
+      // add rules
+      for (const ruleName in schema[prop]) {
+        const rule = this.buildRule(ruleName, schema[prop][ruleName])
+
+        this.rules[prop].push(rule)
+      }
     }
   }
 
-  addRule (prop, name, options) {
-    if (!this.ruleset[name]) {
+  buildRule (name, options) {
+    const Constructor = this.ruleset[name]
+
+    if (!Constructor) {
       throw new TypeError(`Rule "${name}" is not defined`)
     }
 
@@ -53,40 +35,24 @@ export default class Validator {
       options = {}
     }
 
-    const rule = this.ruleset[name](options)
-
-    this.rules[prop] = this.rules[prop] || []
-    this.rules[prop].push(rule)
+    return new Constructor(options)
   }
 
-  addRules (config) {
-    _each(config, (rules, prop) => {
-      _each(rules, (options, name) => {
-        this.addRule(prop, name, options)
-      })
-    })
+  validateProp (record, prop, scope = null) {
+    const rules = this.rules[prop] || []
+
+    return rules
+      .filter(rule => rule.elegible())
+      .map(rule => rule.verify(record, prop))
+      .filter(x => x)
   }
 
-  validateProp (record, prop) {
-    const errors = []
-
-    _each(this.rules[prop], rule => {
-      const error = rule.run(record, prop)
-
-      if (error) errors.push(error)
-    })
-
-    return errors
-  }
-
-  validate (record) {
+  validate (record, scope = null) {
     const errors = {}
 
-    _each(this.rules, (rules, prop) => {
-      const attrErrors = this.validateProp(record, prop)
-
-      if (attrErrors.length) errors[prop] = attrErrors
-    })
+    for (const prop in this.rules) {
+      errors[prop] = this.validateProp(record, prop, scope)
+    }
 
     return errors
   }
