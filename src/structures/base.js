@@ -42,12 +42,6 @@ export default class Base {
     })
   }
 
-  // states
-
-  pending () {
-    return this._pending
-  }
-
   // private
 
   _getURL (route, parameters = {}) {

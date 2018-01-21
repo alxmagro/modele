@@ -157,6 +157,10 @@ export default class Member extends Base {
     return this._changes.size > 0
   }
 
+  pending () {
+    return this._pending
+  }
+
   // delegate to resource
 
   getOption (path, fallback) {

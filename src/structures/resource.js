@@ -76,6 +76,12 @@ export default class Resource extends Base {
     }
   }
 
+  // states
+
+  pending () {
+    return this._pending
+  }
+
   // methods
 
   getOption (path, fallback) {
