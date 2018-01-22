@@ -13,27 +13,8 @@ import Errors from '../validation/structures/errors'
 const DEFAULT_ACTIONS = {
   fetch: {
     config: {},
-    callbacks: {
-      success (response) {
-        this.assign(response.data)
-      }
-    }
-  },
-
-  create: {
-    config () {
-      return {
-        method: 'post',
-        data: this.toJSON()
-      }
-    },
-
-    callbacks: {
-      success (response) {
-        if (response) {
-          this.assign(response.data)
-        }
-      }
+    success (response) {
+      this.assign(response.data)
     }
   },
 
@@ -44,23 +25,17 @@ const DEFAULT_ACTIONS = {
         data: this.toJSON()
       }
     },
-
-    callbacks: {
-      success (response) {
-        if (response) {
-          this.assign(response.data)
-        }
+    success (response) {
+      if (response) {
+        this.assign(response.data)
       }
     }
   },
 
   destroy: {
     config: { method: 'delete' },
-
-    callbacks: {
-      success () {
-        this.clear()
-      }
+    success () {
+      this.clear()
     }
   }
 }
