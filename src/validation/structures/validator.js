@@ -42,7 +42,7 @@ export default class Validator {
     const rules = this.rules[prop] || []
 
     return rules
-      .filter(rule => rule.elegible())
+      .filter(rule => rule.elegible(scope))
       .map(rule => rule.verify(record, prop))
       .filter(x => x)
   }

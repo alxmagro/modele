@@ -226,7 +226,7 @@ export default class Member extends Base {
 
   valid (options = {}) {
     const attribute = options.attribute
-    const scope = options.scope
+    const scope = options.on
 
     if (attribute) {
       const errors = this._validator.validateProp(this.toJSON(), attribute, scope)
