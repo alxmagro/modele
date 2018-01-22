@@ -39,12 +39,12 @@ export default class Resource extends Base {
     return new Member(attributes, this)
   }
 
-  stub (identifier) {
+  stub (key) {
     const Member = this.member()
     const stub = new Member(null, this)
-    const key = this.getOption('identifier')
+    const identifier = this.getOption('identifier')
 
-    stub.set(key, identifier)
+    stub.set(identifier, key)
 
     return stub
   }
@@ -69,16 +69,17 @@ export default class Resource extends Base {
 
   routes () {
     const actionURL = this.getOption('routeParameterURL')
+    const identifier = this.getOption('identifier')
 
     return {
       resource: '{' + actionURL + '}',
-      member: '/{id}{' + actionURL + '}'
+      member: '/{' + identifier + '}{' + actionURL + '}'
     }
   }
 
-  // states
+  // getters
 
-  pending () {
+  get pending () {
     return this._pending
   }
 
