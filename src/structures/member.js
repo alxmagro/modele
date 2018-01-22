@@ -211,7 +211,7 @@ export default class Member extends Base {
 
     const mutator = _get(this._mutations, attribute)
 
-    return mutator
+    return (value != null) && mutator
       ? mutator(value)
       : value
   }
