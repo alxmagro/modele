@@ -42,6 +42,10 @@ export default class Errors {
   // destroyers
 
   clear (prop) {
-    this.set(prop, [])
+    if (!prop) {
+      Object.keys(this.map).forEach(key => this.clear(key))
+    } else {
+      this.set(prop, [])
+    }
   }
 }
