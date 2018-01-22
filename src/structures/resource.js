@@ -33,6 +33,12 @@ export default class Resource extends Base {
     this.boot()
   }
 
+  new (attributes) {
+    const Member = this.member()
+
+    return new Member(attributes, this)
+  }
+
   stub (identifier) {
     const Member = this.member()
     const stub = new Member(null, this)
@@ -43,27 +49,21 @@ export default class Resource extends Base {
     return stub
   }
 
-  new (attributes) {
-    const Member = this.member()
-
-    return new Member(attributes, this)
-  }
-
   // interface
 
-  member () {}
-
-  boot () {}
+  actions () {
+    return {}
+  }
 
   axios () {
     return {}
   }
 
-  options () {
-    return {}
-  }
+  boot () {}
 
-  actions () {
+  member () {}
+
+  options () {
     return {}
   }
 

@@ -44,17 +44,6 @@ export default class Base {
 
   // private
 
-  _getURL (route, parameters = {}) {
-    const replacements = this._getRouteReplacements(route, parameters)
-
-    // Replace all {variable} in routes to your values
-    return Object.keys(replacements).reduce((result, parameter) => {
-      const value = replacements[parameter] || ''
-
-      return result.replace(parameter, value)
-    }, route)
-  }
-
   _getRouteReplacements (route, parameters = {}) {
     const pattern = new RegExp(this.getOption('routeParameterPattern'), 'g')
     const replace = {}
@@ -67,16 +56,15 @@ export default class Base {
     return replace
   }
 
-  _setPending (value) {
-    this._pending = value
-  }
+  _getURL (route, parameters = {}) {
+    const replacements = this._getRouteReplacements(route, parameters)
 
-  _registerActions () {
-    const actions = Object.assign({}, this._defaults.actions, this.actions())
+    // Replace all {variable} in routes to your values
+    return Object.keys(replacements).reduce((result, parameter) => {
+      const value = replacements[parameter] || ''
 
-    for (const attribute in actions) {
-      this._registerAction(attribute, actions[attribute])
-    }
+      return result.replace(parameter, value)
+    }, route)
   }
 
   _registerAction (name, options) {
@@ -99,5 +87,17 @@ export default class Base {
 
     // register
     Object.defineProperty(this, name, { value })
+  }
+
+  _registerActions () {
+    const actions = Object.assign({}, this._defaults.actions, this.actions())
+
+    for (const attribute in actions) {
+      this._registerAction(attribute, actions[attribute])
+    }
+  }
+
+  _setPending (value) {
+    this._pending = value
   }
 }

@@ -109,17 +109,13 @@ export default class Member extends Base {
 
   // interface
 
-  boot () {}
-
   actions () {
     return {}
   }
 
-  defaults () {
-    return {}
-  }
+  boot () {}
 
-  validation () {
+  defaults () {
     return {}
   }
 
@@ -127,19 +123,14 @@ export default class Member extends Base {
     return {}
   }
 
-  // state
-
-  sync () {
-    if (this.getOption('mutateBeforeSync')) {
-      this.mutate()
-    }
-
-    this._reference = _cloneDeep(this._attributes)
-    this._changes.clear()
+  validation () {
+    return {}
   }
 
-  reset () {
-    this._attributes = _cloneDeep(this._reference)
+  // state
+
+  changed () {
+    return this._changes.size > 0
   }
 
   // reset attributes, errors and state
@@ -153,15 +144,28 @@ export default class Member extends Base {
     this._pending = false
   }
 
-  changed () {
-    return this._changes.size > 0
-  }
-
   pending () {
     return this._pending
   }
 
+  reset () {
+    this._attributes = _cloneDeep(this._reference)
+  }
+
+  sync () {
+    if (this.getOption('mutateBeforeSync')) {
+      this.mutate()
+    }
+
+    this._reference = _cloneDeep(this._attributes)
+    this._changes.clear()
+  }
+
   // delegate to resource
+
+  axios () {
+    return this._resource.axios()
+  }
 
   getOption (path, fallback) {
     return this._resource.getOption(path, fallback)
@@ -169,10 +173,6 @@ export default class Member extends Base {
 
   routes () {
     return this._resource.routes()
-  }
-
-  axios () {
-    return this._resource.axios()
   }
 
   // getters
@@ -189,31 +189,21 @@ export default class Member extends Base {
     return this._validator
   }
 
-  // methods
+  // accessor methods
+
+  get (attribute, fallback) {
+    return _get(this._attributes, attribute, fallback)
+  }
+
+  has (attribute) {
+    return this._attributes.hasOwnProperty(attribute)
+  }
 
   /**
    * Returns the model's identifier value.
    */
   identifier () {
     return this.get(this.getOption('identifier'))
-  }
-
-  /**
-   * @param {Object} attributes
-   *
-   * @returns {Object} The attributes that were assigned to the model.
-   */
-  assign (attributes) {
-    this.set(_defaultsDeep({}, attributes, _cloneDeep(this.defaults())))
-    this.sync()
-  }
-
-  toJSON () {
-    return _mapValues(this._attributes, (value, key) => this.mutated(key, value))
-  }
-
-  has (attribute) {
-    return this._attributes.hasOwnProperty(attribute)
   }
 
   mutated (attribute, value) {
@@ -230,8 +220,41 @@ export default class Member extends Base {
     return _get(this._reference, attribute, fallback)
   }
 
-  get (attribute, fallback) {
-    return _get(this._attributes, attribute, fallback)
+  toJSON () {
+    return _mapValues(this._attributes, (value, key) => this.mutated(key, value))
+  }
+
+  valid (options = {}) {
+    const attribute = options.attribute
+    const scope = options.scope
+
+    if (attribute) {
+      const errors = this._validator.validateProp(this.toJSON(), attribute, scope)
+
+      this.errors.set(attribute, errors)
+    } else {
+      const errors = this._validator.validate(this.toJSON(), scope)
+
+      this.errors.record(errors)
+    }
+
+    return !this.errors.any()
+  }
+
+  // modifier methods
+
+  /**
+   * @param {Object} attributes
+   *
+   * @returns {Object} The attributes that were assigned to the model.
+   */
+  assign (attributes) {
+    this.set(_defaultsDeep({}, attributes, _cloneDeep(this.defaults())))
+    this.sync()
+  }
+
+  mutate () {
+    this._attributes = this.toJSON()
   }
 
   set (attribute, value) {
@@ -268,43 +291,14 @@ export default class Member extends Base {
     return value
   }
 
-  mutate () {
-    this._attributes = this.toJSON()
-  }
-
-  valid (options = {}) {
-    const attribute = options.attribute
-    const scope = options.scope
-
-    if (attribute) {
-      const errors = this._validator.validateProp(this.toJSON(), attribute, scope)
-
-      this.errors.set(attribute, errors)
-    } else {
-      const errors = this._validator.validate(this.toJSON(), scope)
-
-      this.errors.record(errors)
-    }
-
-    return !this.errors.any()
-  }
-
   // private
-
-  _getRouteParameters (defaults = {}) {
-    return Object.assign({}, this._attributes, this._routeParams, defaults)
-  }
-
-  _setChange (attribute) {
-    if (this.get(attribute) !== this.saved(attribute)) {
-      this._changes.add(attribute)
-    } else {
-      this._changes.delete(attribute)
-    }
-  }
 
   _compiledMutations () {
     return _mapValues(this.mutations(), (m) => _flow(m))
+  }
+
+  _getRouteParameters (defaults = {}) {
+    return Object.assign({}, this._attributes, this._routeParams, defaults)
   }
 
   _registerAttribute (attribute) {
@@ -325,5 +319,13 @@ export default class Member extends Base {
 
   _registerRules () {
     this._validator.setRules(this.validation())
+  }
+
+  _setChange (attribute) {
+    if (this.get(attribute) !== this.saved(attribute)) {
+      this._changes.add(attribute)
+    } else {
+      this._changes.delete(attribute)
+    }
   }
 }
