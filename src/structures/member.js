@@ -144,10 +144,6 @@ export default class Member extends Base {
     this._pending = false
   }
 
-  pending () {
-    return this._pending
-  }
-
   reset () {
     this._attributes = _cloneDeep(this._reference)
   }
@@ -183,6 +179,10 @@ export default class Member extends Base {
 
   get errors () {
     return this._errors
+  }
+
+  get pending () {
+    return this._pending
   }
 
   get validator () {
