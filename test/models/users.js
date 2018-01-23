@@ -37,7 +37,7 @@ class User extends Modele.Member {
     return {
       name: { presence: true },
       surname: { presence: true },
-      password: { presence: true }
+      password: { presence: { on: 'create' }}
     }
   }
 
