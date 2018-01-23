@@ -6,10 +6,10 @@ export default class Date extends Rule {
     const before = options.before && this.solved(options.before)
     const after = options.after && this.solved(options.after)
 
-    if (before && after) {
+    if (after && before) {
       return {
         name: 'date_between',
-        test: (value) => is.inDateRange(value, before, after)
+        test: (value) => is.inDateRange(value, after, before)
       }
     }
 

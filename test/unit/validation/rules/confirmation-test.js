@@ -1,11 +1,11 @@
 import { expect } from 'chai'
-import Confirmation from '../../../../src/validation/rules/confirmation'
+import ConfirmationRule from '../../../../src/validation/rules/confirmation'
 
-describe('confirmation', function () {
+describe('ConfirmationRule', function () {
   var rule
 
   beforeEach(function () {
-    rule = new Confirmation({ with: 'second' })
+    rule = new ConfirmationRule({ with: 'second' })
   })
 
   it('return true if value is equal to record[with]', function () {
