@@ -136,8 +136,10 @@ export default class Member extends Base {
 
   // state
 
-  changed () {
-    return this._changes.size > 0
+  changed (attribute) {
+    return attribute != null
+      ? this._changes.has(attribute)
+      : this._changes.size > 0
   }
 
   // reset attributes, errors and state
