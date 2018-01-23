@@ -9,7 +9,7 @@ import _mapValues from 'lodash/mapValues'
 import _set from 'lodash/set'
 import Base from './base'
 import Validator from '../validation/structures/validator'
-import Errors from '../validation/structures/errors'
+import Map from '../utils/map'
 
 const DEFAULT_ACTIONS = {
   fetch: {
@@ -72,7 +72,6 @@ const RESERVED = [
   'defaults',
   'mutations',
   'validation',
-  'changed',
   'clear',
   'reset',
   'sync',
@@ -96,9 +95,9 @@ export default class Member extends Base {
     super()
 
     this._attributes = {}
-    this._changes = new Set()
+    this._changes = new Map(false)
     this._defaultActions = DEFAULT_ACTIONS
-    this._errors = new Errors()
+    this._errors = new Map([])
     this._mutations = this._compiledMutations()
     this._pending = false
     this._reference = {}
@@ -135,12 +134,6 @@ export default class Member extends Base {
   }
 
   // state
-
-  changed (attribute) {
-    return attribute != null
-      ? this._changes.has(attribute)
-      : this._changes.size > 0
-  }
 
   // reset attributes, errors and state
   clear () {
@@ -184,6 +177,10 @@ export default class Member extends Base {
 
   get $ () {
     return this._reference
+  }
+
+  get changes () {
+    return this._changes
   }
 
   get errors () {
@@ -325,7 +322,9 @@ export default class Member extends Base {
 
     _set(this._attributes, attribute, value)
 
-    this._setChange(attribute)
+    const saved = this.saved(attribute)
+
+    this._changes.set(attribute, value !== saved)
 
     return value
   }
@@ -348,6 +347,7 @@ export default class Member extends Base {
 
     // create empty error list
     this._errors.set(attribute, [])
+    this._changes.set(attribute, false)
 
     // define getter and setter
     Object.defineProperty(this, attribute, {
@@ -358,13 +358,5 @@ export default class Member extends Base {
 
   _registerRules () {
     this._validator.setRules(this.validation())
-  }
-
-  _setChange (attribute) {
-    if (this.get(attribute) !== this.saved(attribute)) {
-      this._changes.add(attribute)
-    } else {
-      this._changes.delete(attribute)
-    }
   }
 }

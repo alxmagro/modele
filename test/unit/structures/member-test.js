@@ -106,34 +106,6 @@ describe('Member', function () {
 
   // states
 
-  describe('.changed', function () {
-    context('when attribute are supplied', function () {
-      it('returns true when given attribute is changed', function () {
-        user.name = 'Yoda'
-
-        expect(user.changed('name')).to.be.true
-      })
-
-      it('returns false when given attribute isnt changed', function () {
-        user.name = 'Yoda'
-
-        expect(user.changed('surname')).to.be.false
-      })
-    })
-
-    context('when no attribute are supplied', function () {
-      it('returns true when a attribute is changed', function () {
-        user.name = 'Yoda'
-
-        expect(user.changed()).to.be.true
-      })
-
-      it('returns false when no attributes are changed', function () {
-        expect(user.changed()).to.be.false
-      })
-    })
-  })
-
   describe('.clear', function () {
     it('reset attributes', function () {
       user.clear()
@@ -152,7 +124,7 @@ describe('Member', function () {
       user.name = 'Yoda'
       user.clear()
 
-      expect(user.changed()).to.be.false
+      expect(user.changes.any()).to.be.false
     })
   })
 
@@ -168,7 +140,7 @@ describe('Member', function () {
       user.name = 'Yoda'
       user.sync()
 
-      expect(user.changed()).to.be.false
+      expect(user.changes.any()).to.be.false
     })
   })
 
@@ -410,7 +382,7 @@ describe('Member', function () {
     it('set change if it was changed', function () {
       user.set('name', 'Darth')
 
-      expect(user.changed('name')).to.be.true
+      expect(user.changes.get('name')).to.be.true
     })
   })
 })
