@@ -1,8 +1,32 @@
-import ruleset from './ruleset'
+import absence from '../rules/absence'
+import acceptance from '../rules/acceptance'
+import confirmation from '../rules/confirmation'
+import date from '../rules/date'
+import exclusion from '../rules/exclusion'
+import format from '../rules/format'
+import future from '../rules/future'
+import inclusion from '../rules/inclusion'
+import length from '../rules/length'
+import past from '../rules/past'
+import presence from '../rules/presence'
+
+const DEFAULT_RULESET = {
+  absence,
+  acceptance,
+  confirmation,
+  date,
+  exclusion,
+  format,
+  future,
+  inclusion,
+  length,
+  past,
+  presence
+}
 
 export default class Validator {
   constructor (additions = {}) {
-    this.ruleset = Object.assign({}, ruleset, additions)
+    this.ruleset = Object.assign({}, DEFAULT_RULESET, additions)
     this.rules = {}
   }
 
