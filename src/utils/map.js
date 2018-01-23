@@ -29,7 +29,7 @@ export default class Map {
   // verificators
 
   has (prop) {
-    return this.hash[prop] && !_isEqual(this.hash[prop], this.empty)
+    return this.hash[prop] != null && !_isEqual(this.hash[prop], this.empty)
   }
 
   any () {
