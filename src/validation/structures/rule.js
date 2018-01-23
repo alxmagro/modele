@@ -15,6 +15,13 @@ export default class Rule {
 
   // methods
 
+  elegible (scope) {
+    const isActive = !this.options.if || this.options.if()
+    const onScope = !this.options.on || this.options.on === scope
+
+    return isActive && onScope
+  }
+
   verify (record, prop) {
     const value = record[prop]
     const valid = this.test(value, record, prop)
@@ -26,18 +33,6 @@ export default class Rule {
         context: Object.assign({}, this.options, { record, prop, value })
       }
     }
-  }
-
-  elegible (scope) {
-    return this.isActive() && this.onScope(scope)
-  }
-
-  isActive () {
-    return !this.options.if || this.options.if()
-  }
-
-  onScope (scope) {
-    return !this.options.on || this.options.on === scope
   }
 
   // helpers

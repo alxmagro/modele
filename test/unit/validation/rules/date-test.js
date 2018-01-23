@@ -23,7 +23,6 @@ describe('DateRule', function () {
         var date = new Date(1879, 2, 10)
 
         expect(rule.test(date)).to.be.false
-
       })
 
       it('return false if value is after "before"', function () {
