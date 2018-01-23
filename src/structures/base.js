@@ -12,9 +12,14 @@ export default class Base {
       // merge default config (api) with config
       const config = _merge({}, this.axios(), options.config)
 
+      // get route
+      const route = options.route != null
+        ? options.route(this.routes())
+        : this._route
+
       // set URL
-      config.url = this._getURL(this._route, this._getRouteParameters({
-        [this.getOption('routeParameterURL')]: config.url
+      config.url = this._getURL(route, this._getRouteParameters({
+        [this.getOption('routeParameterURL')]: (config.url || '')
       }))
 
       // send
@@ -61,9 +66,11 @@ export default class Base {
 
     // Replace all {variable} in routes to your values
     return Object.keys(replacements).reduce((result, parameter) => {
-      const value = replacements[parameter] || ''
+      if (replacements[parameter] == null) {
+        throw new TypeError(`Cannot find ${parameter} value to URL: ${route}`)
+      }
 
-      return result.replace(parameter, value)
+      return result.replace(parameter, replacements[parameter])
     }, route)
   }
 
@@ -81,6 +88,7 @@ export default class Base {
 
       // send request
       return this.send({
+        route: options.route,
         config: _merge({}, actionConfig, callConfig),
         before: options.before,
         success: options.success,
@@ -93,7 +101,7 @@ export default class Base {
   }
 
   _registerActions () {
-    const actions = Object.assign({}, this._defaults.actions, this.actions())
+    const actions = Object.assign({}, this._defaultActions, this.actions())
 
     for (const attribute in actions) {
       this._registerAction(attribute, actions[attribute])

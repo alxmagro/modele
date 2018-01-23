@@ -24,11 +24,11 @@ export default class Resource extends Base {
   constructor () {
     super()
 
-    this._pending = false
-    this._defaults = { actions: DEFAULT_ACTIONS }
-    this._routeParams = {}
-    this._route = this.routes().resource
+    this._defaultActions = DEFAULT_ACTIONS
     this._options = Object.assign({}, DEFAULT_OPTIONS, this.options())
+    this._pending = false
+    this._route = this.routes().resource
+    this._routeParams = {}
 
     this._registerActions()
 

@@ -19,6 +19,26 @@ const DEFAULT_ACTIONS = {
     }
   },
 
+  create: {
+    route: (routes) => routes.resource,
+    config () {
+      return {
+        method: 'post',
+        data: this.toJSON()
+      }
+    },
+    before () {
+      if (this.getOption('mutateBeforeSave')) {
+        this.mutate()
+      }
+    },
+    success (response) {
+      if (response) {
+        this.assign(response.data)
+      }
+    }
+  },
+
   update: {
     config () {
       return {
@@ -75,17 +95,17 @@ export default class Member extends Base {
   constructor (attributes = {}, resource) {
     super()
 
-    this._pending = false
-    this._defaults = { actions: DEFAULT_ACTIONS }
-    this._resource = resource
-    this._routeParams = {}
     this._attributes = {}
-    this._reference = {}
     this._changes = new Set()
-    this._mutations = this._compiledMutations()
-    this._route = this.routes().member
-    this._validator = new Validator(this.getOption('customRules'))
+    this._defaultActions = DEFAULT_ACTIONS
     this._errors = new Errors()
+    this._mutations = this._compiledMutations()
+    this._pending = false
+    this._reference = {}
+    this._resource = resource
+    this._route = this.routes().member
+    this._routeParams = {}
+    this._validator = new Validator(this.getOption('customRules'))
 
     this._registerActions()
     this._registerRules()
