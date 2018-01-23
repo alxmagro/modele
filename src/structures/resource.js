@@ -12,10 +12,12 @@ const DEFAULT_ACTIONS = {
 const DEFAULT_OPTIONS = {
   customRules: null,
   identifier: 'id',
+  mutateBeforeSave: true,
   mutateBeforeSync: true,
   mutateOnChange: false,
   routeParameterPattern: /\{([^}]+)\}/,
-  routeParameterURL: '$url'
+  routeParameterURL: '$url',
+  validateMutatedAttributes: true
 }
 
 export default class Resource extends Base {

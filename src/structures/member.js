@@ -1,3 +1,4 @@
+import _castArray from 'lodash/castArray'
 import _cloneDeep from 'lodash/cloneDeep'
 import _defaultsDeep from 'lodash/defaultsDeep'
 import _flow from 'lodash/flow'
@@ -25,6 +26,11 @@ const DEFAULT_ACTIONS = {
         data: this.toJSON()
       }
     },
+    before () {
+      if (this.getOption('mutateBeforeSave')) {
+        this.mutate()
+      }
+    },
     success (response) {
       if (response) {
         this.assign(response.data)
@@ -41,22 +47,28 @@ const DEFAULT_ACTIONS = {
 }
 
 const RESERVED = [
-  'boot',
   'actions',
+  'boot',
   'defaults',
+  'mutations',
   'validation',
-  'sync',
-  'reset',
-  'clear',
   'changed',
-  'assign',
-  'toJSON',
+  'clear',
+  'reset',
+  'sync',
+  'axios',
+  'getOption',
+  'routes',
+  'get',
   'has',
+  'identifier',
   'mutated',
   'saved',
-  'get',
-  'set',
-  'valid'
+  'toJSON',
+  'valid',
+  'assign',
+  'mutate',
+  'set'
 ]
 
 export default class Member extends Base {
@@ -182,13 +194,26 @@ export default class Member extends Base {
   }
 
   mutated (attribute, value) {
-    value = value || this.get(attribute)
+    // return all mutated object
+    if (attribute == null) {
+      const result = {}
 
-    const mutator = _get(this._mutations, attribute)
+      for (attribute in this._attributes) {
+        result[attribute] = this.mutated(attribute)
+      }
 
-    return (value != null) && mutator
-      ? mutator(value)
-      : value
+      return result
+
+    // return given mutated attribute
+    } else {
+      value = value || this.get(attribute)
+
+      const mutator = _get(this._mutations, attribute)
+
+      return (value != null) && mutator
+        ? mutator(value)
+        : value
+    }
   }
 
   saved (attribute, fallback) {
@@ -196,19 +221,22 @@ export default class Member extends Base {
   }
 
   toJSON () {
-    return _mapValues(this._attributes, (value, key) => this.mutated(key, value))
+    return this._attributes
   }
 
   valid (options = {}) {
     const attribute = options.attribute
     const scope = options.on
+    const record = this.getOption('validateMutatedAttributes')
+      ? this.mutated()
+      : this.toJSON()
 
     if (attribute) {
-      const errors = this._validator.validateProp(this.toJSON(), attribute, scope)
+      const errors = this._validator.validateProp(record, attribute, scope)
 
       this.errors.set(attribute, errors)
     } else {
-      const errors = this._validator.validate(this.toJSON(), scope)
+      const errors = this._validator.validate(record, scope)
 
       this.errors.record(errors)
     }
@@ -228,8 +256,22 @@ export default class Member extends Base {
     this.sync()
   }
 
-  mutate () {
-    this._attributes = this.toJSON()
+  mutate (attribute) {
+    // mutate all attributes
+    if (attribute == null) {
+      for (attribute in this._attributes) {
+        this.set(attribute, this.mutated(attribute))
+      }
+
+    // mutate specific attribute(s)
+    } else {
+      _castArray(attribute).forEach(attribute => {
+        const current = this.get(attribute)
+        const mutated = this.mutated(attribute, current)
+
+        this.set(attribute, mutated)
+      })
+    }
   }
 
   set (attribute, value) {
