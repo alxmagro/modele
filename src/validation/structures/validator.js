@@ -10,6 +10,12 @@ import length from '../rules/length'
 import past from '../rules/past'
 import presence from '../rules/presence'
 
+/**
+ * @summary Default Validator ruleset
+ * @type Object
+ * @constant
+ * @private
+ */
 const DEFAULT_RULESET = {
   absence,
   acceptance,
@@ -24,44 +30,78 @@ const DEFAULT_RULESET = {
   presence
 }
 
-export default class Validator {
-  constructor (additions = {}) {
-    this.ruleset = Object.assign({}, DEFAULT_RULESET, additions)
-    this.rules = {}
+/**
+ * @summary Get a rule by name into a given ruleset, and build it with options
+ * @function
+ * @private
+ *
+ * @param  {Object} ruleset
+ * @param  {string} name
+ * @param  {boolean|Object} options
+ * @return {Rule} a Rule instance
+ */
+const buildRule = function (ruleset, name, options) {
+  const Constructor = ruleset[name]
+
+  if (!Constructor) {
+    throw new TypeError(`Rule "${name}" is not defined`)
   }
 
-  setRules (schema = {}) {
+  if (options === false) {
+    return
+  }
+
+  if (options === true) {
+    options = {}
+  }
+
+  return new Constructor(options)
+}
+
+export default class Validator {
+
+  /**
+   * @summary Create an instance of Validator
+   * @name Validator
+   * @class
+   * @public
+   *
+   * @param {Object} schema
+   * @param {Object} [additions] Custom rules to add to ruleset
+   * @returns {Validator} Validator instance
+   *
+   * @example
+   * new Validator({
+   *   name: { presence: true, length: { min: 8 } }
+   * })
+   */
+  constructor (schema = {}, additions = {}) {
+    this.ruleset = Object.assign({}, DEFAULT_RULESET, additions)
+    this.rules = {}
+
     for (const prop in schema) {
       // init ruleset
       this.rules[prop] = []
 
       // add rules
       for (const ruleName in schema[prop]) {
-        const rule = this.buildRule(ruleName, schema[prop][ruleName])
+        const rule = buildRule(this.ruleset, ruleName, schema[prop][ruleName])
 
         this.rules[prop].push(rule)
       }
     }
   }
 
-  buildRule (name, options) {
-    const Constructor = this.ruleset[name]
-
-    if (!Constructor) {
-      throw new TypeError(`Rule "${name}" is not defined`)
-    }
-
-    if (options === false) {
-      return
-    }
-
-    if (options === true) {
-      options = {}
-    }
-
-    return new Constructor(options)
-  }
-
+  /**
+   * @summary Check a record property with elegible rules on this.rules
+   * @function
+   * @public
+   *
+   * @param  {Object} record
+   * @param  {string} prop
+   * @param  {string} [scope]
+   * @return {Array} an Array of errors
+   */
   validateProp (record, prop, scope = null) {
     const rules = this.rules[prop] || []
 
@@ -71,6 +111,15 @@ export default class Validator {
       .filter(x => x)
   }
 
+  /**
+   * @summary Check a record with elegible rules on this.rules
+   * @function
+   * @public
+   *
+   * @param  {Object} record
+   * @param  {string} [scope]
+   * @return {Object<{property: string, errors: Array}>} an dictionary of errors
+   */
   validate (record, scope = null) {
     const errors = {}
 

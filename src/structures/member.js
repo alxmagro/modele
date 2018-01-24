@@ -11,6 +11,12 @@ import Base from './base'
 import Validator from '../validation/structures/validator'
 import Map from '../utils/map'
 
+/**
+ * @summary Default Member actions
+ * @type Object
+ * @constant
+ * @private
+ */
 const DEFAULT_ACTIONS = {
   fetch: {
     config: {},
@@ -66,6 +72,12 @@ const DEFAULT_ACTIONS = {
   }
 }
 
+/**
+ * @summary List of methods that can not be overridden
+ * @type Array
+ * @constant
+ * @private
+ */
 const RESERVED = [
   'actions',
   'boot',
@@ -91,51 +103,105 @@ const RESERVED = [
 ]
 
 export default class Member extends Base {
+
+  /**
+   * @summary Create an instance of Member
+   * @name Member
+   * @class
+   * @public
+   *
+   * @param {Object} attributes
+   * @param {Resource} resource
+   * @returns {Member} Member instance
+   */
   constructor (attributes = {}, resource) {
     super()
 
+    const actions = Object.assign({}, DEFAULT_ACTIONS, this.actions())
+
     this._attributes = {}
     this._changes = new Map(false)
-    this._defaultActions = DEFAULT_ACTIONS
     this._errors = new Map([])
-    this._mutations = this._compiledMutations()
+    this._mutations = _mapValues(this.mutations(), (m) => _flow(m))
     this._pending = false
     this._reference = {}
     this._resource = resource
     this._route = this.routes().member
     this._routeParams = {}
-    this._validator = new Validator(this.getOption('customRules'))
+    this._validator = new Validator(
+      this.validation(),
+      this.getOption('customRules')
+    )
 
-    this._registerActions()
-    this._registerRules()
+    // set actions
+    for (const prop in actions) {
+      this.setAction(prop, actions[prop])
+    }
 
     this.assign(attributes)
     this.boot()
   }
 
-  // interface
+  // interface (can be override)
 
+  /**
+   * @summary Interface that represents model actions
+   * @function
+   * @public
+   *
+   * @return {Object} Dictionary of actions
+   */
   actions () {
     return {}
   }
 
+  /**
+   * @summary Function that is called at constructor, use this to avoid overriding the constructor
+   * @function
+   * @public
+   */
   boot () {}
 
+  /**
+   * @summary Interface that represents default properties of Member
+   * @function
+   * @public
+   *
+   * @return {Object}
+   */
   defaults () {
     return {}
   }
 
+  /**
+   * @summary Interface that represents properties mutations
+   * @function
+   * @public
+   *
+   * @return {Object.<string, function|function[]>}
+   */
   mutations () {
     return {}
   }
 
+  /**
+   * @summary Interface that represents properties validations
+   * @function
+   * @public
+   *
+   * @return {Object.<string, Object>}
+   */
   validation () {
     return {}
   }
 
   // state
 
-  // reset attributes, errors and state
+  /**
+   * @summary Reset attributes, errors, changes and states
+   * @function
+   * @public
+   */
   clear () {
     const defaults = this.defaults()
 
@@ -144,12 +210,23 @@ export default class Member extends Base {
     this._errors.clear()
     this._changes.clear()
     this._pending = false
+    this._routeParams = {}
   }
 
+  /**
+   * @summary Resets attributes to values the last time the object was sync
+   * @function
+   * @public
+   */
   reset () {
     this._attributes = _cloneDeep(this._reference)
   }
 
+  /**
+   * @summary Save value of attributes in reference
+   * @function
+   * @public
+   */
   sync () {
     if (this.getOption('mutateBeforeSync')) {
       this.mutate()
@@ -161,57 +238,145 @@ export default class Member extends Base {
 
   // delegate to resource
 
+  /**
+   * @summary Resource axios default configs
+   * @function
+   * @public
+   *
+   * @return {Object}
+   */
   axios () {
     return this._resource.axios()
   }
 
+  /**
+   * @summary Resource options
+   * @function
+   * @public
+   *
+   * @param  {string} path
+   * @param  {string} [fallback]
+   * @return {*} Resource option
+   */
   getOption (path, fallback) {
     return this._resource.getOption(path, fallback)
   }
 
+  /**
+   * @summary Resource routes
+   * @function
+   * @public
+   *
+   * @return {Object.<string, string>}
+   */
   routes () {
     return this._resource.routes()
   }
 
   // getters
 
+  /**
+   * @summary Saved attributes getter
+   * @function
+   * @public
+   *
+   * @return {Object} Saved attributes
+   */
   get $ () {
     return this._reference
   }
 
+  /**
+   * @summary Changed attributes getter
+   * @function
+   * @public
+   *
+   * @return {Map} Map of attribute changes
+   */
   get changes () {
     return this._changes
   }
 
+  /**
+   * @summary Errors getter
+   * @function
+   * @public
+   *
+   * @return {Map} Map of errors
+   */
   get errors () {
     return this._errors
   }
 
+  /**
+   * @summary Pending state getter
+   * @function
+   * @public
+   *
+   * @return {boolean}
+   */
   get pending () {
     return this._pending
   }
 
+  /**
+   * @summary Validator getter
+   * @function
+   * @public
+   *
+   * @return {Validator}
+   */
   get validator () {
     return this._validator
   }
 
   // accessor methods
 
+  /**
+   * @summary Returns an attribute's value or a fallback value
+   * @function
+   * @public
+   *
+   * @param  {string} attribute
+   * @param  {*} [fallback]
+   * @return {*}
+   */
   get (attribute, fallback) {
     return _get(this._attributes, attribute, fallback)
   }
 
+  /**
+   * @summary Determines if the model has an attribute
+   * @function
+   * @public
+   *
+   * @param  {string} attribute
+   * @return {Boolean}
+   */
   has (attribute) {
     return this._attributes.hasOwnProperty(attribute)
   }
 
   /**
-   * Returns the model's identifier value.
+   * @summary Returns the model's identifier value
+   * @function
+   * @public
+   *
+   * @return {*}
    */
   identifier () {
     return this.get(this.getOption('identifier'))
   }
 
+  /**
+   * @summary Define the value of an attribute after applying its mutations
+   * @function
+   * @public
+   *
+   * @param  {string} attribute
+   * @param  {*} [value] Value can be supplied instead of self attribute value
+   * @return {*}
+   */
   mutated (attribute, value) {
     // return all mutated object
     if (attribute == null) {
@@ -235,14 +400,51 @@ export default class Member extends Base {
     }
   }
 
+  /**
+   * @summary Returns an salved attribute's value or a fallback value
+   * @function
+   * @public
+   *
+   * @param  {string} attribute
+   * @param  {*} [fallback]
+   * @return {*}
+   */
   saved (attribute, fallback) {
     return _get(this._reference, attribute, fallback)
   }
 
+  /**
+   * @summary A native representation of this model
+   * @function
+   * @public
+   *
+   * @return {Object}
+   */
   toJSON () {
     return this._attributes
   }
 
+  /**
+   * @summary A set of this model attributes plus atributes setted with .where()
+   * @function
+   * @public
+   *
+   * @return {Object}
+   */
+  toParam () {
+    return Object.assign({}, this._attributes, this._routeParams)
+  }
+
+  /**
+   * @summary Validate all atributes or given attribute
+   * @function
+   * @public
+   *
+   * @param {Object} options
+   * @param {string} [options.attribute]
+   * @param {string} [options.scope] Which scope validate (they are defined in validations "on" option)
+   * @return {*}
+   */
   valid (options = {}) {
     const attribute = options.attribute
     const scope = options.on
@@ -266,15 +468,24 @@ export default class Member extends Base {
   // modifier methods
 
   /**
-   * @param {Object} attributes
+   * @summary Assign given attributes to model attributes and reference. Defaults are considered.
+   * @function
+   * @public
    *
-   * @returns {Object} The attributes that were assigned to the model.
+   * @param  {Object} attributes
    */
   assign (attributes) {
     this.set(_defaultsDeep({}, attributes, _cloneDeep(this.defaults())))
     this.sync()
   }
 
+  /**
+   * @summary Mutates either specific attributes or all attributes if none supplied
+   * @function
+   * @public
+   *
+   * @param  {string} [attribute]
+   */
   mutate (attribute) {
     // mutate all attributes
     if (attribute == null) {
@@ -293,6 +504,14 @@ export default class Member extends Base {
     }
   }
 
+  /**
+   * @summary Sets the value of an attribute. If it is not defined, register and create setter and getter.
+   * @function
+   * @public
+   *
+   * @param {string} attribute
+   * @param {*} value
+   */
   set (attribute, value) {
     if (_isPlainObject(attribute)) {
       for (const key in attribute) {
@@ -304,8 +523,23 @@ export default class Member extends Base {
 
     const defined = this.has(attribute)
 
+    // register attribute is not already defined
     if (!defined) {
-      this._registerAttribute(attribute)
+
+      // verify is already exists
+      if (RESERVED.includes(attribute)) {
+        throw new Error(`Attribute ${attribute} cannot be define: reserved property.`)
+      }
+
+      // create empty error list
+      this._errors.set(attribute, [])
+      this._changes.set(attribute, false)
+
+      // define getter and setter
+      Object.defineProperty(this, attribute, {
+        get: () => this.get(attribute),
+        set: (value) => this.set(attribute, value)
+      })
     }
 
     const previous = this.get(attribute)
@@ -327,36 +561,5 @@ export default class Member extends Base {
     this._changes.set(attribute, value !== saved)
 
     return value
-  }
-
-  // private
-
-  _compiledMutations () {
-    return _mapValues(this.mutations(), (m) => _flow(m))
-  }
-
-  _getRouteParameters (defaults = {}) {
-    return Object.assign({}, this._attributes, this._routeParams, defaults)
-  }
-
-  _registerAttribute (attribute) {
-    // verify is already exists
-    if (RESERVED.includes(attribute)) {
-      throw new Error(`Attribute ${attribute} cannot be define: reserved property.`)
-    }
-
-    // create empty error list
-    this._errors.set(attribute, [])
-    this._changes.set(attribute, false)
-
-    // define getter and setter
-    Object.defineProperty(this, attribute, {
-      get: () => this.get(attribute),
-      set: (value) => this.set(attribute, value)
-    })
-  }
-
-  _registerRules () {
-    this._validator.setRules(this.validation())
   }
 }
