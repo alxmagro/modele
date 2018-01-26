@@ -1,5 +1,4 @@
 import { expect } from 'chai'
-import Rule from '../../../../src/validation/structures/rule'
 import ExclusionRule from '../../../../src/validation/rules/exclusion'
 
 describe('ExclusionRule', function () {
@@ -10,10 +9,6 @@ describe('ExclusionRule', function () {
   })
 
   describe('.test', function () {
-    it('build a Rule', function () {
-      expect(rule).to.be.an.instanceof(Rule)
-    })
-
     it('return false if list includes value', function () {
       expect(rule.test('foo')).to.be.false
     })

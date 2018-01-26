@@ -1,15 +1,13 @@
 import _isEqual from 'lodash/isEqual'
 
+/**
+ * Class that represents a set of key-value pairs with helpfull things
+ */
 export default class Map {
-
   /**
-   * @summary Create an instance of Map
-   * @name Map
-   * @class
-   * @public
+   * Create a Map instance
    *
    * @param {*} [empty] Represetation of empty state
-   * @returns {Map} Map instance
    *
    * @example
    * new Map(false)
@@ -23,9 +21,7 @@ export default class Map {
   // getters
 
   /**
-   * @summary Return all values
-   * @function
-   * @public
+   * Return all values
    *
    * @return {Object}
    */
@@ -34,9 +30,7 @@ export default class Map {
   }
 
   /**
-   * @summary Get a value
-   * @function
-   * @public
+   * Get a value
    *
    * @param  {string} prop
    * @return {*}
@@ -48,9 +42,7 @@ export default class Map {
   // setters
 
   /**
-   * @summary Set all values
-   * @function
-   * @public
+   * Set all values
    *
    * @param  {Object} [hash]
    */
@@ -59,9 +51,7 @@ export default class Map {
   }
 
   /**
-   * @summary Set a value
-   * @function
-   * @public
+   * Set a value
    *
    * @param {string} prop
    * @param {*} value
@@ -73,9 +63,7 @@ export default class Map {
   // verificators
 
   /**
-   * @summary Check if property exists and it is different to empty value
-   * @function
-   * @public
+   * Check if property exists and it is different to empty value
    *
    * @param  {string} prop
    * @return {Boolean}
@@ -85,9 +73,7 @@ export default class Map {
   }
 
   /**
-   * @summary Check if any property exists and is different to empty value
-   * @function
-   * @public
+   * Check if any property exists and is different to empty value
    *
    * @return {Boolean}
    */
@@ -102,9 +88,7 @@ export default class Map {
   // destroyers
 
   /**
-   * @summary Clear a given property, or all of them
-   * @function
-   * @public
+   * Clear a given property, or all of them
    *
    * @param  {prop}
    */

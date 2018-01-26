@@ -1,4 +1,4 @@
-import Rule from '../structures/rule'
+import Rule from '../rule'
 import is from 'is_js'
 
 export default class Date extends Rule {

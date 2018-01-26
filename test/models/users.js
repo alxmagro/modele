@@ -1,25 +1,23 @@
 import Modele from '../../src/modele'
 
-class Users extends Modele.Resource {
-  axios () {
+class User extends Modele.Model {
+  static axios () {
     return {
       baseURL: 'http://localhost:3000'
     }
   }
 
-  routes () {
+  static boot () {
+    this.classProperty = 'Some value'
+  }
+
+  static routes () {
     return {
-      resource: '/users{$url}',
-      member: '/users/{id}{$url}'
+      collection: '/users',
+      member: '/users/{$id}'
     }
   }
 
-  member () {
-    return User
-  }
-}
-
-class User extends Modele.Member {
   defaults () {
     return {
       ligthsaberColor: 'Blue'
@@ -41,23 +39,30 @@ class User extends Modele.Member {
     }
   }
 
-  actions () {
-    return {
-      upvote: {
-        config: { method: 'put', url: '/upvote' }
-      }
+  // actions
+
+  upvote () {
+    const config = {
+      url: '/upvote',
+      method: 'put'
     }
+
+    return this.request(config)
   }
 
-  // custom
+  // getters
 
   get fullName () {
     return this.name + ' ' + this.surname
   }
+
+  // methods
 
   salute (name) {
     return 'Hello'
   }
 }
 
-export default new Users()
+export default User
+  .use(Modele.plugins.CRUD)
+  .init()

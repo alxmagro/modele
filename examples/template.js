@@ -1,30 +1,16 @@
 import Modele from 'modele'
 
-class Users extends Modele.Resource {
-  axios () {
+class User extends Modele.Model {
+  static axios () {
     return {
       baseURL: 'http://www.mydomain.com/api'
     }
   }
 
-  routes () {
+  static routes () {
     return {
-      resource: '/users{$url}',
-      member: '/users/{id}{$url}'
-    }
-  }
-
-  member () {
-    return User
-  }
-}
-
-class User extends Modele.Member {
-  actions () {
-    return {
-      uploadAvatar: {
-        config: { method: 'put', url: '/avatar' }
-      }
+      collection: '/users',
+      member: '/users/{$id}'
     }
   }
 
@@ -48,11 +34,34 @@ class User extends Modele.Member {
     }
   }
 
-  // custom
+  // getters
 
-  get fullName(record) {
+  get fullName () {
     return this.name + ' ' + this.surname
+  }
+
+  // methods
+
+  uploadAvatar () {
+    const config = {
+      url: '/avatar',
+      method: 'put',
+      data: this.toJSON()
+    }
+
+    return this.request(config)
+      .then(response => {
+        this.assign(response)
+
+        return response
+      })
   }
 }
 
-export default new Users()
+export default User
+
+  // add fetch, create, update, delete actions automatically
+  .use(Modele.plugins.CRUD, { mutateOnSave: true })
+
+  // init Model
+  .init()

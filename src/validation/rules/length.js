@@ -1,4 +1,4 @@
-import Rule from '../structures/rule'
+import Rule from '../rule'
 
 export default class Length extends Rule {
   definitions (options) {

@@ -1,17 +1,18 @@
-import absence from '../rules/absence'
-import acceptance from '../rules/acceptance'
-import confirmation from '../rules/confirmation'
-import date from '../rules/date'
-import exclusion from '../rules/exclusion'
-import format from '../rules/format'
-import future from '../rules/future'
-import inclusion from '../rules/inclusion'
-import length from '../rules/length'
-import past from '../rules/past'
-import presence from '../rules/presence'
+import absence from './rules/absence'
+import acceptance from './rules/acceptance'
+import confirmation from './rules/confirmation'
+import date from './rules/date'
+import exclusion from './rules/exclusion'
+import format from './rules/format'
+import future from './rules/future'
+import inclusion from './rules/inclusion'
+import length from './rules/length'
+import past from './rules/past'
+import presence from './rules/presence'
 
 /**
- * @summary Default Validator ruleset
+ * Default Validator ruleset
+ *
  * @type Object
  * @constant
  * @private
@@ -31,9 +32,7 @@ const DEFAULT_RULESET = {
 }
 
 /**
- * @summary Get a rule by name into a given ruleset, and build it with options
- * @function
- * @private
+ * Get a rule by name into a given ruleset, and build it with options
  *
  * @param  {Object} ruleset
  * @param  {string} name
@@ -58,17 +57,15 @@ const buildRule = function (ruleset, name, options) {
   return new Constructor(options)
 }
 
+/**
+ * Class that represents a Validator
+ */
 export default class Validator {
-
   /**
-   * @summary Create an instance of Validator
-   * @name Validator
-   * @class
-   * @public
+   * @summary Create a Validator instance
    *
    * @param {Object} schema
    * @param {Object} [additions] Custom rules to add to ruleset
-   * @returns {Validator} Validator instance
    *
    * @example
    * new Validator({
@@ -93,9 +90,7 @@ export default class Validator {
   }
 
   /**
-   * @summary Check a record property with elegible rules on this.rules
-   * @function
-   * @public
+   * Check a record property with elegible rules on this.rules
    *
    * @param  {Object} record
    * @param  {string} prop
@@ -112,9 +107,7 @@ export default class Validator {
   }
 
   /**
-   * @summary Check a record with elegible rules on this.rules
-   * @function
-   * @public
+   * Check a record with elegible rules on this.rules
    *
    * @param  {Object} record
    * @param  {string} [scope]

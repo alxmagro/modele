@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import Rule from '../../../../src/validation/structures/rule'
+import Rule from '../../../src/validation/rule'
 
 describe('Rule', function () {
   var test, Test

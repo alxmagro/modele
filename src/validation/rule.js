@@ -1,13 +1,11 @@
+/**
+ * Class that represents a rule that can be validated
+ */
 export default class Rule {
-
   /**
-   * @summary Create an instance of Rule
-   * @name Rule
-   * @class
-   * @public
+   * Create an Rule instance
    *
    * @param {*} [options] Options that can be used in definitions and test
-   * @returns {Rule} Rule instance
    */
   constructor (options = {}) {
     const definitions = this.definitions(options)
@@ -20,10 +18,7 @@ export default class Rule {
   // interfaces
 
   /**
-   * @summary Function that returns the name and test of Rule
-   * @function
-   * @abstract
-   * @public
+   * Function that returns the name and test of Rule
    *
    * @param  {Object} [options] Received options in constructor
    * @return {Object}
@@ -43,9 +38,7 @@ export default class Rule {
   // methods
 
   /**
-   * @summary Check if rule has options "if" (and it's true) and check scope ("on")
-   * @function
-   * @public
+   * Check if rule has options "if" (and it's true) and check scope ("on")
    *
    * @param  {string} [scope]
    * @return {boolean}
@@ -58,9 +51,7 @@ export default class Rule {
   }
 
   /**
-   * @summary Tests the rule on a property (prop) of an object (record)
-   * @function
-   * @public
+   * Tests the rule on a property (prop) of an object (record)
    *
    * @param  {Object} record
    * @param  {string} prop
@@ -82,9 +73,7 @@ export default class Rule {
   // helpers
 
   /**
-   * @summary Calls the value if this is a function, otherwise it returns itself
-   * @function
-   * @public
+   * Calls the value if this is a function, otherwise it returns itself
    *
    * @param  {*} value
    * @return {*}

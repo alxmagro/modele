@@ -1,13 +1,15 @@
 import axios from 'axios'
-import Resource from './structures/resource'
-import Member from './structures/member'
-import Rule from './validation/structures/rule'
+import Model from './core/model'
+import Rule from './validation/rule'
+import CRUDPlugin from './plugins/crud-plugin'
 
 export default {
-  Resource,
-  Member,
+  Model,
   Rule,
   globals: {
     axios
+  },
+  plugins: {
+    CRUD: CRUDPlugin
   }
 }
