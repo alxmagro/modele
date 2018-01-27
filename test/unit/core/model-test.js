@@ -193,6 +193,32 @@ describe('Model', function () {
     })
   })
 
+  describe('.changed', function () {
+    context('when attribute name is given', function () {
+      it('returns true if given attribute was changed', function () {
+        user._changes['name'] = true
+
+        expect(user.changed('name')).to.be.true
+      })
+
+      it('returns false if given attribute was not changed', function () {
+        expect(user.changed('name')).to.be.false
+      })
+    })
+
+    context('when no param is given', function () {
+      it('returns true if any attribute was changed', function () {
+        user._changes['name'] = true
+
+        expect(user.changed()).to.be.true
+      })
+
+      it('returns false if any attribute was changed', function () {
+        expect(user.changed()).to.be.false
+      })
+    })
+  })
+
   describe('.clear', function () {
     it('reset attributes', function () {
       user.clear()
@@ -201,17 +227,17 @@ describe('Model', function () {
     })
 
     it('reset errors', function () {
-      user.valid()
+      user.validate()
       user.clear()
 
-      expect(user.errors.any()).to.be.false
+      expect(user.valid()).to.be.true
     })
 
     it('reset changes', function () {
       user.name = 'Yoda'
       user.clear()
 
-      expect(user.changes.any()).to.be.false
+      expect(user.changed()).to.be.false
     })
   })
 
@@ -342,7 +368,7 @@ describe('Model', function () {
     it('set empty error list if it isnt defined', function () {
       user.set('side', 'Light')
 
-      expect(user.errors.all()).to.have.deep.property('side', [])
+      expect(user.errors).to.have.deep.property('side', [])
     })
 
     it('set attribute if it was changed', function () {
@@ -354,7 +380,7 @@ describe('Model', function () {
     it('set change if it was changed', function () {
       user.set('name', 'Darth')
 
-      expect(user.changes.get('name')).to.be.true
+      expect(user.changed('name')).to.be.true
     })
   })
 
@@ -370,7 +396,7 @@ describe('Model', function () {
       user.name = 'Yoda'
       user.sync()
 
-      expect(user.changes.any()).to.be.false
+      expect(user.changed()).to.be.false
     })
   })
 
@@ -404,11 +430,39 @@ describe('Model', function () {
   })
 
   describe('.valid', function () {
+    context('when attribute name is given', function () {
+      it('returns true if attribute errors is empty', function () {
+        user.errors['surname'].push('presence')
+
+        expect(user.valid('name')).to.be.true
+      })
+
+      it('returns false if attribute errors has anything', function () {
+        user.errors['name'].push('presence')
+
+        expect(user.valid('name')).to.be.false
+      })
+    })
+
+    context('when no param is given', function () {
+      it('returns true if attribute errors are empty', function () {
+        expect(user.valid()).to.be.true
+      })
+
+      it('returns false if has anything in any attribute errors', function () {
+        user.errors['name'].push('presence')
+
+        expect(user.valid()).to.be.false
+      })
+    })
+  })
+
+  describe('.validate', function () {
     context('when option "attribute" is supplied', function () {
       it('returns false if attribute is wrong', function () {
         user.name = null
 
-        const report = user.valid({ attribute: 'name' })
+        const report = user.validate({ attribute: 'name' })
 
         expect(report).to.be.false
       })
@@ -416,9 +470,9 @@ describe('Model', function () {
       it('set errors if attribute is wrong', function () {
         user.name = null
 
-        user.valid({ attribute: 'name' })
+        user.validate({ attribute: 'name' })
 
-        expect(user.errors.all()).to.deep.include({
+        expect(user.errors).to.deep.include({
           name: [
             {
               name: 'presence',
@@ -434,7 +488,7 @@ describe('Model', function () {
       })
 
       it('returns true if attribute is correct', function () {
-        const report = user.valid({ attribute: 'name' })
+        const report = user.validate({ attribute: 'name' })
 
         expect(report).to.be.true
       })
@@ -442,15 +496,15 @@ describe('Model', function () {
 
     context('when option "scope" is supplied', function () {
       it('returns false if it is wrong by given scope', function () {
-        const report = user.valid({ on: 'create' })
+        const report = user.validate({ on: 'create' })
 
         expect(report).to.be.false
       })
 
       it('set errors if it is wrong by given scope', function () {
-        user.valid({ on: 'create' })
+        user.validate({ on: 'create' })
 
-        expect(user.errors.all()).to.deep.include({
+        expect(user.errors).to.deep.include({
           password: [
             {
               name: 'presence',
@@ -469,7 +523,7 @@ describe('Model', function () {
       it('returns true if it is correct by given scope', function () {
         user.set('password', '123123')
 
-        const report = user.valid({ attribute: 'password', on: 'create' })
+        const report = user.validate({ attribute: 'password', on: 'create' })
 
         expect(report).to.be.true
       })

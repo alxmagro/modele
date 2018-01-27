@@ -9,7 +9,6 @@ import _mapValues from 'lodash/mapValues'
 import _set from 'lodash/set'
 import request from './request'
 import Validator from '../validation/validator'
-import Map from '../utils/map'
 
 const DEFAULT_OPTIONS = {
   customRules: null,
@@ -41,8 +40,8 @@ export default class Model {
     }
 
     this._attributes = {}
-    this._changes = new Map(false)
-    this._errors = new Map([])
+    this._changes = {}
+    this._errors = {}
     this._mutations = _mapValues(this.mutations(), (m) => _flow(m))
     this._pending = false
     this._reference = {}
@@ -333,6 +332,20 @@ export default class Model {
   }
 
   /**
+   * Checks for changes in a given attribute, or any of them
+   *
+   * @param  {string} [attribute]
+   * @return {Boolean}
+   */
+  changed (attribute) {
+    if (attribute) {
+      return this._changes[attribute]
+    }
+
+    return Object.keys(this._changes).some(key => this.changed(key))
+  }
+
+  /**
    * Reset attributes, errors, changes and states
    */
   clear () {
@@ -340,8 +353,8 @@ export default class Model {
 
     this._attributes = defaults
     this._reference = defaults
-    this._errors.clear()
-    this._changes.clear()
+    this._errors = _mapValues(this._errors, () => [])
+    this._changes = _mapValues(this._changes, () => false)
     this.clearState()
   }
 
@@ -506,8 +519,8 @@ export default class Model {
       }
 
       // create empty error list
-      this._errors.set(attribute, [])
-      this._changes.set(attribute, false)
+      this._errors[attribute] = []
+      this._changes[attribute] = false
 
       // define getter and setter
       Object.defineProperty(this, attribute, {
@@ -532,7 +545,7 @@ export default class Model {
 
     const saved = this.saved(attribute)
 
-    this._changes.set(attribute, value !== saved)
+    this._changes[attribute] = value !== saved
 
     return value
   }
@@ -546,7 +559,7 @@ export default class Model {
     }
 
     this._reference = _cloneDeep(this._attributes)
-    this._changes.clear()
+    this._changes = _mapValues(this._changes, () => false)
   }
 
   /**
@@ -572,14 +585,28 @@ export default class Model {
   }
 
   /**
+   * Checks whether there are no errors in a given attribute, or none of them
+   *
+   * @param  {string} [attribute]
+   * @return {Boolean}
+   */
+  valid (attribute) {
+    if (attribute) {
+      return !this._errors[attribute] || !this._errors[attribute].length
+    }
+
+    return Object.keys(this._errors).every(key => this.valid(key))
+  }
+
+  /**
    * Validate all atributes or given attribute
    *
    * @param {Object} options
    * @param {string} [options.attribute]
    * @param {string} [options.scope] Which scope validate (they are defined in validations "on" option)
-   * @return {*}
+   * @return {Boolean} validity of the validation
    */
-  valid (options = {}) {
+  validate (options = {}) {
     const attribute = options.attribute
     const scope = options.on
     const record = this.getOption('validateMutatedAttributes')
@@ -589,14 +616,14 @@ export default class Model {
     if (attribute) {
       const errors = this._validator.validateProp(record, attribute, scope)
 
-      this.errors.set(attribute, errors)
+      this._errors[attribute] = errors
     } else {
       const errors = this._validator.validate(record, scope)
 
-      this.errors.record(errors)
+      this._errors = errors
     }
 
-    return !this.errors.any()
+    return this.valid(attribute)
   }
 
   /**
