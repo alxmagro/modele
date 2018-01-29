@@ -46,6 +46,32 @@ describe('Model', function () {
     })
   })
 
+  describe('#create', function () {
+    it('creates a resource', function (done) {
+      User.create({ name: 'Darth', surname: 'Vader' })
+
+        .then(res => {
+          expect(res.data).to.include({ name: 'Darth', surname: 'Vader' })
+          done()
+        })
+
+        .catch(done)
+    })
+  })
+
+  describe('#fetch', function () {
+    it('fetch resources', function (done) {
+      User.fetch()
+
+        .then(res => {
+          expect(res.data).to.deep.equal(server.db.users)
+          done()
+        })
+
+        .catch(done)
+    })
+  })
+
   describe('#getOption', function () {
     it('returns an option', function () {
       const option = User.getOption('identifier')
@@ -241,6 +267,49 @@ describe('Model', function () {
     })
   })
 
+  describe('.create', function () {
+    it('creates a resource', function (done) {
+      user = new User({ name: 'Darth', surname: 'Vader' })
+
+      user.create()
+
+        .then(res => {
+          expect(res.data).to.include({ name: 'Darth', surname: 'Vader' })
+          done()
+        })
+
+        .catch(done)
+    })
+  })
+
+  describe('.destroy', function () {
+    it('destroy a resource', function (done) {
+      const size = server.db.users.length
+
+      user.destroy()
+
+        .then(res => {
+          expect(server.db.users.length).to.equal(size - 1)
+          done()
+        })
+
+        .catch(done)
+    })
+  })
+
+  describe('.fetch', function () {
+    it('fetch a resource', function (done) {
+      user.fetch()
+
+        .then(res => {
+          expect(res.data).to.deep.equal(server.db.users[0])
+          done()
+        })
+
+        .catch(done)
+    })
+  })
+
   describe('.get', function () {
     it('returns an attribute', function () {
       expect(user.get('name')).to.equal('Luke')
@@ -426,6 +495,34 @@ describe('Model', function () {
       )
 
       expect(user.toParam()).to.deep.equal(expected)
+    })
+  })
+
+  describe('.update', function () {
+    it('update a resource', function (done) {
+      user.name = 'Yoda'
+
+      user.update()
+
+        .then(res => {
+          expect(res.data.name).to.equal('Yoda')
+          done()
+        })
+
+        .catch(done)
+    })
+
+    it('update a resource with param given', function (done) {
+      user.name = 'Yoda'
+
+      user.update({ name: 'Obi-Wan' })
+
+        .then(res => {
+          expect(res.data.name).to.equal('Obi-Wan')
+          done()
+        })
+
+        .catch(done)
     })
   })
 

@@ -11,6 +11,7 @@ import request from './request'
 import Validator from '../validation/validator'
 
 const DEFAULT_OPTIONS = {
+  crudMethods: { create: 'post', fetch: 'get', update: 'put', destroy: 'delete' },
   customRules: null,
   identifier: 'id',
   mutateBeforeSave: true,
@@ -114,6 +115,36 @@ export default class Model {
   static clearState () {
     this._pending = false
     this._routeParams = {}
+  }
+
+  /**
+   * Send a HTTP Request to create a resource
+   *
+   * @param  {Object} data
+   * @return {Promise}
+   */
+  static create (data) {
+    const config = {
+      method: this.getOption('crudMethods').create,
+      data: data
+    }
+
+    return this.request(config)
+  }
+
+  /**
+   * Send a HTTP Request to fetch resources
+   *
+   * @param  {Object} query
+   * @return {Promise}
+   */
+  static fetch (query) {
+    const config = {
+      method: this.getOption('crudMethods').fetch,
+      query: query
+    }
+
+    return this.request(config)
   }
 
   /**
@@ -367,6 +398,70 @@ export default class Model {
   }
 
   /**
+   * Send a HTTP Request to create a resource
+   *
+   * @param  {Object} data
+   * @return {Promise}
+   */
+  create () {
+    if (this.getOption('mutateBeforeSave')) {
+      this.mutate()
+    }
+
+    const config = {
+      method: this.getOption('crudMethods').create,
+      data: this
+    }
+
+    return this.request(config, { on: 'collection' })
+
+      .then(response => {
+        if (response) {
+          this.assign(response)
+        }
+
+        return response
+      })
+  }
+
+  /**
+   * Send a HTTP Request to delete a resource
+   *
+   * @param  {Object} data
+   * @return {Promise}
+   */
+  destroy () {
+    const config = {
+      method: this.getOption('crudMethods').destroy
+    }
+
+    return this.request(config)
+  }
+
+  /**
+   * Send a HTTP Request to fetch a resource
+   *
+   * @param  {Object} query
+   * @return {Promise}
+   */
+  fetch (query) {
+    const config = {
+      method: this.getOption('crudMethods').fetch,
+      query: query
+    }
+
+    return this.request(config)
+
+      .then(response => {
+        if (response) {
+          this.assign(response)
+        }
+
+        return response
+      })
+  }
+
+  /**
    * Returns an attribute's value or a fallback value
    *
    * @param  {string} attribute
@@ -582,6 +677,33 @@ export default class Model {
     }
 
     return Object.assign({}, this._attributes, this._routeParams, virtuals)
+  }
+
+  /**
+   * Send a HTTP Request to update a resource
+   *
+   * @param  {Object} query
+   * @return {Promise}
+   */
+  update (data) {
+    if (this.getOption('mutateBeforeSave')) {
+      this.mutate()
+    }
+
+    const config = {
+      method: this.getOption('crudMethods').update,
+      data: data || this
+    }
+
+    return this.request(config)
+
+      .then(response => {
+        if (response) {
+          this.assign(response)
+        }
+
+        return response
+      })
   }
 
   /**

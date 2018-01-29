@@ -63,6 +63,4 @@ class User extends Modele.Model {
   }
 }
 
-export default User
-  .use(Modele.plugins.CRUD)
-  .init()
+export default User.init()

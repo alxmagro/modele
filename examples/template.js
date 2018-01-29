@@ -58,10 +58,4 @@ class User extends Modele.Model {
   }
 }
 
-export default User
-
-  // add fetch, create, update, delete actions automatically
-  .use(Modele.plugins.CRUD, { mutateOnSave: true })
-
-  // init Model
-  .init()
+export default User.init()
