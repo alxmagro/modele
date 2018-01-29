@@ -1,6 +1,5 @@
 import _merge from 'lodash/merge'
 import _template from 'lodash/template'
-import Modele from '../'
 
 /**
  * Send a request using axios. Designed to be used by Model and their instance
@@ -27,7 +26,7 @@ export function request (caller, config, options = {}) {
   config.url = _template([route, config.url].join(''), { interpolate })(params)
 
   // send request and handle responses
-  return Modele.globals.axios(config)
+  return caller.getGlobal('axios')(config)
 
     .then((response) => {
       caller._pending = false

@@ -8,6 +8,7 @@ import _isPlainObject from 'lodash/isPlainObject'
 import _mapValues from 'lodash/mapValues'
 import _set from 'lodash/set'
 import { request } from './utils'
+import Modele from '../'
 import Validator from './validator'
 import ruleset from './ruleset'
 
@@ -146,6 +147,17 @@ export default class Model {
   }
 
   /**
+   * Get a global
+   *
+   * @param  {string} path
+   * @param  {string} [fallback]
+   * @return {*} Global option
+   */
+  static getGlobal (path, fallback) {
+    return _get(this._globals, path, fallback)
+  }
+
+  /**
    * Get a option
    *
    * @param  {string} path
@@ -179,6 +191,7 @@ export default class Model {
     this._routes = Object.assign({}, DEFAULT_ROUTES, this.routes())
     this._routeParams = {}
     this._ruleset = Object.assign({}, ruleset, this.getOption('customRules'))
+    this._globals = Modele.globals
 
     this.boot()
 
@@ -461,6 +474,17 @@ export default class Model {
    */
   get (attribute, fallback) {
     return _get(this._attributes, attribute, fallback)
+  }
+
+  /**
+   * Get a global
+   *
+   * @param  {string} path
+   * @param  {string} [fallback]
+   * @return {*} Global option
+   */
+  getGlobal (path, fallback) {
+    return _get(this.constructor._globals, path, fallback)
   }
 
   /**

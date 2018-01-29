@@ -1,6 +1,7 @@
 import { expect } from 'chai'
 import sinon from 'sinon'
 import FakeServer from '../../fake-server'
+import Modele from '../../../src'
 import User from '../../models/user'
 
 describe('Model', function () {
@@ -69,6 +70,24 @@ describe('Model', function () {
         })
 
         .catch(done)
+    })
+  })
+
+  describe('#getGlobal', function () {
+    it('returns an global', function () {
+      const locale = User.getGlobal('locale')
+
+      expect(locale).to.equal('en')
+    })
+
+    it('returns an changed global', function () {
+      Modele.globals.locale = 'pt-BR'
+
+      const locale = User.getGlobal('locale')
+
+      expect(locale).to.equal('pt-BR')
+
+      Modele.globals.locale = 'en'
     })
   })
 
@@ -317,6 +336,24 @@ describe('Model', function () {
 
     it('returns fallback when attribute is not found', function () {
       expect(user.get('side', 'Light')).to.equal('Light')
+    })
+  })
+
+  describe('.getGlobal', function () {
+    it('returns an global', function () {
+      const locale = user.getGlobal('locale')
+
+      expect(locale).to.equal('en')
+    })
+
+    it('returns an changed global', function () {
+      Modele.globals.locale = 'pt-BR'
+
+      const locale = user.getGlobal('locale')
+
+      expect(locale).to.equal('pt-BR')
+
+      Modele.globals.locale = 'en'
     })
   })
 
