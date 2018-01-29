@@ -1,36 +1,3 @@
-import absence from './rules/absence'
-import acceptance from './rules/acceptance'
-import confirmation from './rules/confirmation'
-import date from './rules/date'
-import exclusion from './rules/exclusion'
-import format from './rules/format'
-import future from './rules/future'
-import inclusion from './rules/inclusion'
-import length from './rules/length'
-import past from './rules/past'
-import presence from './rules/presence'
-
-/**
- * Default Validator ruleset
- *
- * @type Object
- * @constant
- * @private
- */
-const DEFAULT_RULESET = {
-  absence,
-  acceptance,
-  confirmation,
-  date,
-  exclusion,
-  format,
-  future,
-  inclusion,
-  length,
-  past,
-  presence
-}
-
 /**
  * Get a rule by name into a given ruleset, and build it with options
  *
@@ -64,16 +31,15 @@ export default class Validator {
   /**
    * @summary Create a Validator instance
    *
+   * @param {Object} ruleset
    * @param {Object} schema
-   * @param {Object} [additions] Custom rules to add to ruleset
    *
    * @example
    * new Validator({
    *   name: { presence: true, length: { min: 8 } }
    * })
    */
-  constructor (schema = {}, additions = {}) {
-    this.ruleset = Object.assign({}, DEFAULT_RULESET, additions)
+  constructor (ruleset, schema = {}) {
     this.rules = {}
 
     for (const prop in schema) {
@@ -81,8 +47,9 @@ export default class Validator {
       this.rules[prop] = []
 
       // add rules
-      for (const ruleName in schema[prop]) {
-        const rule = buildRule(this.ruleset, ruleName, schema[prop][ruleName])
+      for (const name in schema[prop]) {
+        const options = schema[prop][name]
+        const rule = buildRule(ruleset, name, options)
 
         this.rules[prop].push(rule)
       }

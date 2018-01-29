@@ -1,4 +1,4 @@
-import Rule from '../rule'
+import Rule from '../core/rule'
 import is from 'is_js'
 
 export default class Confirmation extends Rule {

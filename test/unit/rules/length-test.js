@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import LengthRule from '../../../../src/validation/rules/length'
+import LengthRule from '../../../src/rules/length'
 
 describe('LengthRule', function () {
   var rule

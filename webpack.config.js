@@ -2,7 +2,7 @@ const path = require('path')
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
 
 module.exports = {
-  entry: './src/modele.js',
+  entry: './src/index.js',
   output: {
     path: path.resolve(__dirname, 'dist'),
     library: 'modele',

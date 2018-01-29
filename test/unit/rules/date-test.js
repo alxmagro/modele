@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import DateRule from '../../../../src/validation/rules/date'
+import DateRule from '../../../src/rules/date'
 
 describe('DateRule', function () {
   var rule

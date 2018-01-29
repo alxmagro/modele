@@ -7,8 +7,9 @@ import _isEqual from 'lodash/isEqual'
 import _isPlainObject from 'lodash/isPlainObject'
 import _mapValues from 'lodash/mapValues'
 import _set from 'lodash/set'
-import request from './request'
-import Validator from '../validation/validator'
+import { request } from './utils'
+import Validator from './validator'
+import ruleset from './ruleset'
 
 const DEFAULT_OPTIONS = {
   crudMethods: { create: 'post', fetch: 'get', update: 'put', destroy: 'delete' },
@@ -47,10 +48,7 @@ export default class Model {
     this._pending = false
     this._reference = {}
     this._routeParams = {}
-    this._validator = new Validator(
-      this.validation(),
-      this.getOption('customRules')
-    )
+    this._validator = new Validator(this.constructor._ruleset, this.validation())
 
     this.assign(attributes)
     this.boot()
@@ -180,9 +178,11 @@ export default class Model {
     this._pending = false
     this._routes = Object.assign({}, DEFAULT_ROUTES, this.routes())
     this._routeParams = {}
-    this._init = true
+    this._ruleset = Object.assign({}, ruleset, this.getOption('customRules'))
 
     this.boot()
+
+    this._init = true
 
     return this
   }
@@ -328,15 +328,6 @@ export default class Model {
    */
   get pending () {
     return this._pending
-  }
-
-  /**
-   * Validator getter
-   *
-   * @return {Validator}
-   */
-  get validator () {
-    return this._validator
   }
 
   //

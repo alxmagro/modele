@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import AbsenceRule from '../../../../src/validation/rules/absence'
+import AbsenceRule from '../../../src/rules/absence'
 
 describe('AbsenceRule', function () {
   var rule

@@ -1,4 +1,4 @@
-import Modele from '../../src/modele'
+import Modele from '../../src'
 
 class User extends Modele.Model {
   static axios () {

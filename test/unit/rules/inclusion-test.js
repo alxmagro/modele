@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import InclusionRule from '../../../../src/validation/rules/inclusion'
+import InclusionRule from '../../../src/rules/inclusion'
 
 describe('InclusionRule', function () {
   var rule

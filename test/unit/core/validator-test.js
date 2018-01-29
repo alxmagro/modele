@@ -1,32 +1,15 @@
 import { expect } from 'chai'
-import Validator from '../../../src/validation/validator'
+import ruleset from '../../../src/core/ruleset'
+import Validator from '../../../src/core/validator'
 
 describe('Validator', function () {
   var validator
 
   beforeEach(function () {
-    validator = new Validator({
+    validator = new Validator(ruleset, {
       name: { presence: true },
       email: { presence: { on: 'create' }},
       password: { presence: { on: 'update' }}
-    })
-  })
-
-  describe('#constructor', function () {
-    it('set ruleset', function () {
-      expect(validator.ruleset).to.have.all.keys(
-        'absence',
-        'acceptance',
-        'confirmation',
-        'date',
-        'exclusion',
-        'format',
-        'future',
-        'inclusion',
-        'length',
-        'past',
-        'presence'
-      )
     })
   })
 

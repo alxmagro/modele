@@ -1,6 +1,6 @@
 import _merge from 'lodash/merge'
 import _template from 'lodash/template'
-import Modele from '../modele'
+import Modele from '../'
 
 /**
  * Send a request using axios. Designed to be used by Model and their instance
@@ -11,7 +11,7 @@ import Modele from '../modele'
  * @param  {string} [options.on] Which route ('collection' or 'member')
  * @return {Promise} Axios promise
  */
-export default function request (caller, config, options = {}) {
+export function request (caller, config, options = {}) {
   const interpolate = caller.getOption('urlInterpolate')
   const params = caller.toParam()
   const route = caller.getRoute(options.on)

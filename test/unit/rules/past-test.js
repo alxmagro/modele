@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import PastRule from '../../../../src/validation/rules/past'
+import PastRule from '../../../src/rules/past'
 
 describe('PastRule', function () {
   var rule

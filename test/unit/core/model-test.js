@@ -19,7 +19,7 @@ describe('Model', function () {
 
   describe('#constructor', function () {
     it('register rules', function () {
-      const rules = [].concat(Object.values(user.validator.rules))
+      const rules = [].concat(Object.values(user._validator.rules))
 
       expect(rules.length).to.equal(3)
     })

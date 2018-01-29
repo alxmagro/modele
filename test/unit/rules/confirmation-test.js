@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import ConfirmationRule from '../../../../src/validation/rules/confirmation'
+import ConfirmationRule from '../../../src/rules/confirmation'
 
 describe('ConfirmationRule', function () {
   var rule

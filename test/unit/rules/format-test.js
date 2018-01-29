@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import FormatRule from '../../../../src/validation/rules/format'
+import FormatRule from '../../../src/rules/format'
 
 describe('FormatRule', function () {
   var rule

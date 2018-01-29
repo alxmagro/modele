@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import FutureRule from '../../../../src/validation/rules/future'
+import FutureRule from '../../../src/rules/future'
 
 describe('FutureRule', function () {
   var rule
