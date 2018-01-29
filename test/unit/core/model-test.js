@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import sinon from 'sinon'
 import FakeServer from '../../fake-server'
-import User from '../../models/users'
+import User from '../../models/user'
 
 describe('Model', function () {
   var server, user
