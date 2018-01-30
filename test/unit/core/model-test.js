@@ -477,6 +477,12 @@ describe('Model', function () {
 
       expect(user.changed('name')).to.be.true
     })
+
+    it('throws an error if trying override a Model method', function () {
+      const trigger = () => user.set('sync', true)
+
+      expect(trigger).to.throw(Error)
+    })
   })
 
   describe('.setOption', function () {

@@ -7,7 +7,7 @@ import _isEqual from 'lodash/isEqual'
 import _isPlainObject from 'lodash/isPlainObject'
 import _mapValues from 'lodash/mapValues'
 import _set from 'lodash/set'
-import { request } from './utils'
+import { request, includesAny } from './utils'
 import Modele from '../'
 import Validator from './validator'
 import ruleset from './ruleset'
@@ -25,6 +25,51 @@ const DEFAULT_OPTIONS = {
 const DEFAULT_ROUTES = {
   resource: null,
   member: '/{$id}'
+}
+
+const RESERVED = {
+  class: [
+    'create',
+    'fetch',
+    'getGlobal',
+    'getOption',
+    'getRoute',
+    'init',
+    'request',
+    'setOption',
+    'stub',
+    'toParam',
+    'use'
+  ],
+
+  instance: [
+    'assign',
+    'axios',
+    'changed',
+    'clear',
+    'create',
+    'destroy',
+    'fetch',
+    'get',
+    'getGlobal',
+    'getOption',
+    'getRoute',
+    'has',
+    'identifier',
+    'mutate',
+    'mutated',
+    'request',
+    'reset',
+    'saved',
+    'set',
+    'setOption',
+    'sync',
+    'toJSON',
+    'toParam',
+    'update',
+    'valid',
+    'validate'
+  ]
 }
 
 /**
@@ -184,6 +229,14 @@ export default class Model {
     this._globals = Modele.globals
 
     this.boot()
+
+    includesAny(Object.getOwnPropertyNames(this), RESERVED.class, (prop) => {
+      throw new Error(`Model Error: Static property "${prop}" is reserved.`)
+    })
+
+    includesAny(Object.getOwnPropertyNames(this.prototype), RESERVED.instance, (prop) => {
+      throw new Error(`Model Error: Property "${prop}" is reserved.`)
+    })
 
     this._init = true
 
@@ -383,7 +436,7 @@ export default class Model {
 
       .then(response => {
         if (response) {
-          this.assign(response)
+          this.assign(response.data)
         }
 
         return response
@@ -420,7 +473,7 @@ export default class Model {
 
       .then(response => {
         if (response) {
-          this.assign(response)
+          this.assign(response.data)
         }
 
         return response
@@ -590,8 +643,8 @@ export default class Model {
     // register attribute is not already defined
     if (!defined) {
       // verify is already exists
-      if (Object.getPrototypeOf(this).hasOwnProperty(attribute)) {
-        throw new Error(`Attribute ${attribute} cannot be define: reserved property.`)
+      if (RESERVED.instance.includes(attribute)) {
+        throw new Error(`Model Error: Property "${attribute}" is reserved.`)
       }
 
       // create empty error list
@@ -690,7 +743,7 @@ export default class Model {
 
       .then(response => {
         if (response) {
-          this.assign(response)
+          this.assign(response.data)
         }
 
         return response
