@@ -22,8 +22,9 @@ export function request (caller, config, options = {}) {
   // merge default config (api) with config
   config = _merge({}, caller.axios(), config)
 
-  // prepend route to url and replace variables
+  // prepend route to url and interpolate url and baseURL
   config.url = _template([route, config.url].join(''), { interpolate })(params)
+  config.baseURL = _template(config.baseURL, { interpolate })(params)
 
   // send request and handle responses
   return caller.getGlobal('axios')(config)
