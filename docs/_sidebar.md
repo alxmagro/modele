@@ -1,0 +1,7 @@
+- [Introduction](/)
+- [Initializing a Model](initializing.md)
+- [Options](options.md)
+- [Data access](data-access.md)
+- [Mutators](mutators.md)
+- [Validation](validation.md)
+- [Actions](actions.md)
