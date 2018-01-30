@@ -38,15 +38,6 @@ describe('Model', function () {
   // STATIC METHODS
   //
 
-  describe('#clearState', function () {
-    it('resets internal variables', function () {
-      User.where({ foo: 'bar' })
-      User.clearState()
-
-      expect(User.toParam()).to.deep.equal({})
-    })
-  })
-
   describe('#create', function () {
     it('creates a resource', function (done) {
       User.create({ name: 'Darth', surname: 'Vader' })
@@ -178,12 +169,12 @@ describe('Model', function () {
   })
 
   describe('#toParam', function () {
-    it('returns values assigned in where', function () {
-      User.where({ foo: 'bar' })
+    it('returns values assigned in option urlParams', function () {
+      User.setOption('urlParams', { foo: 'bar' })
 
       expect(User.toParam()).to.deep.equal({ foo: 'bar' })
 
-      User.clearState()
+      User.setOption('urlParams', {})
     })
   })
 
@@ -195,16 +186,6 @@ describe('Model', function () {
       User.use(pluginStub, pluginOptions)
 
       expect(pluginStub.install.calledWith(User, pluginOptions)).to.be.true
-    })
-  })
-
-  describe('#where', function () {
-    it('include values to route params', function () {
-      User.where({ foo: 'bar' })
-
-      expect(User.toParam()).includes({ foo: 'bar' })
-
-      User.clearState()
     })
   })
 
@@ -366,7 +347,15 @@ describe('Model', function () {
   })
 
   describe('.getOption', function () {
-    it('returns resource option', function () {
+    it('returns an instance options if exists', function () {
+      user.setOption('foo', 'bar')
+
+      const option = user.getOption('foo')
+
+      expect(option).to.equal('bar')
+    })
+
+    it('returns resource option if instance option doesnt exists', function () {
       const option = user.getOption('identifier')
 
       expect(option).to.equal('id')
@@ -498,6 +487,20 @@ describe('Model', function () {
     })
   })
 
+  describe('.setOption', function () {
+    it('set an instance option', function () {
+      user.setOption('foo', 'bar')
+
+      expect(user._options.foo).to.equal('bar')
+    })
+
+    it('do not change Model option', function () {
+      user.setOption('foo', 'bar')
+
+      expect(User._options.foo).to.be.undefined
+    })
+  })
+
   describe('.sync', function () {
     it('synchronizes the reference and attributes', function () {
       user.name = 'Yoda'
@@ -530,16 +533,18 @@ describe('Model', function () {
   })
 
   describe('.toParam', function () {
-    it('returns attributes, route params and virtual id', function () {
-      user.where({ foo: 'bar' })
+    it('contains attributes', function () {
+      expect(user.toParam()).to.include(user.toJSON())
+    })
 
-      const expected = Object.assign(
-        user.toJSON(),
-        { foo: 'bar' },
-        { $id: user.id }
-      )
+    it('contains option urlParams', function () {
+      user.setOption('urlParams', { foo: 'bar' })
 
-      expect(user.toParam()).to.deep.equal(expected)
+      expect(user.toParam()).to.include({ foo: 'bar' })
+    })
+
+    it('contains identifier $id', function () {
+      expect(user.toParam()).to.include({ $id: user.id })
     })
   })
 
@@ -669,14 +674,6 @@ describe('Model', function () {
 
         expect(report).to.be.true
       })
-    })
-  })
-
-  describe('.where', function () {
-    it('includes values to route params', function () {
-      user.where({ foo: 'baz' })
-
-      expect(user.toParam()).include({ foo: 'baz' })
     })
   })
 })

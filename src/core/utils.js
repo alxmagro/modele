@@ -11,7 +11,7 @@ import _template from 'lodash/template'
  * @return {Promise} Axios promise
  */
 export function request (caller, config, options = {}) {
-  const interpolate = caller.getOption('urlInterpolate')
+  const interpolate = caller.getOption('urlParamPattern')
   const params = caller.toParam()
   const route = caller.getRoute(options.on)
 

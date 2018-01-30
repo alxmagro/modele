@@ -13,14 +13,13 @@ import Validator from './validator'
 import ruleset from './ruleset'
 
 const DEFAULT_OPTIONS = {
-  crudMethods: { create: 'post', fetch: 'get', update: 'put', destroy: 'delete' },
-  customRules: null,
   identifier: 'id',
   mutateBeforeSave: true,
   mutateBeforeSync: true,
   mutateOnChange: false,
-  urlInterpolate: /{([\S]+?)}/g,
-  validateMutatedAttributes: true
+  rulesetAddition: null,
+  urlParamPattern: /{([\S]+?)}/g,
+  urlParams: {}
 }
 
 const DEFAULT_ROUTES = {
@@ -37,7 +36,7 @@ export default class Model {
    *
    * @param {Object} attributes
    */
-  constructor (attributes = {}) {
+  constructor (attributes = {}, options = {}) {
     if (!this.constructor._init) {
       throw TypeError('Constructor not initiate, use Model.init() shortly after its creation')
     }
@@ -46,9 +45,9 @@ export default class Model {
     this._changes = {}
     this._errors = {}
     this._mutations = _mapValues(this.mutations(), (m) => _flow(m))
+    this._options = options
     this._pending = false
     this._reference = {}
-    this._routeParams = {}
     this._validator = new Validator(this.constructor._ruleset, this.validation())
 
     this.assign(attributes)
@@ -109,14 +108,6 @@ export default class Model {
   //
 
   /**
-   * Reset internal variables
-   */
-  static clearState () {
-    this._pending = false
-    this._routeParams = {}
-  }
-
-  /**
    * Send a HTTP Request to create a resource
    *
    * @param  {Object} data
@@ -124,7 +115,7 @@ export default class Model {
    */
   static create (data) {
     const config = {
-      method: this.getOption('crudMethods').create,
+      method: 'post',
       data: data
     }
 
@@ -139,7 +130,7 @@ export default class Model {
    */
   static fetch (query) {
     const config = {
-      method: this.getOption('crudMethods').fetch,
+      method: 'get',
       query: query
     }
 
@@ -189,8 +180,7 @@ export default class Model {
     this._options = Object.assign({}, DEFAULT_OPTIONS, this.options())
     this._pending = false
     this._routes = Object.assign({}, DEFAULT_ROUTES, this.routes())
-    this._routeParams = {}
-    this._ruleset = Object.assign({}, ruleset, this.getOption('customRules'))
+    this._ruleset = Object.assign({}, ruleset, this.getOption('rulesetAddition'))
     this._globals = Modele.globals
 
     this.boot()
@@ -241,12 +231,12 @@ export default class Model {
   }
 
   /**
-   * Returns route parameters
+   * URL interpolated parameters (Option.urlParams)
    *
    * @return {Object}
    */
   static toParam () {
-    return Object.assign({}, this._routeParams)
+    return this.getOption('urlParams')
   }
 
   /**
@@ -258,17 +248,6 @@ export default class Model {
    */
   static use (plugin, options) {
     plugin.install(this, options)
-
-    return this
-  }
-
-  /**
-   * Assign values to route parameters
-   *
-   * @return {Object} this
-   */
-  static where (parameters) {
-    Object.assign(this._routeParams, parameters)
 
     return this
   }
@@ -390,15 +369,7 @@ export default class Model {
     this._reference = defaults
     this._errors = _mapValues(this._errors, () => [])
     this._changes = _mapValues(this._changes, () => false)
-    this.clearState()
-  }
-
-  /**
-   * Reset states
-   */
-  clearState () {
     this._pending = false
-    this._routeParams = {}
   }
 
   /**
@@ -413,7 +384,7 @@ export default class Model {
     }
 
     const config = {
-      method: this.getOption('crudMethods').create,
+      method: 'post',
       data: this
     }
 
@@ -436,7 +407,7 @@ export default class Model {
    */
   destroy () {
     const config = {
-      method: this.getOption('crudMethods').destroy
+      method: 'delete'
     }
 
     return this.request(config)
@@ -450,7 +421,7 @@ export default class Model {
    */
   fetch (query) {
     const config = {
-      method: this.getOption('crudMethods').fetch,
+      method: 'get',
       query: query
     }
 
@@ -488,14 +459,18 @@ export default class Model {
   }
 
   /**
-   * @Resource options
+   * Get a instance option, if this is not set, get a Class option, otherwise, fallback.
    *
    * @param  {string} path
    * @param  {string} [fallback]
    * @return {*} Resource option
    */
   getOption (path, fallback) {
-    return this.constructor.getOption(path, fallback)
+    return _get(
+      this._options,
+      path,
+      this.constructor.getOption(path, fallback)
+    )
   }
 
   /**
@@ -661,6 +636,17 @@ export default class Model {
   }
 
   /**
+   * Set an option
+   *
+   * @param  {string} path
+   * @param  {string} [fallback]
+   * @return {*} Option
+   */
+  setOption (path, value) {
+    return _set(this._options, path, value)
+  }
+
+  /**
    * Save value of attributes in reference
    */
   sync () {
@@ -682,16 +668,15 @@ export default class Model {
   }
 
   /**
-   * A set of this model attributes plus atributes setted with .where()
+   * URL interpolated parameters (Attributes + Option.urlParams + $id)
    *
    * @return {Object}
    */
   toParam () {
-    const virtuals = {
-      $id: this.identifier()
-    }
+    const params = this.getOption('urlParams')
+    const virtuals = { $id: this.identifier() }
 
-    return Object.assign({}, this._attributes, this._routeParams, virtuals)
+    return Object.assign({}, this._attributes, params, virtuals)
   }
 
   /**
@@ -706,7 +691,7 @@ export default class Model {
     }
 
     const config = {
-      method: this.getOption('crudMethods').update,
+      method: 'put',
       data: data || this
     }
 
@@ -746,9 +731,7 @@ export default class Model {
   validate (options = {}) {
     const attribute = options.attribute
     const scope = options.on
-    const record = this.getOption('validateMutatedAttributes')
-      ? this.mutated()
-      : this.toJSON()
+    const record = this.mutated()
 
     if (attribute) {
       const errors = this._validator.validateProp(record, attribute, scope)
@@ -761,16 +744,5 @@ export default class Model {
     }
 
     return this.valid(attribute)
-  }
-
-  /**
-   * Assign values to route parameters
-   *
-   * @return {Object} this
-   */
-  where (parameters) {
-    Object.assign(this._routeParams, parameters)
-
-    return this
   }
 }
