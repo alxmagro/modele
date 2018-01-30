@@ -75,9 +75,13 @@ describe('Model', function () {
 
   describe('#getGlobal', function () {
     it('returns an global', function () {
+      Modele.globals.locale = 'en'
+
       const locale = User.getGlobal('locale')
 
       expect(locale).to.equal('en')
+
+      delete Modele.globals.locale
     })
 
     it('returns an changed global', function () {
@@ -87,7 +91,7 @@ describe('Model', function () {
 
       expect(locale).to.equal('pt-BR')
 
-      Modele.globals.locale = 'en'
+      delete Modele.globals.locale
     })
   })
 
@@ -341,9 +345,13 @@ describe('Model', function () {
 
   describe('.getGlobal', function () {
     it('returns an global', function () {
+      Modele.globals.locale = 'en'
+
       const locale = user.getGlobal('locale')
 
       expect(locale).to.equal('en')
+
+      delete Modele.globals.locale
     })
 
     it('returns an changed global', function () {
@@ -353,7 +361,7 @@ describe('Model', function () {
 
       expect(locale).to.equal('pt-BR')
 
-      Modele.globals.locale = 'en'
+      delete Modele.globals.locale
     })
   })
 

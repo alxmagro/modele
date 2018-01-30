@@ -6,7 +6,6 @@ export default {
   Model,
   Rule,
   globals: {
-    axios,
-    locale: 'en'
+    axios
   }
 }
