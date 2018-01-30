@@ -5,7 +5,7 @@ Use it to create a business layer in client-side, with an RESTful API, validatio
 
 ## Documentation
 
-Soon.
+Visit https://alexandremagro.github.io/modele.
 
 ### Bug Reports & Feature Requests
 
