@@ -108,14 +108,6 @@ describe('Model', function () {
     })
   })
 
-  describe('#new', function () {
-    it('build a member with given attributes', function () {
-      const user = new User({ name: 'Darth', surname: 'Vader' })
-
-      expect(user).to.include({ name: 'Darth', surname: 'Vader' })
-    })
-  })
-
   describe('#request', function () {
     it('send a http request', function (done) {
       const config = {

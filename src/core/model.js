@@ -191,16 +191,6 @@ export default class Model {
   }
 
   /**
-   * Create an Model instance
-   *
-   * @param  {Object} attributes
-   * @return {Object} Model instance
-   */
-  static new (attributes) {
-    return new this(attributes)
-  }
-
-  /**
    * @see request
    */
   static request (config, options = { on: 'collection' }) {
@@ -222,12 +212,13 @@ export default class Model {
    * Create an Model instance with given identifier
    *
    * @param  {*} key
+   * @param  {Object} [options]
    * @return {Object} Model instance
    */
-  static stub (key) {
+  static stub (key, options) {
     const identifier = this.getOption('identifier')
 
-    return new this({ [identifier]: key })
+    return new this({ [identifier]: key }, options)
   }
 
   /**
