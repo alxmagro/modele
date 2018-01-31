@@ -7,7 +7,7 @@ Use it to create a business layer in client-side, with an RESTful API, validatio
 
 Visit https://alexandremagro.github.io/modele.
 
-### Bug Reports & Feature Requests
+## Bug Reports & Feature Requests
 
 Please use the [issue tracker](https://github.com/alexandremagro/modele/issues) to report any bugs or file feature requests.
 
