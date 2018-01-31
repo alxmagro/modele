@@ -28,11 +28,13 @@ jobs:
   lint:
     <<: *defaults
     steps:
+      - checkout
       - run: yarn lint
 
   test:
     <<: *defaults
     steps:
+      - checkout
       - run: yarn test
 
 workflows:
