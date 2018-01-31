@@ -24,11 +24,11 @@ class User extends Modele.Model {
     return {
       email: {
         presence: true,
-        format: { with: /\S+@\S+\.\S+/ }
+        format: { with: /\S+@\S+\.\S+/ },
         confirmation: { with: 'email_confirmation', on: 'create' }
       },
       password: {
-        length: { min: 8 }
+        length: { min: 8 },
         presence: { on: 'create' }
       }
     }
