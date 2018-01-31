@@ -1,5 +1,10 @@
 ## Introduction
 
+[![CircleCI](https://img.shields.io/circleci/project/alexandremagro/modele.svg)](https://circleci.com/gh/alexandremagro/modele)
+[![npm](https://img.shields.io/npm/dt/modele.svg)](https://www.npmjs.com/package/modele)
+[![npm](https://img.shields.io/npm/v/modele.svg)](https://www.npmjs.com/package/modele)
+[![GitHub license](https://img.shields.io/github/license/alexandremagro/modele.svg)](https://github.com/alexandremagro/modele/blob/master/LICENSE)
+
 Modele is a client-side representation of Resources and Models.
 Use it to create a business layer in client-side, with an RESTful API, validations, and default properties of your server-side Models.
 
