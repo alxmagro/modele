@@ -429,9 +429,9 @@ export default class Model {
     return this.request(config, { on: 'collection' })
 
       .then(response => {
-        if (response) {
-          this.assign(response.data)
-        }
+        response.data
+          ? this.assign(response.data)
+          : this.sync()
 
         return response
       })
@@ -443,9 +443,10 @@ export default class Model {
    * @param  {Object} data
    * @return {Promise}
    */
-  destroy () {
+  destroy (data) {
     const config = {
-      method: 'delete'
+      method: 'delete',
+      data: data
     }
 
     return this.request(config)
@@ -736,9 +737,9 @@ export default class Model {
     return this.request(config)
 
       .then(response => {
-        if (response) {
-          this.assign(response.data)
-        }
+        response.data
+          ? this.assign(response.data)
+          : this.sync()
 
         return response
       })
