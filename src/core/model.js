@@ -29,8 +29,6 @@ const DEFAULT_ROUTES = {
 
 const RESERVED = {
   class: [
-    'create',
-    'fetch',
     'getGlobal',
     'getOption',
     'getRoute',
@@ -47,9 +45,6 @@ const RESERVED = {
     'axios',
     'changed',
     'clear',
-    'create',
-    'destroy',
-    'fetch',
     'get',
     'getGlobal',
     'getOption',
@@ -66,7 +61,6 @@ const RESERVED = {
     'sync',
     'toJSON',
     'toParam',
-    'update',
     'valid',
     'validate'
   ]
