@@ -1,6 +1,6 @@
 {
   "name": "modele",
-  "description": "Business layer with Model and API, for Javascript",
+  "description": "Models and Resources for Front-end.",
   "private": false,
   "author": "Alexandre Magro <alexandremagro@live.com>",
   "version": "0.8.0",
