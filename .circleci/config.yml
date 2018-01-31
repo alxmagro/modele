@@ -1,13 +1,17 @@
 version: 2
-
-defaults: &defaults
-  working_directory: ~/repo
-  docker:
-    - image: circleci/node:7.10
-
 jobs:
-  install:
-    <<: *defaults
+  build:
+    docker:
+      # specify the version you desire here
+      - image: circleci/node:7.10
+
+      # Specify service dependencies here if necessary
+      # CircleCI maintains a library of pre-built images
+      # documented at https://circleci.com/docs/2.0/circleci-images/
+      # - image: circleci/mongo:3.4.4
+
+    working_directory: ~/repo
+
     steps:
       - checkout
 
@@ -25,26 +29,8 @@ jobs:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
 
-  lint:
-    <<: *defaults
-    steps:
-      - checkout
+      # run lint!
       - run: yarn lint
 
-  test:
-    <<: *defaults
-    steps:
-      - checkout
+      # run tests!
       - run: yarn test
-
-workflows:
-  version: 2
-  install-and-test:
-    jobs:
-      - install
-      - lint:
-          requires:
-            - install
-      - test:
-          requires:
-            - install
