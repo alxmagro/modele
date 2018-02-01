@@ -8,6 +8,22 @@ Models contain routines that need to be executed and static variables to be writ
 import Modele from 'modele'
 
 class Task extends Modele.Model {
+  // ...
+}
+
+export default Task.init()
+```
+
+## Default attributes
+
+Default attributes are defined by a model’s `defaults()` method. This function is called in constructor to complete missing parameter attributes.
+
+?> **Important:** You should define a default value for every attribute.
+
+```javascript
+import Modele from 'modele'
+
+class Task extends Modele.Model {
   defaults () {
     return {
       id: null,
@@ -37,8 +53,6 @@ let model = Model.stub(identifier, options = {})
 ### Attributes parameter
 
 Attributes will be merged with the default attributes as defined by the `defaults()` method. If no attributes are provided on construction, the model will represent an "empty" state.
-
-?> **Important:** You should define a default value for every attribute.
 
 ```javascript
 // Create a new task with initial attributes.

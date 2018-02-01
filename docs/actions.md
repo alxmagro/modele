@@ -1,5 +1,7 @@
 # Actions
 
+> Action is an internal concept for methods that send a request.
+
 ## Routes
 
 Routes are basically a common prefix for all action URLs. There are two basic types of routes, collection route, for actions that do not have a specific resource as a target, such as listing all users. And the member route, which acts on a specific resource, such as updating a user. Routes are defined in a Model’s `static routes()` method. Expected keys are **collection**, and **member**.
@@ -35,7 +37,7 @@ task.request({ method: 'put', url: '/like' })
 
 You can change this behavior by passing the `on` option to the `request` method:
 
-```
+```javascript
 task.request({}, { on: 'collection' })
 // => Promise <GET /tasks>
 ```

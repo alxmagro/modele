@@ -98,7 +98,8 @@ export default class Model {
   //
 
   /**
-   * @Interface that represents axios default config
+   * Every time you make a request, this method is call to set the defaults request configuration.
+   * See axios Request Config, to know the accepted keys.
    *
    * @return {Object}
    */
@@ -108,11 +109,13 @@ export default class Model {
 
   /**
    * Function that is called at constructor, use this to avoid overriding the constructor
+   *
+   * @ignore
    */
   static boot () {}
 
   /**
-   * Interface that represents resource options
+   * This method is called on init, to set model options. Class and their instances can access them via getOption.
    *
    * @return {Object}
    */
@@ -121,7 +124,8 @@ export default class Model {
   }
 
   /**
-   * Interface that represents routes. This will be used in request.
+   * Every time you make a class request, **collection** route is prepend to url.
+   * In the same way, every instance request prepend **member** route to url.
    *
    * @return {Object}
    */
@@ -134,7 +138,8 @@ export default class Model {
   //
 
   /**
-   * Pending state getter
+   * State that represents whether the class is waiting for the response of a request, or is idle.
+   * Use this to, for example, reveal a spinner, or disable a button.
    *
    * @return {boolean}
    */
@@ -147,7 +152,7 @@ export default class Model {
   //
 
   /**
-   * Send a HTTP Request to create a resource
+   * Send a `POST` request to collection route URL.
    *
    * @param  {Object} data
    * @return {Promise}
@@ -162,7 +167,7 @@ export default class Model {
   }
 
   /**
-   * Send a HTTP Request to fetch resources
+   * Send a `GET` request to collection route URL.
    *
    * @param  {Object} query
    * @return {Promise}
@@ -177,33 +182,33 @@ export default class Model {
   }
 
   /**
-   * Get a global
+   * Get a global value defined by `Modele.globals`.
    *
    * @param  {string} path
    * @param  {string} [fallback]
-   * @return {*} Global option
+   * @return {*} the global value
    */
   static getGlobal (path, fallback) {
     return _get(this._globals, path, fallback)
   }
 
   /**
-   * Get a option
+   * Get a model option defined by `static options`.
    *
    * @param  {string} path
    * @param  {string} [fallback]
-   * @return {*} Option
+   * @return {*} the option value
    */
   static getOption (path, fallback) {
     return _get(this._options, path, fallback)
   }
 
   /**
-   * Get a route
+   * Get a model option defined by `static routes`.
    *
    * @param  {string} path
    * @param  {string} [fallback]
-   * @return {string} an Route defined by static method routes()
+   * @return {string} the route value
    */
   static getRoute (path, fallback) {
     return _get(this._routes, path, fallback)
@@ -211,9 +216,15 @@ export default class Model {
 
   /**
    * Function that be called after Class is defined.
-   * It sets defaults Class attributes.
+   * It sets to Class, the options, routes, ruleset,
+   * and checks if the class is trying to overwrite some reserved property.
    *
-   * @return {function} this
+   * @return {function} the class itself.
+   *
+   * @example
+   * class Foo extends Model { ... }
+   *
+   * Foo.init()
    */
   static init () {
     this._options = Object.assign({}, DEFAULT_OPTIONS, this.options())
@@ -238,29 +249,33 @@ export default class Model {
   }
 
   /**
-   * @see request
+   * Send a request using axios, the first argument refer to
+   * axios [request config](https://github.com/axios/axios#request-config),
+   * and use `options.on` to choose the route that will prefix the `url`.
+   *
+   * @return {Promise} a Promise
    */
   static request (config, options = { on: 'collection' }) {
     return request(this, config, options)
   }
 
   /**
-   * Set an option
+   * Set a model option
    *
    * @param  {string} path
    * @param  {string} [fallback]
-   * @return {*} Option
+   * @return {*} the option
    */
   static setOption (path, value) {
     return _set(this._options, path, value)
   }
 
   /**
-   * Create an Model instance with given identifier
+   * Helper constructor that create an instance with given identifier.
    *
    * @param  {*} key
    * @param  {Object} [options]
-   * @return {Object} Model instance
+   * @return {Object} an instance.
    */
   static stub (key, options) {
     const identifier = this.getOption('identifier')
@@ -272,15 +287,17 @@ export default class Model {
    * URL interpolated parameters (Option.urlParams)
    *
    * @return {Object}
+   * @ignore
    */
   static toParam () {
     return this.getOption('urlParams')
   }
 
   /**
-   * Install plugin
+   * Call the `plugin.install` function, passing this class, and **options** argument.
+   * Use this to programatically define methods to Model.
    *
-   * @param  {Object} plugin Object that respond to .install()
+   * @param  {Object} plugin
    * @param  {Object} [options]
    * @return {Object} this
    */
@@ -296,6 +313,8 @@ export default class Model {
 
   /**
    * Function that is called at constructor, use this to avoid overriding the constructor
+   *
+   * @ignore
    */
   boot () {}
 
@@ -378,6 +397,7 @@ export default class Model {
    * Resource axios default configs
    *
    * @return {Object}
+   * @ignore
    */
   axios () {
     return this.constructor.axios()
@@ -398,7 +418,7 @@ export default class Model {
   }
 
   /**
-   * Reset attributes, errors, changes and states
+   * Set `defaults()` to active and saved attributes, and reset errors, changes and states.
    */
   clear () {
     const defaults = this.defaults()
@@ -487,7 +507,7 @@ export default class Model {
   }
 
   /**
-   * Get a global
+   * Get a global value defined by `Modele.globals`.
    *
    * @param  {string} path
    * @param  {string} [fallback]
@@ -498,7 +518,8 @@ export default class Model {
   }
 
   /**
-   * Get a instance option, if this is not set, get a Class option, otherwise, fallback.
+   * Get a instance option defined by constructor,
+   * if not set, then fallback to `static getOption(path, fallback)`.
    *
    * @param  {string} path
    * @param  {string} [fallback]
@@ -522,7 +543,7 @@ export default class Model {
   }
 
   /**
-   * Determines if the model has an attribute
+   * Checks if the instance has an attribute
    *
    * @param  {string} attribute
    * @return {Boolean}
@@ -541,7 +562,7 @@ export default class Model {
   }
 
   /**
-   * Mutates either specific attributes or all attributes if none supplied
+   * Mutates either specific attributes or all attributes if none supplied.
    *
    * @param  {string} [attribute]
    */
@@ -564,10 +585,11 @@ export default class Model {
   }
 
   /**
-   * Define the value of an attribute after applying its mutations
+   * Return the value of mutated attribute, or all attributes if none is supplied,
+   * without changed the active attributes. If `value` is supplied, calc mutation in this value instead.
    *
    * @param  {string} attribute
-   * @param  {*} [value] Value can be supplied instead of self attribute value
+   * @param  {*} [value]
    * @return {*}
    */
   mutated (attribute, value) {
@@ -594,14 +616,15 @@ export default class Model {
   }
 
   /**
-   * @see request
+   * Send a request using axios, the first argument refer to axios [request config](https://github.com/axios/axios#request-config),
+   * and use `options.on` to choose the route that will prefix the `url`.
    */
   request (config, options = { on: 'member' }) {
     return request(this, config, options)
   }
 
   /**
-   * Resets attributes to values the last time the object was sync
+   * Undo changes, that is, sets the value of saved attributes in active attributes.
    */
   reset () {
     this._attributes = _cloneDeep(this._reference)
@@ -619,10 +642,15 @@ export default class Model {
   }
 
   /**
-   * @summary Sets the value of an attribute. If it is not defined, register and create setter and getter.
+   * Sets the value of an attribute. If it is not defined, register and create setter and getter.
+   * Accept mass assign, performing it recursively.
    *
    * @param {string} attribute
    * @param {*} value
+   *
+   * @example
+   * model.set('name', 'Luke')
+   * model.set({ name: 'Luke', surname: 'Sywalker' })
    */
   set (attribute, value) {
     if (_isPlainObject(attribute)) {
@@ -675,10 +703,10 @@ export default class Model {
   }
 
   /**
-   * Set an option
+   * Set an instance option.
    *
    * @param  {string} path
-   * @param  {string} [fallback]
+   * @param  {string} value
    * @return {*} Option
    */
   setOption (path, value) {
@@ -686,7 +714,7 @@ export default class Model {
   }
 
   /**
-   * Save value of attributes in reference
+   * Mutate attributes it `mutateBeforeSync` is true, then save value of attributes in reference.
    */
   sync () {
     if (this.getOption('mutateBeforeSync')) {
@@ -698,7 +726,7 @@ export default class Model {
   }
 
   /**
-   * A native representation of this model
+   * Returns a native representation of this model
    *
    * @return {Object}
    */
@@ -710,6 +738,7 @@ export default class Model {
    * URL interpolated parameters (Attributes + Option.urlParams + $id)
    *
    * @return {Object}
+   * @ignore
    */
   toParam () {
     const params = this.getOption('urlParams')
@@ -746,7 +775,7 @@ export default class Model {
   }
 
   /**
-   * Checks whether there are no errors in a given attribute, or none of them
+   * Checks whether there are no errors in a given attribute, or none of them.
    *
    * @param  {string} [attribute]
    * @return {Boolean}
@@ -760,7 +789,7 @@ export default class Model {
   }
 
   /**
-   * Validate all atributes or given attribute
+   * Perform validations rules, then call `valid` and return.
    *
    * @param {Object} options
    * @param {string} [options.attribute]
