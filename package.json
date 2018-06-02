@@ -22,7 +22,7 @@
   "scripts": {
     "lint": "eslint src test",
     "test": "mocha",
-    "build": "webpack"
+    "build": "webpack --mode production"
   },
   "dependencies": {
     "axios": "^0.18.0",
@@ -42,8 +42,9 @@
     "express": "^4.15.4",
     "mocha": "^3.5.3",
     "sinon": "^4.1.1",
-    "uglifyjs-webpack-plugin": "^0.4.6",
+    "uglifyjs-webpack-plugin": "^1.2.5",
     "uuid": "^3.1.0",
-    "webpack": "^3.6.0"
+    "webpack": "^4.10.2",
+    "webpack-cli": "^3.0.1"
   }
 }
