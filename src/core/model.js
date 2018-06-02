@@ -6,6 +6,7 @@ import _get from 'lodash/get'
 import _isEqual from 'lodash/isEqual'
 import _isPlainObject from 'lodash/isPlainObject'
 import _mapValues from 'lodash/mapValues'
+import _omitBy from 'lodash/omitBy'
 import _set from 'lodash/set'
 import { request, includesAny } from './utils'
 import Modele from '../'
@@ -14,6 +15,7 @@ import ruleset from './ruleset'
 
 const DEFAULT_OPTIONS = {
   identifier: 'id',
+  ignoreNullAttributesOnAssign: false,
   mutateBeforeSave: true,
   mutateBeforeSync: true,
   mutateOnChange: false,
@@ -389,7 +391,11 @@ export default class Model {
    * @param {Object} attributes
    */
   assign (attributes) {
-    this.set(_defaultsDeep({}, attributes, _cloneDeep(this.defaults())))
+    const values = this.getOption('ignoreNullAttributesOnAssign')
+      ? _omitBy(attributes, (value) => value == null)
+      : attributes
+
+    this.set(_defaultsDeep({}, values, _cloneDeep(this.defaults())))
     this.sync()
   }
 

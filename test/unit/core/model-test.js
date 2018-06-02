@@ -32,6 +32,22 @@ describe('Model', function () {
     it('assign attributes', function () {
       expect(user.name).to.equal('Luke')
     })
+
+    context('when option ignoreNullAttributesOnAssign is false', function () {
+      it('assign attributes with null values', function () {
+        user = new User({ createdAt: null }, { ignoreNullAttributesOnAssign: false })
+
+        expect(user).to.have.property('createdAt', null)
+      })
+    })
+
+    context('when option ignoreNullAttributesOnAssign is true', function () {
+      it('assign attributes and ignore null values', function () {
+        user = new User({ createdAt: null }, { ignoreNullAttributesOnAssign: true })
+
+        expect(user).to.not.have.property('createdAt')
+      })
+    })
   })
 
   //
