@@ -1,29 +1,28 @@
 import Rule from '../core/rule'
-import is from 'is_js'
 
 export default class Date extends Rule {
   definitions (options) {
-    const before = options.before && this.solved(options.before)
-    const after = options.after && this.solved(options.after)
+    const end = options.before && this.solved(options.before)
+    const start = options.after && this.solved(options.after)
 
-    if (after && before) {
+    if (start && end) {
       return {
         name: 'date_between',
-        test: (value) => is.inDateRange(value, after, before)
+        test: (value) => value < end && value > start
       }
     }
 
-    if (before) {
+    if (end) {
       return {
         name: 'date_before',
-        test: (value) => value < before
+        test: (value) => value < end
       }
     }
 
-    if (after) {
+    if (start) {
       return {
         name: 'date_after',
-        test: (value) => value > after
+        test: (value) => value > start
       }
     }
 
