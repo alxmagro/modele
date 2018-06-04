@@ -41,20 +41,3 @@ export function request (caller, config, options = {}) {
       throw error
     })
 }
-
-/**
- * Checks if any element in one, is included in two. If so, call callback with
- * first found element as parameter and return it.
- *
- * @param  {Array}    one
- * @param  {Array}    two
- * @param  {Function} callback [description]
- * @return {*} the callback returns
- */
-export function includesAny (one, two, callback) {
-  one.forEach(elem => {
-    if (two.includes(elem)) {
-      return callback(elem)
-    }
-  })
-}

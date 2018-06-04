@@ -2,7 +2,7 @@ import { expect } from 'chai'
 import sinon from 'sinon'
 import FakeServer from '../../fake-server'
 import Modele from '../../../src'
-import User from '../../models/user'
+import User from '../../stubs/user'
 
 describe('Model', function () {
   var server, user
@@ -20,9 +20,7 @@ describe('Model', function () {
 
   describe('#constructor', function () {
     it('register rules', function () {
-      const rules = [].concat(Object.values(user._validator.rules))
-
-      expect(rules.length).to.equal(3)
+      expect(user._ruleset).to.have.all.keys('name', 'surname', 'password')
     })
 
     it('assign defaults', function () {

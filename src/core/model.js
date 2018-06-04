@@ -8,10 +8,9 @@ import _isPlainObject from 'lodash/isPlainObject'
 import _mapValues from 'lodash/mapValues'
 import _omitBy from 'lodash/omitBy'
 import _set from 'lodash/set'
-import { request, includesAny } from './utils'
+import { request } from './utils'
 import Modele from '../'
-import Validator from './validator'
-import ruleset from './ruleset'
+import RuleDict from './rule-dict'
 
 const DEFAULT_OPTIONS = {
   identifier: 'id',
@@ -85,11 +84,11 @@ export default class Model {
     this._attributes = {}
     this._changes = {}
     this._errors = {}
-    this._mutations = _mapValues(this.mutations(), (m) => _flow(m))
+    this._mutations = this._compileMutations()
     this._options = options
     this._pending = false
     this._reference = {}
-    this._validator = new Validator(this.constructor._ruleset, this.validation())
+    this._ruleset = this._compileRuleset()
 
     this.assign(attributes)
     this.boot()
@@ -229,22 +228,16 @@ export default class Model {
    * Foo.init()
    */
   static init () {
-    this._options = Object.assign({}, DEFAULT_OPTIONS, this.options())
-    this._pending = false
-    this._routes = Object.assign({}, DEFAULT_ROUTES, this.routes())
-    this._ruleset = Object.assign({}, ruleset, this.getOption('rulesetAddition'))
     this._globals = Modele.globals
+    this._options = this._compileOptions()
+    this._pending = false
+    this._routes = this._compileRoutes()
+    this._ruleDict = new RuleDict(this.getOption('rulesetAddition'))
 
     this.boot()
 
-    includesAny(Object.getOwnPropertyNames(this), RESERVED.class, (prop) => {
-      throw new Error(`Model Error: Static property "${prop}" is reserved.`)
-    })
-
-    includesAny(Object.getOwnPropertyNames(this.prototype), RESERVED.instance, (prop) => {
-      throw new Error(`Model Error: Property "${prop}" is reserved.`)
-    })
-
+    this._checkForDangerousStaticOverriding()
+    this._checkForDangerousOverriding()
     this._init = true
 
     return this
@@ -307,6 +300,36 @@ export default class Model {
     plugin.install(this, options)
 
     return this
+  }
+
+  /* static privates  */
+
+  static _checkForDangerousStaticOverriding () {
+    const props = Object.getOwnPropertyNames(this)
+
+    props.forEach(prop => {
+      if (RESERVED.class.includes(prop)) {
+        throw new Error(`Model Error: Static property "${prop}" is reserved.`)
+      }
+    })
+  }
+
+  static _checkForDangerousOverriding () {
+    const props = Object.getOwnPropertyNames(this.prototype)
+
+    props.forEach(prop => {
+      if (RESERVED.instance.includes(prop)) {
+        throw new Error(`Model Error: Static property "${prop}" is reserved.`)
+      }
+    })
+  }
+
+  static _compileOptions () {
+    return Object.assign({}, DEFAULT_OPTIONS, this.options())
+  }
+
+  static _compileRoutes () {
+    return Object.assign({}, DEFAULT_ROUTES, this.routes())
   }
 
   //
@@ -795,28 +818,58 @@ export default class Model {
   }
 
   /**
-   * Perform validations rules, then call `valid` and return.
+   * Performs validation rules in a given attribute or on all of them.
    *
    * @param {Object} options
    * @param {string} [options.attribute]
-   * @param {string} [options.scope] Which scope validate (they are defined in validations "on" option)
+   * @param {string} [options.on] Which rule scope validate
    * @return {Boolean} validity of the validation
    */
   validate (options = {}) {
+    // IF no attribute is given, performs validation recursively
+    if (!options.attribute) {
+      for (const attribute in this._ruleset) {
+        this.validate({ attribute, on: options.on })
+      }
+
+      return this.valid()
+    }
+
     const attribute = options.attribute
     const scope = options.on
     const record = this.mutated()
+    const rules = this._ruleset[attribute] || []
 
-    if (attribute) {
-      const errors = this._validator.validateProp(record, attribute, scope)
+    const errors = rules
+      .filter(rule => rule.elegible(scope))
+      .map(rule => rule.verify(record, attribute))
+      .filter(x => x)
 
-      this._errors[attribute] = errors
-    } else {
-      const errors = this._validator.validate(record, scope)
-
-      this._errors = errors
-    }
+    this._errors[attribute] = errors
 
     return this.valid(attribute)
+  }
+
+  /* privates */
+
+  _compileMutations () {
+    return _mapValues(this.mutations(), (m) => _flow(m))
+  }
+
+  _compileRuleset () {
+    const ruleset = {}
+    const schema = this.validation()
+
+    for (const attribute in schema) {
+      ruleset[attribute] = []
+
+      for (const name in schema[attribute]) {
+        const rule = this.constructor._ruleDict.get(name, schema[attribute][name])
+
+        rule && ruleset[attribute].push(rule)
+      }
+    }
+
+    return ruleset
   }
 }
