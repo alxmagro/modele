@@ -10,8 +10,8 @@ Use it to create a business layer in client-side, with an RESTful API, validatio
 
 ## Documentation
 
-Guide: https://alexandremagro.github.io/modele.
-Changelog: https://github.com/alexandremagro/modele/releases.
+- Guide: https://alexandremagro.github.io/modele.
+- Changelog: https://github.com/alexandremagro/modele/releases.
 
 ## Bug Reports & Feature Requests
 

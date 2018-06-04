@@ -31,15 +31,16 @@ task2.getOption('points')   // 10
 
 ## Available options
 
-| Option                    | Type    | Default         | Description
-| ------------------------- | ------- | --------------- | -----------
-| identifier                | String  | `id`            | The attribute that should be used to uniquely identify this model, usually a primary key like "id".
-| mutateBeforeSave          | Boolean | `true`          | Whether this model should mutate all attributes before they are saved (`create` or `update` actions).
-| mutateBeforeSync          | Boolean | `true`          | Whether this model should mutate all attributes before they are synced.
-| mutateOnChange            | Boolean | `false`         | Whether this model should mutate a property as it is changed before it is set. This is a rare requirement because you usually don’t want to mutate something that you are busy editing.
-| rulesetAddition           | Object  | `null`          | Add custom rules to Validator
-| urlParamPattern           | Regex   | `/{([\S]+?)}/g` | Route parameter matching pattern.
-| urlParams                 | Object  | `{}`            | Additional parameters to URLs.
+| Option                       | Type    | Default         | Description
+| ---------------------------- | ------- | --------------- | -----------
+| identifier                   | String  | `id`            | The attribute that should be used to uniquely identify this model, usually a primary key like "id".
+| ignoreNullAttributesOnAssign | Boolean | `false`         | Ignore attributes with null values when you create or save (create, update) an model instance.
+| mutateBeforeSave             | Boolean | `true`          | Whether this model should mutate all attributes before they are saved (`create` or `update` actions).
+| mutateBeforeSync             | Boolean | `true`          | Whether this model should mutate all attributes before they are synced.
+| mutateOnChange               | Boolean | `false`         | Whether this model should mutate a property as it is changed before it is set. This is a rare requirement because you usually don’t want to mutate something that you are busy editing.
+| rulesetAddition              | Object  | `null`          | Add custom rules to Validator
+| urlParamPattern              | Regex   | `/{([\S]+?)}/g` | Route parameter matching pattern.
+| urlParams                    | Object  | `{}`            | Additional parameters to URLs.
 
 ## Identifier option
 
