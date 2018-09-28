@@ -1,6 +1,6 @@
 ## Introduction
 
-[![CircleCI](https://img.shields.io/circleci/project/alexandremagro/modele.svg)](https://circleci.com/gh/alexandremagro/modele)
+[![CircleCI](https://img.shields.io/circleci/project/github/alexandremagro/modele.svg)](https://circleci.com/gh/alexandremagro/modele)
 [![npm](https://img.shields.io/npm/dt/modele.svg)](https://www.npmjs.com/package/modele)
 [![npm](https://img.shields.io/npm/v/modele.svg)](https://www.npmjs.com/package/modele)
 [![GitHub license](https://img.shields.io/github/license/alexandremagro/modele.svg)](https://github.com/alexandremagro/modele/blob/master/LICENSE)
