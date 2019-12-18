@@ -4,7 +4,9 @@
   "private": false,
   "author": "Alexandre Magro <alexandremagro@live.com>",
   "version": "1.1.1",
-  "main": "dist/modele.js",
+  "main": "build/modele.cjs.js",
+  "module": "build/modele.esm.js",
+  "browser": "build/modele.min.js",
   "homepage": "https://github.com/alexandremagro/modele#readme",
   "repository": {
     "type": "git",
@@ -21,7 +23,7 @@
     "api"
   ],
   "scripts": {
-    "build": "webpack --mode production"
+    "build": "rollup -c"
   },
   "dependencies": {
     "axios": "^0.18.0",
@@ -29,12 +31,13 @@
     "lodash": "^4.17.10"
   },
   "devDependencies": {
-    "babel-core": "^6.26.3",
-    "babel-loader": "^7.1.2",
-    "babel-plugin-add-module-exports": "^0.2.1",
-    "babel-preset-env": "^1.7.0",
-    "uglifyjs-webpack-plugin": "^1.2.5",
-    "webpack": "^4.10.2",
-    "webpack-cli": "^3.0.1"
+    "@babel/core": "^7.7.5",
+    "@babel/preset-env": "^7.7.6",
+    "@rollup/plugin-node-resolve": "^6.0.0",
+    "rollup": "^1.27.13",
+    "rollup-plugin-babel": "^4.3.3",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-terser": "^5.1.3",
+    "rollup-plugin-uglify": "^6.0.4"
   }
 }
