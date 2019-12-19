@@ -118,7 +118,7 @@ export function format (options) {
 /**
  * Returns true if value is future.
  */
-export function future () {
+export function future (options) {
   return {
     name: 'future',
     test: (value) => value > new Date(),
@@ -185,7 +185,7 @@ export function length (options) {
 /**
  * Returns true if value is past.
  */
-export function past () {
+export function past (options) {
   return {
     name: 'past',
     test: (value) => value < new Date(),
@@ -196,7 +196,7 @@ export function past () {
 /**
  * Returns true if value is not null, has length greater than zero or has keys.
  */
-export function presence () {
+export function presence (options) {
   return {
     name: 'presence',
     test: (value) => !isEmpty(value),

@@ -1,3 +1,4 @@
+import qs from 'qs'
 import Errors from './errors'
 import ValidationError from './validation-error'
 
@@ -254,7 +255,7 @@ export default class Model {
    * @param {string} [scope]
    * @return {Boolean} Retuns true if has no errors, otherwise false.
    */
-  $validateProperty(prop, scope = null) {
+  $validateProperty (prop, scope = null) {
     const rules = this.constructor.validation()
     const record = this.toJSON()
 
@@ -264,10 +265,10 @@ export default class Model {
         .filter(({ test, options }) => {
           return (
             // Rule conditional
-            !options.if || options.if() &&
+            (!options.if || options.if()) &&
 
             // Rule scope
-            !options.on || options.on === scope &&
+            (!options.on || options.on === scope) &&
 
             // Rule test
             test(record[prop], record, prop)
@@ -276,17 +277,17 @@ export default class Model {
         .map(({ name, options }) => {
           return { name, record, prop, options, origin: 'client' }
         })
-     )
+    )
 
-      return this.$errors.any(prop)
-   }
+    return this.$errors.any(prop)
+  }
 
   /**
    * Sets the "pending" status to `true` until promise is completed.
    *
    * @param {Promise} promise
    */
-  $wait(promise) {
+  $wait (promise) {
     this.$pending = true
 
     return promise

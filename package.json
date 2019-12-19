@@ -7,7 +7,9 @@
   "main": "dist/modele.cjs.js",
   "module": "dist/modele.esm.js",
   "browser": "dist/modele.min.js",
-  "files": ["dist/**/*.js"],
+  "files": [
+    "dist/**/*.js"
+  ],
   "homepage": "https://github.com/alexandremagro/modele#readme",
   "repository": {
     "type": "git",
@@ -24,6 +26,7 @@
     "api"
   ],
   "scripts": {
+    "lint": "standard",
     "build": "rollup -c"
   },
   "dependencies": {
@@ -37,6 +40,7 @@
     "rollup-plugin-babel": "^4.3.3",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-terser": "^5.1.3",
-    "rollup-plugin-uglify": "^6.0.4"
+    "rollup-plugin-uglify": "^6.0.4",
+    "standard": "^14.3.1"
   }
 }
