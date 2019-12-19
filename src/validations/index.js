@@ -4,7 +4,7 @@ const isEmpty = function (value) {
     (value == null) ||
 
     // has length and it's zero
-    (value.length && value.length === 0) ||
+    (value.length === 0) ||
 
     // is an Object and has no keys
     (typeof value === 'object' && Object.keys(value).length === 0)
@@ -36,7 +36,7 @@ export function acceptance (options) {
 /**
  * Returns true if value is equal to record[options.with].
  */
-export function confirmation (options) {
+export function confirmation (options = {}) {
   if (options.with) {
     return {
       name: 'confirmation',
@@ -54,9 +54,9 @@ export function confirmation (options) {
  *   - before: The date is lower than `before`.
  *   - after: The date is greater than `after`.
  */
-export function date (options) {
-  const start = options.after()
-  const end = options.before()
+export function date (options = {}) {
+  const start = options.after && options.after()
+  const end = options.before && options.before()
 
   if (start && end) {
     return {
@@ -88,7 +88,7 @@ export function date (options) {
 /**
  * Returns true if value is not included into `in`.
  */
-export function exclusion (options) {
+export function exclusion (options = {}) {
   if (options.in) {
     return {
       name: 'exclusion',
@@ -103,7 +103,7 @@ export function exclusion (options) {
 /**
  * Returns true if value matches with regexp.
  */
-export function format (options) {
+export function format (options = {}) {
   if (options.with) {
     return {
       name: 'format',
@@ -129,7 +129,7 @@ export function future (options) {
 /**
  * Returns true if value is included into `in`.
  */
-export function inclusion (options) {
+export function inclusion (options = {}) {
   if (options.in) {
     return {
       name: 'inclusion',
@@ -137,6 +137,8 @@ export function inclusion (options) {
       options
     }
   }
+
+  throw new Error('Enter "in" option')
 }
 
 /**
@@ -146,7 +148,7 @@ export function inclusion (options) {
  *   - min: The length of value is greater than `min`.
  *   - max: The length of value is lower than `max`.
  */
-export function length (options) {
+export function length (options = {}) {
   if (options.is) {
     return {
       name: 'length',
@@ -179,7 +181,7 @@ export function length (options) {
     }
   }
 
-  return new TypeError('Supply options "is", "min" and/or "max"')
+  throw new Error('Supply options "is", "min" and/or "max"')
 }
 
 /**

@@ -9,11 +9,7 @@ const base = {
   plugins: [
     resolve(),
     commonjs(),
-    babel({
-      babelrc: false,
-      exclude: ['node_modules/**'],
-      presets: ['@babel/env']
-    })
+    babel()
   ]
 }
 
