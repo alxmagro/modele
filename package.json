@@ -4,9 +4,10 @@
   "private": false,
   "author": "Alexandre Magro <alexandremagro@live.com>",
   "version": "1.1.1",
-  "main": "build/modele.cjs.js",
-  "module": "build/modele.esm.js",
-  "browser": "build/modele.min.js",
+  "main": "dist/modele.cjs.js",
+  "module": "dist/modele.esm.js",
+  "browser": "dist/modele.min.js",
+  "files": ["dist/**/*.js"],
   "homepage": "https://github.com/alexandremagro/modele#readme",
   "repository": {
     "type": "git",
@@ -26,9 +27,7 @@
     "build": "rollup -c"
   },
   "dependencies": {
-    "axios": "^0.18.0",
-    "is_js": "^0.9.0",
-    "lodash": "^4.17.10"
+    "qs": "^6.9.1"
   },
   "devDependencies": {
     "@babel/core": "^7.7.5",
