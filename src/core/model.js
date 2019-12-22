@@ -1,4 +1,3 @@
-import qs from 'qs'
 import Errors from './errors'
 import ValidationError from './validation-error'
 
@@ -12,15 +11,17 @@ export default class Model {
    * @param {Object} attributes
    */
   constructor (attributes) {
-    const validationKeys = Object.keys(this.constructor.validation())
-    const config = this.constructor.options()
-
     Object.assign(this, attributes)
 
     // non-enumerable properties
-    Object.defineProperty(this, '$config', { value: config })
-    Object.defineProperty(this, '$errors', { value: new Errors(validationKeys) })
-    Object.defineProperty(this, '$pending', { value: false })
+    Object.defineProperty(this, '$errors', {
+      value: new Errors(Object.keys(this.constructor.validation()))
+    })
+
+    Object.defineProperty(this, '$pending', {
+      value: false,
+      writable: true
+    })
   }
 
   // REGION Interfaces
@@ -32,11 +33,9 @@ export default class Model {
    */
   static options () {
     return {
-      baseURL: '/',
-      identifier: 'id',
-      isSingular: false,
-      httpMethods: {
-        fetch: 'get',
+      baseURL: '[/:id]',
+      verbs: {
+        get: 'get',
         create: 'post',
         update: 'put',
         delete: 'delete'
@@ -72,66 +71,49 @@ export default class Model {
   // REGION Static Methods
 
   /**
-   * Returns a URL for resources or single resource if id is given, replacing
-   * URL variables.
+   * Returns the url with replaced variables and appended parameters.
    *
-   * @param {*} [id]
-   * @param {Object} [variables] - Values of baseURL variables.
+   * @param {Object} [parameters]
+   * @param {Object} [variables]
    * @return {String}
    */
-  static url (id = null, variables = {}) {
-    const { baseURL, isSingular } = this.options()
-    const url = baseURL.replace(/:(\w+)/g, (_, group) => variables[group])
+  static url (parameters, variables = {}) {
+    const { baseURL } = this.options()
+    const query = this.toQuery(parameters)
 
-    return (!id || isSingular) ? url : [url, id].join('/')
+    return baseURL
+      .replace(/\[\/:(\w+)\]/g, (_, group) => {
+        return variables[group] ? ('/' + variables[group]) : ''
+      })
+      .replace(/:(\w+)/g, (match, group) => {
+        return variables[group] || match
+      })
+      .concat(query && query.length ? ('?' + query) : '')
   }
 
   /**
    * Retuns a string representing URL Parameters of given params.
    *
-   * @param {Object} [params]
+   * @param {Object} parameters
    * @return {String}
    */
-  static toQuery (params = {}) {
-    return qs.stringify(params, { encode: 'false' })
+  static toQuery (parameters) {
+    return parameters && new URLSearchParams(parameters).toString()
   }
 
   /**
    * Call `request` to fetch resources.
    *
-   * @param {Object} [params] - URL Parameters.
-   * @param {Object} [variables] - URL variables.
+   * @param {Object} [parameters]
+   * @param {Object} [variables]
    * @return {Promise}
    */
-  static get (params = {}, variables = {}) {
-    const { httpMethods } = this.options()
-
-    const url = this.url(null, variables)
-    const query = this.toQuery(params)
+  static get (parameters, variables) {
+    const { verbs } = this.options()
 
     return this.request({
-      method: httpMethods.fetch,
-      url: [url, query].filter(Boolean).join('?')
-    })
-  }
-
-  /**
-   * Call `request` to fetch single resources.
-   *
-   * @param {*} id
-   * @param {Object} [params] - URL Parameters.
-   * @param {Object} [variables] - URL variables.
-   * @return {Promise}
-   */
-  static find (id, params, variables = {}) {
-    const { httpMethods } = this.options()
-
-    const url = this.url(id, variables)
-    const query = this.toQuery(params)
-
-    return this.request({
-      method: httpMethods.fetch,
-      url: [url, query].filter(Boolean).join('?')
+      method: verbs.get,
+      url: this.url(parameters, variables)
     })
   }
 
@@ -142,12 +124,12 @@ export default class Model {
    * @param {Object} [variables] - URL variables.
    * @return {Promise}
    */
-  static create (data, variables = {}) {
-    const { httpMethods } = this.options()
+  static create (data, variables) {
+    const { verbs } = this.options()
 
     return this.request({
-      method: httpMethods.create,
-      url: this.url(null, variables),
+      method: verbs.create,
+      url: this.url({}, variables),
       data: data
     })
   }
@@ -155,17 +137,16 @@ export default class Model {
   /**
    * Call `request` to post a resource.
    *
-   * @param {*} id
    * @param {Object} data
    * @param {Object} [variables] - URL variables.
    * @return {Promise}
    */
-  static update (id, data, variables = {}) {
-    const { httpMethods } = this.options()
+  static update (data, variables) {
+    const { verbs } = this.options()
 
     return this.request({
-      method: httpMethods.update,
-      url: this.url(id, variables),
+      method: verbs.update,
+      url: this.url({}, variables),
       data: data
     })
   }
@@ -173,68 +154,19 @@ export default class Model {
   /**
    * Call `request` to delete a resource.
    *
-   * @param {*} id
    * @param {Object} [variables] - URL variables.
    * @return {Promise}
    */
-  static delete (id, variables) {
-    const { httpMethods } = this.options()
+  static delete (variables) {
+    const { verbs } = this.options()
 
     return this.request({
-      method: httpMethods.delete,
-      url: this.url(id, variables)
+      method: verbs.delete,
+      url: this.url({}, variables)
     })
   }
 
   // REGION Instance Methods
-
-  /**
-   * Helper method that returns identifier value.
-   *
-   * @return {*} - Value of identifier.
-   */
-  $id () {
-    const { identifier } = this.constructor.options()
-
-    return this[identifier]
-  }
-
-  /**
-   * Call `request` to create or update this resource, call validation and set
-   * pending status properly.
-   *
-   * @param {boolean} validate - Call validation or not.
-   * @param {Object} [variables] - URL variables.
-   * @return {Promise}
-   */
-  $save (validate = true, variables = {}) {
-    const id = this.$id()
-
-    if (validate && this.$validate(id ? 'update' : 'create')) {
-      return Promise.reject(new ValidationError(this))
-    }
-
-    return this.$wait(
-      id
-        ? this.constructor.update(id, this, variables)
-        : this.constructor.create(this, variables)
-    )
-      .then(response => {
-        return Object.assign(this, response.data)
-      })
-  }
-
-  /**
-   * Call `request` to delete this resource.
-   *
-   * @param {Object} [variables] - URL variables.
-   * @return {Promise}
-   */
-  $delete (variables = {}) {
-    return this.$wait(
-      this.constructor.delete(this.$id(), variables)
-    )
-  }
 
   /**
    * Validate each property based on tests specified at `Model.validation`.
@@ -242,9 +174,9 @@ export default class Model {
    * @param {string} [scope]
    * @return {Boolean} Retuns true if has no errors, otherwise false.
    */
-  $validate (scope = null) {
+  $validate (scope) {
     return Object.keys(this.$errors.items)
-      .map(prop => this.$validateAttribute(prop, scope))
+      .map(prop => this.$validateProperty(prop, scope))
       .every(validation => validation)
   }
 
@@ -255,23 +187,23 @@ export default class Model {
    * @param {string} [scope]
    * @return {Boolean} Retuns true if has no errors, otherwise false.
    */
-  $validateProperty (prop, scope = null) {
-    const rules = this.constructor.validation()
+  $validateProperty (prop, scope) {
+    const rules = this.constructor.validation()[prop] || []
     const record = this.toJSON()
 
     this.$errors.set(
       prop,
       rules
-        .filter(({ test, options }) => {
+        .filter(({ test, options = {} }) => {
           return (
             // Rule conditional
-            (!options.if || options.if()) &&
+            (!options.if || options.if(this)) &&
 
             // Rule scope
             (!options.on || options.on === scope) &&
 
             // Rule test
-            test(record[prop], record, prop)
+            !test(record[prop], record, prop)
           )
         })
         .map(({ name, options }) => {
@@ -279,7 +211,7 @@ export default class Model {
         })
     )
 
-    return this.$errors.any(prop)
+    return this.$errors.empty(prop)
   }
 
   /**

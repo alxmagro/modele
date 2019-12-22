@@ -32,17 +32,20 @@
   },
   "jest": {
     "collectCoverage": true,
-    "moduleDirectories": ["node_modules", "src"],
-    "testEnvironment": "node"
-  },
-  "dependencies": {
-    "qs": "^6.9.1"
+    "moduleDirectories": [
+      "node_modules",
+      "src",
+      "test"
+    ]
   },
   "devDependencies": {
     "@babel/core": "^7.7.5",
     "@babel/preset-env": "^7.7.6",
     "@rollup/plugin-node-resolve": "^6.0.0",
+    "axios": "^0.19.0",
+    "axios-mock-adapter": "^1.17.0",
     "jest": "^24.9.0",
+    "regenerator-runtime": "^0.13.3",
     "rollup": "^1.27.13",
     "rollup-plugin-babel": "^4.3.3",
     "rollup-plugin-commonjs": "^10.1.0",
