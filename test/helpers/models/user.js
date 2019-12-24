@@ -30,7 +30,7 @@ export default class User extends Model {
         presence({ on: 'create' })
       ],
       passwordConfirmation: [
-        confirmation({ with: 'password', if: (user) => user.password})
+        confirmation({ with: 'password', if: (user) => user.password })
       ]
     }
   }

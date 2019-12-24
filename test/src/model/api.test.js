@@ -10,7 +10,7 @@ import User from 'helpers/models/user'
 import Post from 'helpers/models/post'
 
 describe('Model API', () => {
-  let mock = new MockAdapter(axios)
+  const mock = new MockAdapter(axios)
 
   beforeEach(() => {
     mock.reset()
@@ -44,8 +44,8 @@ describe('Model API', () => {
     test('returns query string to given parameters', () => {
       const params = User.toQuery({
         'filter[status]': 'ACTIVE',
-        'include': ['user', 'category'],
-        'append': 'likes'
+        include: ['user', 'category'],
+        append: 'likes'
       })
 
       expect(decodeURIComponent(params)).toBe(

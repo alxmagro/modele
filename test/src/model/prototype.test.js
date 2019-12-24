@@ -84,15 +84,15 @@ describe('Model Prototype', () => {
 
         return false
       }))
-      .catch(() => {
-        expect(user.$pending).toBe(false)
-      })
+        .catch(() => {
+          expect(user.$pending).toBe(false)
+        })
     })
   })
 
   describe('.toJSON', () => {
     test('apply mutations and return a plain object', () => {
-      user = new User({ name: '   Darth   '})
+      user = new User({ name: '   Darth   ' })
 
       expect(user.toJSON()).toEqual({ name: 'Darth' })
     })

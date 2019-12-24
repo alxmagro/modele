@@ -1,5 +1,4 @@
 import Errors from './errors'
-import ValidationError from './validation-error'
 
 /**
  * Class representing a form object with Resourceful API.

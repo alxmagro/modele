@@ -5,11 +5,10 @@ import Model from 'core/model'
 
 // helpers
 import User from 'helpers/models/user'
-import Post from 'helpers/models/post'
 
 describe('Model Constructor', () => {
   describe('#constructor', () => {
-    let model = new User({ name: 'Joe', surname: 'Doe' })
+    const model = new User({ name: 'Joe', surname: 'Doe' })
 
     test('assign attributes to instance', () => {
       expect(model.name).toBe('Joe')
