@@ -9,8 +9,8 @@ const base = {
     commonjs(),
     babel({
       babelrc: false,
-      presets: [["@babel/env", { "modules": false }]],
-      exclude: ["node_modules/**/*"]
+      presets: [['@babel/env', { modules: false }]],
+      exclude: ['node_modules/**/*']
     })
   ]
 }

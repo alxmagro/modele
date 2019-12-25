@@ -27,7 +27,8 @@
   "scripts": {
     "lint": "standard",
     "test": "jest",
-    "build": "rollup -c"
+    "build": "rollup -c",
+    "prepublishOnly": "yarn test && yarn build"
   },
   "jest": {
     "collectCoverage": true,
