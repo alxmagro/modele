@@ -15,23 +15,10 @@ describe('Model Constructor', () => {
       expect(model.surname).toBe('Doe')
     })
 
-    test('sets non-enumerable properties', () => {
-      const hasProperty = (object, prop) => Object
-        .prototype
-        .hasOwnProperty
-        .call(object, prop)
-
-      const isEnumerable = (object, prop) => Object
-        .prototype
-        .propertyIsEnumerable
-        .call(object, prop)
-
-      expect(hasProperty(model, '$errors')).toBe(true)
-      expect(hasProperty(model, '$pending')).toBe(true)
-      expect(hasProperty(model, '$validations')).toBe(true)
-      expect(isEnumerable(model, '$errors')).toBe(false)
-      expect(isEnumerable(model, '$pending')).toBe(false)
-      expect(isEnumerable(model, '$validations')).toBe(false)
+    test('sets private properties', () => {
+      expect(model).toHaveProperty('$errors')
+      expect(model).toHaveProperty('$pending')
+      expect(model).toHaveProperty('$validations')
     })
   })
 

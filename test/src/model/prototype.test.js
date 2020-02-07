@@ -99,5 +99,12 @@ describe('Model Prototype', () => {
 
       expect(user.toJSON()).toEqual({ name: 'Darth' })
     })
+
+    test('ignore private ($) properties', () => {
+      user = new User({ name: 'Darth', $evil: true })
+
+      expect(user.toJSON()).toHaveProperty('name')
+      expect(user.toJSON()).not.toHaveProperty('$evil')
+    })
   })
 })

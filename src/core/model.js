@@ -10,21 +10,14 @@ export default class Model {
    * @param {Object} attributes
    */
   constructor (attributes) {
+    const validations = this.constructor.validation()
+
     Object.assign(this, attributes)
 
-    // non-enumerable properties
-    Object.defineProperty(this, '$errors', {
-      value: new Errors(Object.keys(this.constructor.validation()))
-    })
-
-    Object.defineProperty(this, '$pending', {
-      value: false,
-      writable: true
-    })
-
-    Object.defineProperty(this, '$validations', {
-      value: this.constructor.validation()
-    })
+    // private properties that should be ignored at toJSON
+    this.$errors = new Errors(Object.keys(validations))
+    this.$pending = false
+    this.$validations = validations
   }
 
   // REGION Interfaces
@@ -246,11 +239,14 @@ export default class Model {
     const mutations = this.constructor.mutations()
     const record = {}
 
-    for (const prop in this) {
-      const value = this[prop]
+    Object
+      .keys(this)
+      .filter(prop => !prop.startsWith('$'))
+      .forEach((prop) => {
+        const value = this[prop]
 
-      record[prop] = mutations[prop] ? mutations[prop](value) : value
-    }
+        record[prop] = mutations[prop] ? mutations[prop](value) : value
+      })
 
     return record
   }
