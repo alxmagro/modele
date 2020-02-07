@@ -1,17 +1,11 @@
 /* eslint-env jest */
 import { inclusion } from 'validations'
 
-describe('inclusion()', () => {
-  test('throws Error', () => {
-    expect(() => inclusion()).toThrowError(Error)
-  })
-})
-
-describe('inclusion({ in })', () => {
+describe('inclusion(list)', () => {
   let rule
 
   beforeEach(() => {
-    rule = inclusion({ in: [1, 2, 3] })
+    rule = inclusion([1, 2, 3])
   })
 
   describe('.name', () => {

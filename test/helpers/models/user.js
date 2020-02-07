@@ -27,10 +27,10 @@ export default class User extends Model {
         presence()
       ],
       password: [
-        presence({ on: 'create' })
+        // added on demand
       ],
       passwordConfirmation: [
-        confirmation({ with: 'password', if: (user) => user.password })
+        { ...confirmation('password'), if: (self) => self.password }
       ]
     }
   }

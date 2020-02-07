@@ -1,17 +1,11 @@
 /* eslint-env jest */
 import { format } from 'validations'
 
-describe('format()', () => {
-  test('throws Error', () => {
-    expect(() => format()).toThrowError(Error)
-  })
-})
-
-describe('format({ with })', () => {
+describe('format(regexp)', () => {
   let rule
 
   beforeEach(() => {
-    rule = format({ with: /\d+/ })
+    rule = format(/\d+/)
   })
 
   describe('.name', () => {

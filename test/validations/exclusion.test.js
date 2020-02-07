@@ -1,17 +1,11 @@
 /* eslint-env jest */
 import { exclusion } from 'validations'
 
-describe('exclusion()', () => {
-  test('throws Error', () => {
-    expect(() => exclusion()).toThrowError(Error)
-  })
-})
-
-describe('exclusion({ in })', () => {
+describe('exclusion(list)', () => {
   let rule
 
   beforeEach(() => {
-    rule = exclusion({ in: [1, 2, 3] })
+    rule = exclusion([1, 2, 3])
   })
 
   describe('.name', () => {

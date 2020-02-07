@@ -14,194 +14,165 @@ const isEmpty = function (value) {
 /**
  * Returns true if value is null, has length zero or has no keys.
  */
-export function absence (options) {
+export function absence () {
   return {
     name: 'absence',
-    test: (value) => isEmpty(value),
-    options
+    test: (value) => isEmpty(value)
   }
 }
 
 /**
  * Returns true if value is truthy.
  */
-export function acceptance (options) {
+export function acceptance () {
   return {
     name: 'acceptance',
-    test: (value) => !!value,
-    options
+    test: (value) => !!value
   }
 }
 
 /**
- * Returns true if value is equal to record[options.with].
+ * Returns true if value is equal to another.
  */
-export function confirmation (options = {}) {
-  if (options.with) {
-    return {
-      name: 'confirmation',
-      test: (value, record) => value === record[options.with],
-      options
-    }
+export function confirmation (other) {
+  return {
+    name: 'confirmation',
+    test: (value, json) => value === json[other],
+    data: { other }
   }
-
-  throw new Error('Enter "with" option')
 }
 
 /**
- * Returns true if:
- *   - after, before: The date is between `after` and `before`.
- *   - before: The date is lower than `before`.
- *   - after: The date is greater than `after`.
+ * Returns true if value is an date after another.
  */
-export function date (options = {}) {
-  const start = options.after && options.after()
-  const end = options.before && options.before()
+export function dateAfter (start) {
+  start = start()
 
-  if (start && end) {
-    return {
-      name: 'date_between',
-      test: (value) => value < end && value > start,
-      options
-    }
+  return {
+    name: 'dateAfter',
+    test: (value) => value > start,
+    data: { start }
   }
-
-  if (end) {
-    return {
-      name: 'date_before',
-      test: (value) => value < end,
-      options
-    }
-  }
-
-  if (start) {
-    return {
-      name: 'date_after',
-      test: (value) => value > start,
-      options
-    }
-  }
-
-  throw new Error('Enter "before" and/or "after" option')
 }
 
 /**
- * Returns true if value is not included into `in`.
+ * Returns true if value is an date before another.
  */
-export function exclusion (options = {}) {
-  if (options.in) {
-    return {
-      name: 'exclusion',
-      test: (value) => !options.in.includes(value),
-      options
-    }
-  }
+export function dateBefore (end) {
+  end = end()
 
-  throw new Error('Enter "in" option')
+  return {
+    name: 'dateBefore',
+    test: (value) => value < end,
+    data: { end }
+  }
+}
+
+/**
+ * Returns true if value is an date between to dates.
+ */
+export function dateBetween (start, end) {
+  start = start()
+  end = end()
+
+  return {
+    name: 'dateBetween',
+    test: (value) => value > start && value < end,
+    data: { start, end }
+  }
+}
+
+/**
+ * Returns true if value is not included to list.
+ */
+export function exclusion (list) {
+  return {
+    name: 'exclusion',
+    test: (value) => !list.includes(value),
+    data: { list }
+  }
 }
 
 /**
  * Returns true if value matches with regexp.
  */
-export function format (options = {}) {
-  if (options.with) {
-    return {
-      name: 'format',
-      test: (value) => options.with.test(value),
-      options
-    }
+export function format (regexp) {
+  return {
+    name: 'format',
+    test: (value) => regexp.test(value),
+    data: { regexp }
   }
-
-  throw new Error('Enter "with" option')
 }
 
 /**
  * Returns true if value is future.
  */
-export function future (options) {
+export function future () {
   return {
     name: 'future',
-    test: (value) => value > new Date(),
-    options
+    test: (value) => value > new Date()
   }
 }
 
 /**
- * Returns true if value is included into `in`.
+ * Returns true if value is included to list.
  */
-export function inclusion (options = {}) {
-  if (options.in) {
-    return {
-      name: 'inclusion',
-      test: (value) => options.in.includes(value),
-      options
-    }
+export function inclusion (list) {
+  return {
+    name: 'inclusion',
+    test: (value) => list.includes(value),
+    data: { list }
   }
-
-  throw new Error('Enter "in" option')
 }
 
-/**
- * Returns true if:
- *   - is: The length of value is equal to `is`.
- *   - min, max: The length of value is between `min` and `max`.
- *   - min: The length of value is greater than `min`.
- *   - max: The length of value is lower than `max`.
- */
-export function length (options = {}) {
-  if (options.is) {
-    return {
-      name: 'length',
-      test: (value) => value.length === options.is,
-      options
-    }
+export function lengthBetween (min, max) {
+  return {
+    name: 'lengthBetween',
+    test: (value) => value.length >= min && value.length <= max,
+    data: { min, max }
   }
+}
 
-  if (options.min) {
-    if (options.max) {
-      return {
-        name: 'length_between',
-        test: (value) => value.length <= options.max && value.length >= options.min,
-        options
-      }
-    } else {
-      return {
-        name: 'length_min',
-        test: (value) => value.length >= options.min,
-        options
-      }
-    }
+export function lengthIs (size) {
+  return {
+    name: 'lengthIs',
+    test: (value) => value.length === size,
+    data: { size }
   }
+}
 
-  if (options.max) {
-    return {
-      name: 'length_max',
-      test: (value) => value.length <= options.max,
-      options
-    }
+export function lengthMax (max) {
+  return {
+    name: 'lengthMax',
+    test: (value) => value.length <= max,
+    data: { max }
   }
+}
 
-  throw new Error('Supply options "is", "min" and/or "max"')
+export function lengthMin (min) {
+  return {
+    name: 'lengthMin',
+    test: (value) => value.length >= min,
+    data: { min }
+  }
 }
 
 /**
  * Returns true if value is past.
  */
-export function past (options) {
+export function past () {
   return {
     name: 'past',
-    test: (value) => value < new Date(),
-    options
+    test: (value) => value < new Date()
   }
 }
 
 /**
  * Returns true if value is not null, has length greater than zero or has keys.
  */
-export function presence (options) {
+export function presence () {
   return {
     name: 'presence',
-    test: (value) => !isEmpty(value),
-    options
+    test: (value) => !isEmpty(value)
   }
 }

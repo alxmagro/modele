@@ -21,6 +21,10 @@ export default class Model {
       value: false,
       writable: true
     })
+
+    Object.defineProperty(this, '$validations', {
+      value: this.constructor.validation()
+    })
   }
 
   // REGION Interfaces
@@ -170,12 +174,11 @@ export default class Model {
   /**
    * Validate each property based on tests specified at `Model.validation`.
    *
-   * @param {string} [scope]
    * @return {Boolean} Retuns true if has no errors, otherwise false.
    */
-  $validate (scope) {
+  $validate () {
     return Object.keys(this.$errors.items)
-      .map(prop => this.$validateProperty(prop, scope))
+      .map(prop => this.$validateProp(prop))
       .every(validation => validation)
   }
 
@@ -183,31 +186,31 @@ export default class Model {
    * Validate a property based on tests specified at `Model.validation`.
    *
    * @param {string} attribute
-   * @param {string} [scope]
    * @return {Boolean} Retuns true if has no errors, otherwise false.
    */
-  $validateProperty (prop, scope) {
-    const rules = this.constructor.validation()[prop] || []
-    const record = this.toJSON()
+  $validateProp (prop) {
+    const rules = this.$validations[prop] || []
+    const json = this.toJSON()
 
     this.$errors.set(
       prop,
       rules
-        .filter(({ test, options = {} }) => {
+        .filter(rule => {
           return (
             // Rule conditional
-            (!options.if || options.if(this)) &&
-
-            // Rule scope
-            (!options.on || options.on === scope) &&
+            (!rule.if || rule.if(this)) &&
 
             // Rule test
-            !test(record[prop], record, prop)
+            !rule.test(json[prop], json, prop)
           )
         })
-        .map(({ name, options }) => {
-          return { name, record, prop, options, origin: 'client' }
-        })
+        .map(({ name, data }) => ({
+          name,
+          data,
+          json,
+          prop,
+          origin: 'client'
+        }))
     )
 
     return this.$errors.empty(prop)

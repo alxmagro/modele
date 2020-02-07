@@ -2,6 +2,7 @@
 import 'regenerator-runtime/runtime'
 
 // helpers
+import { presence } from 'validations'
 import User from 'helpers/models/user'
 import delayPromise from 'helpers/delay-promise'
 
@@ -21,36 +22,38 @@ describe('Model Prototype', () => {
       expect(user.$validate()).toBe(false)
     })
 
-    test('returns false when has error on scope', () => {
+    test('returns false when has error on dynamic validation', () => {
       user = new User({ name: 'Luke' })
+      user.$validations.password.push(presence())
 
-      expect(user.$validate('create')).toBe(false)
+      expect(user.$validate()).toBe(false)
     })
   })
 
-  describe('.$validateProperty', () => {
+  describe('.$validateProp', () => {
     test('returns true when no errors on property', () => {
       user = new User()
 
-      expect(user.$validateProperty('surname')).toBe(true)
+      expect(user.$validateProp('surname')).toBe(true)
     })
 
     test('returns true when wrong rule has falsy condition', () => {
       user = new User({ passwordConfirmation: 'Test' })
 
-      expect(user.$validateProperty('passwordConfirmation')).toBe(true)
+      expect(user.$validateProp('passwordConfirmation')).toBe(true)
     })
 
     test('returns false when property has errors', () => {
       user = new User({ surname: 'Skywalker' })
 
-      expect(user.$validateProperty('name')).toBe(false)
+      expect(user.$validateProp('name')).toBe(false)
     })
 
-    test('returns false when has error on scope', () => {
+    test('returns false when has error on dynamic validation', () => {
       user = new User({ name: 'Luke' })
+      user.$validations.password.push(presence())
 
-      expect(user.$validateProperty('password', 'create')).toBe(false)
+      expect(user.$validateProp('password')).toBe(false)
     })
   })
 

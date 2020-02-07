@@ -27,9 +27,11 @@ describe('Model Constructor', () => {
         .call(object, prop)
 
       expect(hasProperty(model, '$errors')).toBe(true)
-      expect(isEnumerable(model, '$errors')).toBe(false)
       expect(hasProperty(model, '$pending')).toBe(true)
+      expect(hasProperty(model, '$validations')).toBe(true)
+      expect(isEnumerable(model, '$errors')).toBe(false)
       expect(isEnumerable(model, '$pending')).toBe(false)
+      expect(isEnumerable(model, '$validations')).toBe(false)
     })
   })
 
