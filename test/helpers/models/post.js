@@ -2,10 +2,8 @@ import Model from 'core/model'
 import axios from 'axios'
 
 export default class Post extends Model {
-  static options () {
+  static setup () {
     return {
-      ...super.options(),
-
       baseURL: '/users/:userId/posts[/:id]'
     }
   }

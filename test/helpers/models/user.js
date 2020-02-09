@@ -3,10 +3,8 @@ import { presence, confirmation } from 'validations'
 import axios from 'axios'
 
 export default class User extends Model {
-  static options () {
+  static setup () {
     return {
-      ...super.options(),
-
       baseURL: '/users[/:id]'
     }
   }
