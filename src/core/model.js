@@ -23,25 +23,16 @@ export default class Model {
   // REGION Interfaces
 
   /**
-   * Retuns a set of model options.
+   * Retuns a set of custom options.
    *
-   * @ignore
    */
-  static options () {
-    return {
-      baseURL: '[/:id]',
-      verbs: {
-        get: 'get',
-        create: 'post',
-        update: 'put',
-        delete: 'delete'
-      }
-    }
+  static setup () {
+    return {}
   }
 
   /**
-   * Returns a set of property mutations, where keys are property names,
-   * and value is a function that changes this property value.
+   * Returns an object mapping property names to their mutator functions.
+   *
    */
   static mutations () {
     return {}
@@ -50,21 +41,40 @@ export default class Model {
   /**
    * Should be overridden to implement server request and should return an
    * Promise. Use `fetch` or `axios`, for example.
+   *
    */
   static request (config) {
     throw new Error('You must declare static request(config) method.')
   }
 
   /**
-   * Retuns a set of property validations, where keys are property names,
-   * and value is an array of objects with name:string, test:function,
-   * [on]:string, [:if]:function, [nullable]:boolean.
+   * Returns an object mapping property names to their validations (Array).
+   *
    */
   static validation () {
     return {}
   }
 
   // REGION Static Methods
+
+  /**
+   * Retuns a set of model default options, merged with custom options
+   * defined at `static setup()`.
+   *
+   */
+  static options () {
+    const defaults = {
+      baseURL: '[/:id]',
+      verbs: {
+        get: 'get',
+        create: 'post',
+        update: 'put',
+        delete: 'delete'
+      }
+    }
+
+    return { ...defaults, ...this.setup() }
+  }
 
   /**
    * Returns the url with replaced variables and appended parameters.
