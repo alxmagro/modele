@@ -17,7 +17,7 @@ export default class Model {
     // private properties that should be ignored at toJSON
     this.$errors = new Errors(Object.keys(validations))
     this.$pending = false
-    this.$validations = validations
+    this.$rules = validations
   }
 
   // REGION Interfaces
@@ -192,7 +192,7 @@ export default class Model {
    * @return {Boolean} Retuns true if has no errors, otherwise false.
    */
   $validateProp (prop) {
-    const rules = this.$validations[prop] || []
+    const rules = this.$rules[prop] || []
     const json = this.toJSON()
 
     this.$errors.set(
@@ -201,7 +201,7 @@ export default class Model {
         .filter(rule => {
           return (
             // Rule conditional
-            (!rule.if || rule.if(this)) &&
+            (!rule.condition || rule.condition(this)) &&
 
             // Rule test
             !rule.test(json[prop], json, prop)

@@ -18,7 +18,7 @@ describe('Model Constructor', () => {
     test('sets private properties', () => {
       expect(model).toHaveProperty('$errors')
       expect(model).toHaveProperty('$pending')
-      expect(model).toHaveProperty('$validations')
+      expect(model).toHaveProperty('$rules')
     })
   })
 

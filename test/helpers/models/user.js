@@ -28,7 +28,7 @@ export default class User extends Model {
         // added on demand
       ],
       passwordConfirmation: [
-        { ...confirmation('password'), if: (self) => self.password }
+        confirmation('password').if(self => self.password)
       ]
     }
   }
