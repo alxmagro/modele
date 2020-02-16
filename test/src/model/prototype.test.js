@@ -24,7 +24,7 @@ describe('Model Prototype', () => {
 
     test('returns false when has error on dynamic validation', () => {
       user = new User({ name: 'Luke' })
-      user.$validations.password.push(presence())
+      user.$rules.password.push(presence())
 
       expect(user.$validate()).toBe(false)
     })
@@ -51,7 +51,7 @@ describe('Model Prototype', () => {
 
     test('returns false when has error on dynamic validation', () => {
       user = new User({ name: 'Luke' })
-      user.$validations.password.push(presence())
+      user.$rules.password.push(presence())
 
       expect(user.$validateProp('password')).toBe(false)
     })

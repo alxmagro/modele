@@ -16,7 +16,7 @@ const base = {
 }
 
 const main = Object.assign({}, base, {
-  input: 'src/core/model',
+  input: 'src',
   output: [
     { file: pkg.main, format: 'cjs' },
     { file: pkg.module, format: 'esm' }
