@@ -9,6 +9,20 @@ import delayPromise from 'helpers/delay-promise'
 describe('Model Prototype', () => {
   let user
 
+  describe('.$mutated', () => {
+    test('returns mutated property if has mutation', () => {
+      user = new User({ name: '   Luke   ' })
+
+      expect(user.$mutated('name')).toBe('Luke')
+    })
+
+    test('returns property if has no mutation', () => {
+      user = new User({ name: 'Luke', surname: '   Skywalker   ' })
+
+      expect(user.$mutated('surname')).toBe('   Skywalker   ')
+    })
+  })
+
   describe('.$validate', () => {
     test('returns true when no errors', () => {
       user = new User({ name: 'Luke' })

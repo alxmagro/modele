@@ -175,6 +175,19 @@ export default class Model {
   // REGION Instance Methods
 
   /**
+   * Returns the value of the property, with mutations applied, if present.
+   *
+   * @param {String} prop - Property
+   * @return {*}
+   */
+  $mutated (prop) {
+    const mutations = this.constructor.mutations()
+    const value = this[prop]
+
+    return mutations[prop] ? mutations[prop](value) : value
+  }
+
+  /**
    * Validate each property based on tests specified at `Model.validation`.
    *
    * @return {Boolean} Retuns true if has no errors, otherwise false.
