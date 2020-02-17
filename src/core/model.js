@@ -66,10 +66,10 @@ export default class Model {
     const defaults = {
       baseURL: '[/:id]',
       verbs: {
-        get: 'get',
-        create: 'post',
-        update: 'put',
-        delete: 'delete'
+        get: 'GET',
+        create: 'POST',
+        update: 'PUT',
+        delete: 'DELETE'
       }
     }
 
