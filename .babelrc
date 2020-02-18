@@ -1,13 +1,4 @@
 {
-  "presets": [
-    ["env", {
-      "targets": {
-        "node": "6.10",
-        "uglify": true
-      }
-    }]
-  ],
-  "plugins": [
-    "add-module-exports"
-  ]
+  "presets": ["@babel/env"],
+  "exclude": ["node_modules/**/*"]
 }

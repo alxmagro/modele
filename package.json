@@ -3,8 +3,12 @@
   "description": "Models and Resources for Front-end.",
   "private": false,
   "author": "Alexandre Magro <alexandremagro@live.com>",
-  "version": "1.1.1",
+  "version": "2.0.0",
   "main": "dist/modele.js",
+  "module": "dist/modele.esm.js",
+  "files": [
+    "dist/**/*.js"
+  ],
   "homepage": "https://github.com/alexandremagro/modele#readme",
   "repository": {
     "type": "git",
@@ -21,31 +25,30 @@
     "api"
   ],
   "scripts": {
-    "lint": "eslint src test",
-    "test": "mocha",
-    "build": "webpack --mode production"
+    "lint": "standard",
+    "test": "jest",
+    "build": "rollup -c",
+    "prepublishOnly": "yarn test && yarn build"
   },
-  "dependencies": {
-    "axios": "^0.18.0",
-    "is_js": "^0.9.0",
-    "lodash": "^4.17.10"
+  "jest": {
+    "collectCoverage": true,
+    "moduleDirectories": [
+      "node_modules",
+      "src",
+      "test"
+    ]
   },
   "devDependencies": {
-    "babel-core": "^6.26.3",
-    "babel-loader": "^7.1.2",
-    "babel-plugin-add-module-exports": "^0.2.1",
-    "babel-preset-env": "^1.7.0",
-    "body-parser": "^1.18.3",
-    "chai": "^4.1.2",
-    "eslint": "^4.19.1",
-    "eslint-plugin-html": "^4.0.3",
-    "eslint-plugin-vue-libs": "^3.0.0",
-    "express": "^4.15.4",
-    "mocha": "^5.2.0",
-    "sinon": "^5.0.10",
-    "uglifyjs-webpack-plugin": "^1.2.5",
-    "uuid": "^3.1.0",
-    "webpack": "^4.10.2",
-    "webpack-cli": "^3.0.1"
+    "@babel/core": "^7.7.5",
+    "@babel/preset-env": "^7.7.6",
+    "@rollup/plugin-node-resolve": "^6.0.0",
+    "axios": "^0.19.0",
+    "axios-mock-adapter": "^1.17.0",
+    "jest": "^24.9.0",
+    "regenerator-runtime": "^0.13.3",
+    "rollup": "^1.27.13",
+    "rollup-plugin-babel": "^4.3.3",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "standard": "^14.3.1"
   }
 }
