@@ -1,10 +1,12 @@
-## Introduction
+# Modele
 
 [![Build Status](https://travis-ci.org/alexandremagro/modele.svg?branch=master)](https://travis-ci.org/alexandremagro/modele)
 [![codecov](https://codecov.io/gh/alexandremagro/modele/branch/master/graph/badge.svg)](https://codecov.io/gh/alexandremagro/modele)
 [![npm](https://img.shields.io/npm/dt/modele.svg)](https://www.npmjs.com/package/modele)
 [![npm](https://img.shields.io/npm/v/modele.svg)](https://www.npmjs.com/package/modele)
 [![GitHub license](https://img.shields.io/github/license/alexandremagro/modele.svg)](https://github.com/alexandremagro/modele/blob/master/LICENSE)
+
+## Introduction
 
 Modele helps you to build requests for REST API. Organize the requests into classes that represents your Back-end models.
 
@@ -14,12 +16,12 @@ This library takes care of this things, helping the developer to keep the commun
 - **Mutation** of the data, before it is sent to the server.
 - **Validation** of data on the client side, including some built-in rules
 
-# Documentation
+## Documentation
 
 - Guide: https://github.com/alexandremagro/modele/wiki.
 - Changelog: https://github.com/alexandremagro/modele/releases.
 
-# Installation
+## Installation
 
 Using NPM:
 
@@ -33,7 +35,7 @@ Using yarn:
 yarn add modele
 ```
 
-# Basic Usage
+## Basic Usage
 
 Full example with configured **Rest API**, **validation** and **mutations**:
 
