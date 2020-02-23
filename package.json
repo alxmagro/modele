@@ -19,10 +19,13 @@
   },
   "license": "MIT",
   "keywords": [
-    "resources",
     "model",
-    "validations",
-    "api"
+    "api",
+    "rest",
+    "query",
+    "builder",
+    "validation",
+    "vue"
   ],
   "scripts": {
     "lint": "standard",
