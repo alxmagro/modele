@@ -3,7 +3,7 @@
   "description": "Models and Resources for Front-end.",
   "private": false,
   "author": "Alexandre Magro <alexandremagro@live.com>",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "main": "dist/modele.js",
   "module": "dist/modele.esm.js",
   "files": [
